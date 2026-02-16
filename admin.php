@@ -76,11 +76,16 @@ $result = $conn->query("
 <body>
     <div class="container">
         <div class="header">
-            <h1>Admin Panel</h1>
-            <div class="nav">
-                <a href="dashboard.php" class="btn back-btn">Back to Dashboard</a>
-                <a href="index.php" class="btn">Create New User</a>
-            </div>
+       
+    <h1>Admin Panel</h1>
+    <div class="nav">
+        <a href="dashboard.php" class="btn back-btn">← Back to Dashboard</a>
+        <a href="index.php" class="btn">➕ Create New User</a>
+        <a href="training_sessions.php" class="btn" style="background: #9c27b0;">
+            📅 Training Sessions
+        </a>
+    </div>
+            
             
             <div class="filter-buttons">
                 <button class="filter-btn <?php echo $filter === 'all' ? 'active' : ''; ?>" onclick="window.location='?filter=all'">All Users</button>

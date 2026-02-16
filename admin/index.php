@@ -64,6 +64,9 @@ if (isset($_POST['update_status'])) {
             <div class="nav">
                 <a href="../dashboard.php" class="btn">Dashboard</a>
                 <a href="../logout.php" class="btn logout-btn">Logout</a>
+                <a href="../training_sessions.php" class="btn" style="background: #9c27b0;">
+                 Training Sessions
+            </a>
             </div>
         </div>
         
