@@ -77,4 +77,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </p>
     </div>
 </body>
+<?php
+// Check if we should use the new multi-step or old signup
+if (isset($_GET['legacy'])) {
+    // Show old signup
+    include 'index.php';
+} else {
+    // Redirect to new multi-step
+    header('Location: signup/step1.php');
+    exit();
+}
+?>
 </html>
