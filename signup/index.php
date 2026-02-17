@@ -1,5 +1,5 @@
 <?php
-// Redirect to step1
-header('Location: step1.php');
+// This redirects to your beautiful landing page
+header('Location: public/index.php');
 exit();
 ?>

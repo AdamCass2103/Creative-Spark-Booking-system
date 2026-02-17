@@ -1,4 +1,6 @@
 <?php
+require_once '../includes/auth.php';
+requireAdmin();
 $conn = new mysqli('localhost', 'root', '', 'booking_system');
 
 // Handle status updates
