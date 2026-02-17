@@ -140,7 +140,7 @@ $result = $conn->query("
                     <td>
                     <a href="user_profile.php?id=<?php echo $row['user_id']; ?>" 
                     style="background: #9c27b0; color: white; padding: 5px 10px; border-radius: 4px; text-decoration: none; font-size: 13px;">
-                        👁️ View
+                        View
                      </a>
                     </td>
                     <?php endwhile; ?>
