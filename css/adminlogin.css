@@ -1,0 +1,177 @@
+/* ========================================
+   ADMIN LOGIN PAGE - CREATIVE SPARK GREEN
+   ======================================== */
+
+   * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #2E7D32 0%, #1B5E20 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.container {
+    max-width: 400px;
+    width: 90%;
+    margin: 20px;
+    background: white;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+/* Typography */
+h1 {
+    color: #2E7D32;
+    margin-bottom: 10px;
+    text-align: center;
+    font-size: 2em;
+}
+
+.sub {
+    color: #666;
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 0.9em;
+}
+
+/* Form Elements */
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
+}
+
+input[type="password"] {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #eee;
+    border-radius: 6px;
+    font-size: 16px;
+    transition: all 0.3s;
+}
+
+input[type="password"]:focus {
+    border-color: #2E7D32;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.1);
+}
+
+/* Button */
+.btn {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #2E7D32 0%, #1B5E20 100%);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(46, 125, 50, 0.4);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+/* Error Message */
+.error {
+    background: #fee;
+    color: #c00;
+    padding: 12px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    text-align: center;
+    border-left: 4px solid #c00;
+    font-size: 14px;
+}
+
+/* Back Link */
+.back-link {
+    text-align: center;
+    margin-top: 25px;
+}
+
+.back-link a {
+    color: #999;
+    text-decoration: none;
+    font-size: 0.9em;
+    transition: color 0.3s;
+}
+
+.back-link a:hover {
+    color: #2E7D32;
+    text-decoration: underline;
+}
+
+/* Creative Spark Logo/Icon */
+.fablab-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #2E7D32 0%, #1B5E20 100%);
+    border-radius: 40px;
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 2em;
+    box-shadow: 0 10px 30px rgba(46, 125, 50, 0.4);
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .container {
+        padding: 30px 20px;
+    }
+    
+    h1 {
+        font-size: 1.5em;
+    }
+    
+    .fablab-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 1.5em;
+    }
+}
+
+/* Success Message (if needed) */
+.success {
+    background: #d4edda;
+    color: #2E7D32;
+    padding: 12px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    text-align: center;
+    border-left: 4px solid #2E7D32;
+}
+
+/* Info Message */
+.info {
+    background: #e3f2fd;
+    color: #1976d2;
+    padding: 12px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    text-align: center;
+    border-left: 4px solid #1976d2;
+}

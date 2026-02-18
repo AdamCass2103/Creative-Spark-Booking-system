@@ -23,97 +23,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Choose Membership - Step 2 of 5</title>
-    <style>
-        body { font-family: Arial; background: #f5f5f5; padding: 20px; }
-        .container { max-width: 800px; margin: 50px auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
-        h1 { color: #1a73e8; margin-bottom: 10px; }
-        .step-indicator { display: flex; justify-content: space-between; margin-bottom: 30px; }
-        .step { flex: 1; text-align: center; padding: 10px; background: #f0f0f0; margin: 0 5px; border-radius: 5px; }
-        .step.active { background: #9c27b0; color: white; }
-        .step.completed { background: #4caf50; color: white; }
-        
-        .pricing-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin: 30px 0;
-        }
-        
-        .pricing-card {
-            border: 2px solid #eee;
-            border-radius: 10px;
-            padding: 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .pricing-card:hover {
-            border-color: #9c27b0;
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(156,39,176,0.2);
-        }
-        
-        .pricing-card.selected {
-            border-color: #9c27b0;
-            background: #f9f0ff;
-        }
-        
-        .pricing-card h3 {
-            color: #333;
-            margin-bottom: 10px;
-        }
-        
-        .price {
-            font-size: 24px;
-            font-weight: bold;
-            color: #1a73e8;
-            margin: 15px 0;
-        }
-        
-        .price small {
-            font-size: 14px;
-            color: #666;
-        }
-        
-        .features {
-            text-align: left;
-            margin: 20px 0;
-            padding-left: 20px;
-        }
-        
-        .features li {
-            margin: 5px 0;
-            color: #555;
-        }
-        
-        .payment-options {
-            background: #f9f9f9;
-            padding: 20px;
-            border-radius: 10px;
-            margin: 20px 0;
-        }
-        
-        .btn { 
-            width: 100%; 
-            padding: 12px; 
-            background: #1a73e8; 
-            color: white; 
-            border: none; 
-            border-radius: 5px; 
-            font-size: 16px; 
-            cursor: pointer;
-        }
-        
-        .btn:hover { background: #0d62d9; }
-        
-        .back-link {
-            display: inline-block;
-            margin-top: 20px;
-            color: #666;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Title</title>
+    <link rel="stylesheet" href="../css/signup.css">
 </head>
 <body>
     <div class="container">

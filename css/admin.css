@@ -1,0 +1,317 @@
+/* ========================================
+   ADMIN PANEL STYLES - CREATIVE SPARK GREEN THEME
+   ======================================== */
+
+   * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #2E7D32 0%, #1B5E20 100%);
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Header */
+.header {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.header h1 {
+    color: #2E7D32;  /* Creative Spark Green */
+    margin-bottom: 15px;
+    font-size: 2em;
+}
+
+/* Navigation */
+.nav {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+/* Buttons - Creative Spark Green Theme */
+.btn {
+    padding: 12px 25px;
+    background: #2E7D32;  /* Dark Green */
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: bold;
+    display: inline-block;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 2px 5px rgba(46, 125, 50, 0.3);
+}
+
+.btn:hover {
+    background: #1B5E20;  /* Darker Green */
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(46, 125, 50, 0.4);
+}
+
+.back-btn {
+    background: #757575;
+}
+
+.back-btn:hover {
+    background: #616161;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+/* Filter Buttons */
+.filter-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 25px;
+}
+
+.filter-btn {
+    padding: 10px 20px;
+    background: #e0e0e0;
+    color: #333;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.filter-btn:hover {
+    background: #d0d0d0;
+    transform: translateY(-2px);
+}
+
+.filter-btn.active {
+    background: #2E7D32;  /* Creative Spark Green */
+    color: white;
+    box-shadow: 0 2px 5px rgba(46, 125, 50, 0.3);
+}
+
+/* Table */
+.table-container {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    overflow-x: auto;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    background: #2E7D32;  /* Creative Spark Green */
+    color: white;
+    padding: 15px;
+    text-align: left;
+    font-weight: 600;
+}
+
+td {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+tr:hover {
+    background: #f1f8e9;  /* Light Green Tint */
+}
+
+/* Status Colors */
+.status-pending {
+    color: #ff9800;
+    font-weight: bold;
+}
+
+.status-approved {
+    color: #2E7D32;  /* Creative Spark Green */
+    font-weight: bold;
+}
+
+.status-rejected {
+    color: #f44336;
+    font-weight: bold;
+}
+
+.status-completed {
+    color: #2196f3;
+    font-weight: bold;
+}
+
+/* Form Elements in Table */
+select {
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+    transition: border-color 0.3s;
+}
+
+select:focus {
+    border-color: #2E7D32;  /* Creative Spark Green */
+    outline: none;
+}
+
+.update-btn {
+    padding: 8px 15px;
+    background: #2E7D32;  /* Creative Spark Green */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.update-btn:hover {
+    background: #1B5E20;  /* Darker Green */
+    transform: translateY(-2px);
+    box-shadow: 0 2px 5px rgba(46, 125, 50, 0.3);
+}
+
+/* View Button */
+.view-btn {
+    background: #2E7D32;  /* Creative Spark Green */
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 13px;
+    display: inline-block;
+    transition: all 0.3s;
+}
+
+.view-btn:hover {
+    background: #1B5E20;  /* Darker Green */
+    transform: translateY(-2px);
+    box-shadow: 0 2px 5px rgba(46, 125, 50, 0.3);
+}
+
+/* Stats Cards */
+.stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-top: 25px;
+}
+
+.stat-card {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    transition: all 0.3s;
+    border-bottom: 4px solid #2E7D32;  /* Creative Spark Green */
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+}
+
+.stat-card h3 {
+    color: #666;
+    margin-bottom: 15px;
+    font-size: 16px;
+}
+
+.stat-card p {
+    font-size: 2.5em;
+    font-weight: bold;
+    color: #2E7D32;  /* Creative Spark Green */
+    margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+    
+    .nav {
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+        text-align: center;
+    }
+    
+    table {
+        display: block;
+        overflow-x: auto;
+    }
+    
+    th, td {
+        white-space: nowrap;
+    }
+    
+    .stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .header h1 {
+        font-size: 1.5em;
+    }
+}
+
+/* Additional Creative Spark Elements */
+.creative-spark-badge {
+    background: #2E7D32;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    display: inline-block;
+}
+
+.green-gradient {
+    background: linear-gradient(135deg, #2E7D32 0%, #1B5E20 100%);
+}
+
+/* Success Message */
+.success-message {
+    background: #f1f8e9;
+    color: #2E7D32;
+    padding: 15px;
+    border-radius: 8px;
+    margin: 20px 0;
+    border-left: 4px solid #2E7D32;
+}
+
+/* Warning Message */
+.warning-message {
+    background: #fff3e0;
+    color: #ff9800;
+    padding: 15px;
+    border-radius: 8px;
+    margin: 20px 0;
+    border-left: 4px solid #ff9800;
+}
+
+/* Error Message */
+.error-message {
+    background: #ffebee;
+    color: #f44336;
+    padding: 15px;
+    border-radius: 8px;
+    margin: 20px 0;
+    border-left: 4px solid #f44336;
+}

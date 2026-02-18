@@ -1,6 +1,7 @@
 <?php
-require_once 'includes/config.php';
-require_once 'includes/db_connect.php';
+session_start();
+require_once '../includes/config.php';
+require_once '../includes/db_connect.php';
 
 // ============================================
 // HANDLE FORM SUBMISSIONS
@@ -100,33 +101,12 @@ $pending_training = $conn->query("
 ");
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Training Sessions - FabLab</title>
-    <link rel="stylesheet" href="css/training.css">
-    <style>
-        .tier-badge-fabber1 { background: #e3f2fd; color: #0d47a1; }
-        .tier-badge-fabber2 { background: #e8f5e9; color: #1b5e20; }
-        .tier-badge-fabber3 { background: #fff3e0; color: #e65100; }
-        .tier-badge-desk { background: #f3e5f5; color: #4a148c; }
-        
-        .attendance-status {
-            font-weight: bold;
-        }
-        .status-completed {
-            color: #4caf50 !important;
-        }
-        .demo-badge {
-            background: #9c27b0;
-            color: white;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 0.7em;
-            margin-left: 8px;
-        }
-    </style>
+    <title>Training Session Manager - Creative Spark FabLab</title>
+    <link rel="stylesheet" href="../css/training.css">
 </head>
 <body>
     <div class="container">
@@ -153,9 +133,9 @@ $pending_training = $conn->query("
             <h2>Upcoming Training Sessions</h2>
             
             <?php if($upcoming_sessions && $upcoming_sessions->num_rows == 0): ?>
-            <div class="card" style="text-align: center; padding: 40px;">
-                <p style="font-size: 1.2em; color: #666;">No upcoming sessions.</p>
-                <p style="margin-top: 10px;">Click the "Create Session" tab to add one!</p>
+            <div class="empty-state">
+                <p style="color: white;">No upcoming sessions scheduled.</p>
+                <p style="color: rgba(255,255,255,0.8);">Click the "Create Session" tab to add one!</p>
             </div>
             <?php elseif($upcoming_sessions): ?>
             <div class="session-grid">
@@ -163,35 +143,32 @@ $pending_training = $conn->query("
                     $tier_class = 'tier-badge-' . strtolower(str_replace(' ', '', $session['tier_name']));
                 ?>
                 <div class="session-card">
-                    <div style="display: flex; justify-content: space-between; align-items: start;">
-                        <h3><?php echo $session['tier_name']; ?> Training</h3>
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px;">
+                        <h3><?php echo $session['tier_name']; ?></h3>
                         <span class="machine-tag <?php echo $tier_class; ?>">
                             Tier <?php echo $session['tier_level']; ?>
                         </span>
                     </div>
                     
-                    <div style="display: flex; gap: 10px; margin-bottom: 15px; margin-top: 10px; flex-wrap: wrap;">
+                    <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
                         <span class="machine-tag">📅 <?php echo date('d/m/Y', strtotime($session['session_date'])); ?></span>
                         <span class="machine-tag">⏰ <?php echo date('H:i', strtotime($session['session_time'])); ?></span>
                     </div>
                     
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
-                        <span>👥 Registered: <strong><?php echo $session['registered_count']; ?>/<?php echo $session['max_attendees']; ?></strong></span>
-                        <span class="spots-left">🎯 <?php echo $session['max_attendees'] - $session['registered_count']; ?> spots left</span>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 10px; background: #f5f5f5; border-radius: 10px;">
+                        <span style="font-weight: 600;">👥 Registered: <?php echo $session['registered_count']; ?>/<?php echo $session['max_attendees']; ?></span>
+                        <span class="spots-left">🎯 <?php echo $session['max_attendees'] - $session['registered_count']; ?> spots</span>
                     </div>
                     
                     <?php if($session['notes']): ?>
-                    <p style="color: #666; font-size: 0.9em; margin-bottom: 15px; padding-top: 10px; border-top: 1px solid #eee;">
-                        📝 <?php echo $session['notes']; ?>
-                    </p>
+                    <div style="background: #f9f9f9; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                        <p style="color: #666; font-size: 0.95em;">📝 <?php echo $session['notes']; ?></p>
+                    </div>
                     <?php endif; ?>
                     
-                    <!-- Registered Users List with Status -->
-                    <div style="margin-top: 15px; border-top: 1px solid #eee; padding-top: 15px;">
-                        <p style="font-weight: bold; margin-bottom: 10px; display: flex; align-items: center;">
-                            📋 Registered Users:
-                            <span class="demo-badge">PROTOTYPE</span>
-                        </p>
+                    <!-- Registered Users List -->
+                    <div style="margin-top: 20px;">
+                        <p style="font-weight: 600; margin-bottom: 15px; color: #333;">📋 Registered Users</p>
                         <?php
                         $attendees = $conn->query("
                             SELECT u.name, sa.attendance_status 
@@ -202,9 +179,9 @@ $pending_training = $conn->query("
                         if($attendees && $attendees->num_rows > 0):
                             while($attendee = $attendees->fetch_assoc()):
                         ?>
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding: 8px; background: #f9f9f9; border-radius: 4px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding: 10px; background: #f5f5f5; border-radius: 8px;">
                             <span style="font-weight: 500;"><?php echo $attendee['name']; ?></span>
-                            <span class="attendance-status" style="color: #ff9800; font-weight: bold;">
+                            <span class="attendance-status" style="color: <?php echo $attendee['attendance_status'] == 'attended' ? '#2E7D32' : '#ff9800'; ?>; font-weight: 600;">
                                 <?php echo ucfirst($attendee['attendance_status'] ?? 'Pending'); ?>
                             </span>
                         </div>
@@ -212,24 +189,22 @@ $pending_training = $conn->query("
                             endwhile;
                         else:
                         ?>
-                        <p style="color: #999; font-style: italic; padding: 10px; text-align: center;">
+                        <p style="color: #999; font-style: italic; text-align: center; padding: 20px; background: #f5f5f5; border-radius: 8px;">
                             No users registered yet
                         </p>
                         <?php endif; ?>
                     </div>
                     
-                    <!-- Register Button -->
                     <button onclick="showRegisterModal(<?php echo $session['session_id']; ?>)" 
                             class="register-btn"
                             <?php echo $session['registered_count'] >= $session['max_attendees'] ? 'disabled' : ''; ?>>
                         <?php echo $session['registered_count'] >= $session['max_attendees'] ? 'Session Full' : '➕ Register Users'; ?>
                     </button>
                     
-                    <!-- BULK COMPLETE BUTTON - PROTOTYPE DEMO -->
                     <button onclick="markAllComplete(<?php echo $session['session_id']; ?>)" 
                             class="btn-small" 
-                            style="background: #9c27b0; color: white; border: none; padding: 12px; border-radius: 6px; margin-top: 10px; width: 100%; cursor: pointer; font-weight: bold; font-size: 14px;">
-                        🎓 DEMO: Complete All Users
+                            style="width: 100%;">
+                        🎓 Demo: Complete All Users
                     </button>
                 </div>
                 <?php endwhile; ?>
@@ -239,12 +214,12 @@ $pending_training = $conn->query("
         
         <!-- Tab 2: Create Session -->
         <div id="create" class="tab-content">
-            <div class="card" style="max-width: 600px; margin: 0 auto;">
-                <h2 style="margin-bottom: 20px; color: #9c27b0;">➕ Create New Training Session</h2>
+            <div class="card" style="max-width: 700px; margin: 0 auto;">
+                <h2 style="color: #2E7D32;">➕ Create New Training Session</h2>
                 
                 <form method="POST">
                     <div class="form-group">
-                        <label>Membership Tier:</label>
+                        <label>Membership Tier</label>
                         <select name="tier_id" required onchange="this.form.tier_name.value=this.options[this.selectedIndex].text">
                             <option value="">-- Select a tier --</option>
                             <?php 
@@ -259,29 +234,29 @@ $pending_training = $conn->query("
                         <input type="hidden" name="tier_name">
                     </div>
                     
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                         <div class="form-group">
-                            <label>Date:</label>
+                            <label>Date</label>
                             <input type="date" name="session_date" required min="<?php echo date('Y-m-d'); ?>">
                         </div>
                         
                         <div class="form-group">
-                            <label>Time:</label>
+                            <label>Time</label>
                             <input type="time" name="session_time" required>
                         </div>
                     </div>
                     
                     <div class="form-group">
-                        <label>Max Attendees:</label>
+                        <label>Max Attendees</label>
                         <input type="number" name="max_attendees" min="1" max="10" value="4">
                     </div>
                     
                     <div class="form-group">
-                        <label>Notes (optional):</label>
-                        <textarea name="notes" rows="3" placeholder="What to bring, prerequisites, meeting point, etc..."></textarea>
+                        <label>Notes (optional)</label>
+                        <textarea name="notes" rows="4" placeholder="What to bring, prerequisites, meeting point, etc..."></textarea>
                     </div>
                     
-                    <button type="submit" name="create_session" class="btn" style="background: #4caf50; width: 100%;">
+                    <button type="submit" name="create_session" class="btn" style="width: 100%; font-size: 16px; padding: 15px;">
                         ➕ Create Training Session
                     </button>
                 </form>
@@ -290,15 +265,15 @@ $pending_training = $conn->query("
         
         <!-- Tab 3: Pending Training -->
         <div id="pending" class="tab-content">
-            <h2 style="margin-bottom: 20px;">Users Needing Training</h2>
+            <h2>Users Needing Training</h2>
             
             <?php if($pending_training && $pending_training->num_rows == 0): ?>
-            <div class="card" style="text-align: center; padding: 40px;">
-                <p style="font-size: 1.2em; color: #4caf50;">✅ All users are trained!</p>
-                <p style="margin-top: 10px; color: #666;">Great job, Oscar!</p>
+            <div class="empty-state">
+                <p style="color: white;">✅ All users are trained!</p>
+                <p style="color: rgba(255,255,255,0.8);">Great job, Oscar!</p>
             </div>
             <?php elseif($pending_training): ?>
-            <div class="card">
+            <div class="table-container">
                 <table>
                     <thead>
                         <tr>
@@ -321,8 +296,8 @@ $pending_training = $conn->query("
                                 </span>
                             </td>
                             <td>
-                                <button onclick="registerForSession(<?php echo $user['user_id']; ?>)" class="btn-small">
-                                    📅 Assign to Session
+                                <button onclick="registerForSession(<?php echo $user['user_id']; ?>)" class="btn" style="padding: 8px 15px; font-size: 13px;">
+                                    📅 Assign
                                 </button>
                             </td>
                         </tr>
@@ -335,33 +310,34 @@ $pending_training = $conn->query("
     </div>
     
     <!-- Register User Modal -->
-    <div id="registerModal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); z-index: 1000; max-width: 500px; width: 90%;">
-        <h3 style="margin-bottom: 20px; color: #9c27b0;">📝 Register User for Session</h3>
-        <form method="POST" id="registerForm">
-            <input type="hidden" name="session_id" id="modalSessionId">
-            <div class="form-group">
-                <label>Select User:</label>
-                <select name="user_id" id="userSelect" required>
-                    <option value="">-- Choose a user --</option>
-                    <?php
-                    $users = $conn->query("SELECT user_id, name FROM users ORDER BY name");
-                    if($users) {
-                        while($user = $users->fetch_assoc()):
-                        ?>
-                        <option value="<?php echo $user['user_id']; ?>"><?php echo $user['name']; ?></option>
-                        <?php endwhile; 
-                    } ?>
-                </select>
-            </div>
-            <div style="display: flex; gap: 10px; margin-top: 25px;">
-                <button type="submit" name="register_user" class="btn" style="flex: 2;">✅ Register</button>
-                <button type="button" onclick="closeModal()" class="btn back-btn" style="flex: 1;">Cancel</button>
-            </div>
-        </form>
+    <div id="registerModal">
+        <div>
+            <h3>📝 Register User for Session</h3>
+            <form method="POST" id="registerForm">
+                <input type="hidden" name="session_id" id="modalSessionId">
+                <div class="form-group">
+                    <label>Select User</label>
+                    <select name="user_id" id="userSelect" required>
+                        <option value="">-- Choose a user --</option>
+                        <?php
+                        $users = $conn->query("SELECT user_id, name FROM users ORDER BY name");
+                        if($users) {
+                            while($user = $users->fetch_assoc()):
+                            ?>
+                            <option value="<?php echo $user['user_id']; ?>"><?php echo $user['name']; ?></option>
+                            <?php endwhile; 
+                        } ?>
+                    </select>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 30px;">
+                    <button type="submit" name="register_user" class="btn" style="flex: 2;">✅ Register</button>
+                    <button type="button" onclick="closeModal()" class="btn back-btn" style="flex: 1;">Cancel</button>
+                </div>
+            </form>
+        </div>
     </div>
     
     <script>
-    // Open tab function
     function openTab(event, tabName) {
         var tabs = document.getElementsByClassName('tab-content');
         for(var i = 0; i < tabs.length; i++) {
@@ -375,18 +351,15 @@ $pending_training = $conn->query("
         event.currentTarget.classList.add('active');
     }
     
-    // Show register modal
     function showRegisterModal(sessionId) {
         document.getElementById('modalSessionId').value = sessionId;
-        document.getElementById('registerModal').style.display = 'block';
+        document.getElementById('registerModal').style.display = 'flex';
     }
     
-    // Close modal
     function closeModal() {
         document.getElementById('registerModal').style.display = 'none';
     }
     
-    // Register for session
     function registerForSession(userId) {
         var select = document.getElementById('userSelect');
         for(var i = 0; i < select.options.length; i++) {
@@ -398,59 +371,28 @@ $pending_training = $conn->query("
         alert('Please select a session from the Upcoming tab first!');
     }
     
-    // BULK COMPLETE - PROTOTYPE DEMO VERSION
     function markAllComplete(sessionId) {
-        if(confirm('🎓 Mark ALL users in this session as COMPLETED?\n\nThis is a prototype demo - no database changes.')) {
-            
-            // Find the session card
+        if(confirm('🎓 Mark ALL users in this session as COMPLETED?')) {
             var button = event.target;
             var sessionCard = button.closest('.session-card');
             
             if(sessionCard) {
-                // Find all attendance status spans and update them
                 var statusSpans = sessionCard.querySelectorAll('.attendance-status');
                 statusSpans.forEach(function(span) {
                     span.innerHTML = 'Completed 🎓';
-                    span.style.color = '#4caf50';
-                    span.style.fontWeight = 'bold';
+                    span.style.color = '#2E7D32';
                 });
                 
-                // Update the spots left to 0
                 var spotsSpan = sessionCard.querySelector('.spots-left');
                 if(spotsSpan) {
-                    spotsSpan.innerHTML = '🎯 0 spots left';
-                    spotsSpan.style.background = '#ffebee';
-                    spotsSpan.style.color = '#c62828';
+                    spotsSpan.innerHTML = '🎯 0 spots';
                 }
                 
-                // Update registered count
-                var registeredSpan = sessionCard.querySelector('span strong');
-                if(registeredSpan) {
-                    var parent = registeredSpan.closest('span');
-                    if(parent) {
-                        var match = parent.innerHTML.match(/(\d+)\/(\d+)/);
-                        if(match) {
-                            var total = match[2];
-                            parent.innerHTML = '👥 Registered: <strong>' + total + '/' + total + '</strong>';
-                        }
-                    }
-                }
-                
-                // Disable the register button
-                var registerBtn = sessionCard.querySelector('.register-btn');
-                if(registerBtn) {
-                    registerBtn.disabled = true;
-                    registerBtn.innerHTML = 'Session Completed';
-                    registerBtn.style.background = '#4caf50';
-                }
-                
-                // Show success message
-                alert('✅ DEMO: All users marked as completed!\n\nIn the real system, this would update the database.');
+                alert('✅ Demo: All users marked as completed!');
             }
         }
     }
     
-    // Close modal when clicking outside
     window.onclick = function(event) {
         var modal = document.getElementById('registerModal');
         if(event.target == modal) {

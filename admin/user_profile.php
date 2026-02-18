@@ -11,65 +11,10 @@ $areas = $conn->query("SELECT area_name FROM user_areas WHERE user_id = $user_id
 <!DOCTYPE html>
 <html>
 <head>
-    <title>User Profile</title>
-    <style>
-        body { font-family: Arial; background: #f5f5f5; padding: 20px; }
-        .container { max-width: 1000px; margin: 0 auto; }
-        .header { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
-        h1 { color: #9c27b0; }
-        .profile-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-        .card {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        .card h2 {
-            color: #1a73e8;
-            margin-bottom: 15px;
-            font-size: 18px;
-            border-bottom: 2px solid #f0f0f0;
-            padding-bottom: 10px;
-        }
-        .info-row {
-            margin: 10px 0;
-            display: flex;
-        }
-        .info-label {
-            font-weight: bold;
-            width: 140px;
-            color: #666;
-        }
-        .info-value {
-            flex: 1;
-        }
-        .areas-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-        .area-tag {
-            background: #e3f2fd;
-            color: #0d47a1;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 13px;
-        }
-        .back-btn {
-            display: inline-block;
-            padding: 10px 20px;
-            background: #757575;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            margin-top: 20px;
-        }
-        .back-btn:hover { background: #616161; }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="../css/admin.css">
 </head>
 <body>
     <div class="container">

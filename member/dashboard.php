@@ -57,6 +57,60 @@ $prefs = $conn->query("SELECT * FROM user_preferences WHERE user_id = $user_id")
                     </span>
                 </div>
             </div>
+            <!-- New Resources Section -->
+<div class="card" style="grid-column: span 2; margin-top: 20px;">
+    <h2>📚 Learning Resources</h2>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <!-- Videos -->
+        <div>
+            <h3 style="color: #2E7D32; margin-bottom: 15px;">🎥 Video Tutorials</h3>
+            <?php foreach($videos as $video): ?>
+            <div style="display: flex; align-items: center; padding: 10px; background: #f5f5f5; margin-bottom: 8px; border-radius: 8px;">
+                <span style="font-size: 1.5em; margin-right: 10px;">▶️</span>
+                <div style="flex: 1;">
+                    <strong><?php echo $video['title']; ?></strong>
+                    <small style="color: #666;"> <?php echo $video['duration']; ?></small>
+                </div>
+                <button class="btn-small" style="padding: 5px 10px;">Watch</button>
+            </div>
+            <?php endforeach; ?>
+        </div>
+        
+        <!-- Wiki -->
+        <div>
+            <h3 style="color: #2E7D32; margin-bottom: 15px;">📖 Wiki Articles</h3>
+            <?php foreach($wiki_articles as $article): ?>
+            <div style="display: flex; align-items: center; padding: 10px; background: #f5f5f5; margin-bottom: 8px; border-radius: 8px;">
+                <span style="font-size: 1.2em; margin-right: 10px;">📄</span>
+                <div style="flex: 1;">
+                    <?php echo $article['title']; ?>
+                    <?php if($article['new']): ?>
+                        <span style="background: #ff9800; color: white; padding: 2px 8px; border-radius: 12px; font-size: 10px; margin-left: 8px;">NEW</span>
+                    <?php endif; ?>
+                </div>
+                <button class="btn-small" style="padding: 5px 10px;">Read</button>
+            </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Help -->
+<div class="card" style="grid-column: span 2;">
+    <h2>❓ Quick Help</h2>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+        <div style="padding: 15px; background: #f5f5f5; border-radius: 8px; cursor: pointer;">
+            "How do I book a machine?"
+        </div>
+        <div style="padding: 15px; background: #f5f5f5; border-radius: 8px; cursor: pointer;">
+            "What safety gear do I need?"
+        </div>
+        <div style="padding: 15px; background: #f5f5f5; border-radius: 8px; cursor: pointer;">
+            "Can I bring my own materials?"
+        </div>
+    </div>
+</div>
         </div>
     </div>
 </body>

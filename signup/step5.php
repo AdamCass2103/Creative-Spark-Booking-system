@@ -75,99 +75,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Review & Submit - Step 5 of 5</title>
-    <style>
-        body { font-family: Arial; background: #f5f5f5; padding: 20px; }
-        .container { max-width: 800px; margin: 50px auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
-        h1 { color: #1a73e8; margin-bottom: 10px; }
-        .step-indicator { display: flex; justify-content: space-between; margin-bottom: 30px; }
-        .step { flex: 1; text-align: center; padding: 10px; background: #f0f0f0; margin: 0 5px; border-radius: 5px; }
-        .step.completed { background: #4caf50; color: white; }
-        
-        .review-section {
-            background: #f9f9f9;
-            padding: 20px;
-            border-radius: 10px;
-            margin: 20px 0;
-        }
-        
-        .review-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-        
-        .review-item {
-            margin: 10px 0;
-        }
-        
-        .review-item strong {
-            display: block;
-            color: #666;
-            font-size: 14px;
-        }
-        
-        .review-item span {
-            font-size: 16px;
-            color: #333;
-        }
-        
-        .btn { 
-            width: 100%; 
-            padding: 12px; 
-            background: #4caf50; 
-            color: white; 
-            border: none; 
-            border-radius: 5px; 
-            font-size: 16px; 
-            cursor: pointer;
-        }
-        
-        .btn:hover { background: #388e3c; }
-        
-        .success-box {
-            background: #d4edda;
-            color: #155724;
-            padding: 30px;
-            border-radius: 10px;
-            text-align: center;
-            margin: 20px 0;
-        }
-        
-        .error-box {
-            background: #fee;
-            color: #c00;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            margin: 20px 0;
-            border-left: 4px solid #c00;
-        }
-        
-        .back-link {
-            display: inline-block;
-            margin-top: 20px;
-            color: #666;
-        }
-        
-        .badge-yes {
-            background: #4caf50;
-            color: white;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            margin-left: 10px;
-        }
-        
-        .badge-no {
-            background: #f44336;
-            color: white;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            margin-left: 10px;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Title</title>
+    <link rel="stylesheet" href="../css/signup.css">
 </head>
 <body>
     <div class="container">
