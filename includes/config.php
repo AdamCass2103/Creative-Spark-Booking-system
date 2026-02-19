@@ -7,5 +7,5 @@ define('DB_NAME', 'booking_system');
 
 // Site configuration
 define('SITE_URL', 'http://localhost/booking-system/');
-session_start();
+
 ?>
