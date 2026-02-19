@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html>
 <head>
     <title>Member Login</title>
-    <link rel="stylesheet" href="../css/public.css">
+    <link rel="stylesheet" href="/booking-system/css/login.css">
 </head>
 <body>
     <div class="container" style="max-width: 400px;">
