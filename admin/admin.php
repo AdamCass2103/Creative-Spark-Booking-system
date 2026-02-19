@@ -11,6 +11,20 @@ if (isset($_POST['update_status'])) {
     $conn->query("UPDATE user_preferences SET training_status = '$status' WHERE user_id = $user_id");
 }
 
+// Handle user deletion - ADDED
+if (isset($_POST['delete_user'])) {
+    $user_id = $_POST['user_id'];
+    
+    // Delete user (foreign keys will cascade)
+    $conn->query("DELETE FROM users WHERE user_id = $user_id");
+    
+    if ($conn->affected_rows > 0) {
+        $delete_success = "User deleted successfully!";
+    } else {
+        $delete_error = "Failed to delete user.";
+    }
+}
+
 // Get filter
 $filter = $_GET['filter'] ?? 'all';
 $where = '';
@@ -43,11 +57,24 @@ $result = $conn->query("
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel</title>
+    <title>Admin Panel - Creative Spark</title>
     <link rel="stylesheet" href="../css/admin.css">
 </head>
 <body>
     <div class="container">
+        <!-- Success/Error Messages - ADDED -->
+        <?php if (isset($delete_success)): ?>
+            <div style="background: #d4edda; color: #155724; padding: 15px; border-radius: 5px; margin-bottom: 20px; border-left: 4px solid #28a745;">
+                ✅ <?php echo $delete_success; ?>
+            </div>
+        <?php endif; ?>
+        
+        <?php if (isset($delete_error)): ?>
+            <div style="background: #fee; color: #c00; padding: 15px; border-radius: 5px; margin-bottom: 20px; border-left: 4px solid #f44336;">
+                ❌ <?php echo $delete_error; ?>
+            </div>
+        <?php endif; ?>
+        
         <div class="header">
             <h1>Admin Panel</h1>
             <div class="nav">
@@ -79,6 +106,7 @@ $result = $conn->query("
                         <th>Training Status</th>
                         <th>Update Status</th>
                         <th>Action</th>
+                        <th>Delete</th>  <!-- NEW COLUMN -->
                     </tr>
                 </thead>
                 <tbody>
@@ -113,6 +141,12 @@ $result = $conn->query("
                                 View
                             </a>
                         </td>
+                        <td>
+                            <button onclick="confirmDelete(<?php echo $row['user_id']; ?>, '<?php echo htmlspecialchars($row['name']); ?>')" 
+                                    style="background: #f44336; color: white; padding: 5px 10px; border-radius: 4px; border: none; cursor: pointer; font-size: 13px;">
+                                🗑️ Delete
+                            </button>
+                        </td>
                     </tr>
                     <?php endwhile; ?>
                 </tbody>
@@ -139,5 +173,32 @@ $result = $conn->query("
             </div>
         </div>
     </div>
+
+    <!-- JavaScript for Delete Confirmation - ADDED -->
+    <script>
+    function confirmDelete(userId, userName) {
+        if (confirm(`Are you sure you want to delete ${userName}?\n\nThis action cannot be undone! All user data will be permanently removed.`)) {
+            // Create a form and submit it
+            var form = document.createElement('form');
+            form.method = 'POST';
+            form.style.display = 'none';
+            
+            var input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'user_id';
+            input.value = userId;
+            
+            var deleteInput = document.createElement('input');
+            deleteInput.type = 'hidden';
+            deleteInput.name = 'delete_user';
+            deleteInput.value = '1';
+            
+            form.appendChild(input);
+            form.appendChild(deleteInput);
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+    </script>
 </body>
 </html>
