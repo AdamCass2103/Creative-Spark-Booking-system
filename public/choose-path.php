@@ -1,5 +1,5 @@
 <?php
-// Simple redirect to main page with options open
-header('Location: index.php?action=choose');
+// Redirect to main page
+header('Location: index.php');
 exit();
 ?>

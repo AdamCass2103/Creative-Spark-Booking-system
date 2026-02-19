@@ -1,5 +1,6 @@
 <?php
 require_once '../includes/auth.php';
+require_once '../includes/functions.php';
 requireLogin();
 
 $user_id = getCurrentUserId();
@@ -9,109 +10,212 @@ $user_name = getCurrentUserName();
 $conn = new mysqli('localhost', 'root', '', 'booking_system');
 $user = $conn->query("SELECT * FROM users WHERE user_id = $user_id")->fetch_assoc();
 $prefs = $conn->query("SELECT * FROM user_preferences WHERE user_id = $user_id")->fetch_assoc();
+
+// Learning Resources Data
+$videos = [
+    ['title' => 'Laser Cutter Basics', 'duration' => '12:34', 'url' => '#'],
+    ['title' => '3D Printer Setup', 'duration' => '8:21', 'url' => '#'],
+    ['title' => 'CNC Router Safety', 'duration' => '15:45', 'url' => '#'],
+    ['title' => 'Vinyl Cutting Guide', 'duration' => '6:18', 'url' => '#'],
+];
+
+$wiki_articles = [
+    ['title' => 'Machine Safety Guidelines', 'new' => true],
+    ['title' => 'Material Selection Guide', 'new' => false],
+    ['title' => 'Troubleshooting Common Issues', 'new' => false],
+    ['title' => 'Project Ideas & Inspiration', 'new' => true],
+];
+
+$quick_help = [
+    [
+        'question' => 'How do I book a machine?',
+        'answer' => 'Go to the bookings page, select your machine, choose a time, and confirm. You need to have completed training for that machine first.',
+        'icon' => '📅'
+    ],
+    [
+        'question' => 'What safety gear do I need?',
+        'answer' => 'Safety glasses are required for all machines. Ear protection for loud equipment. Dust masks for sanding/woodwork.',
+        'icon' => '🛡️'
+    ],
+    [
+        'question' => 'Can I bring my own materials?',
+        'answer' => 'Yes, but they must be approved by staff first. Some materials can damage machines or are fire hazards.',
+        'icon' => '📦'
+    ]
+];
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Member Dashboard</title>
-    <style>
-        body { font-family: Arial; background: #f5f5f5; padding: 20px; }
-        .container { max-width: 1000px; margin: 0 auto; }
-        .header { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
-        h1 { color: #9c27b0; }
-        .welcome { color: #666; }
-        .logout { float: right; background: #f44336; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; }
-        .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .card h2 { color: #1a73e8; margin-bottom: 15px; }
-        .info-row { margin: 10px 0; padding: 5px 0; border-bottom: 1px solid #eee; }
-        .status-pending { color: #ff9800; font-weight: bold; }
-        .status-approved { color: #4caf50; font-weight: bold; }
-        .status-completed { color: #2196f3; font-weight: bold; }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member Dashboard - Creative Spark</title>
+    <link rel="stylesheet" href="../css/member-dashboard.css">
 </head>
 <body>
     <div class="container">
+        <!-- Header -->
         <div class="header">
             <a href="logout.php" class="logout">Logout</a>
-            <h1>👋 Welcome, <?php echo htmlspecialchars($user['name']); ?></h1>
-            <p class="welcome">Member since: <?php echo date('d M Y', strtotime($user['created_at'])); ?></p>
+            <h1>👋 Welcome back, <?php echo htmlspecialchars($user['name']); ?></h1>
+            <p class="welcome">Member since: <?php echo date('F j, Y', strtotime($user['created_at'])); ?></p>
         </div>
         
+        <!-- Dashboard Grid -->
         <div class="dashboard-grid">
+            <!-- Profile Card -->
             <div class="card">
                 <h2>📋 Your Profile</h2>
-                <div class="info-row"><strong>Email:</strong> <?php echo $user['email']; ?></div>
-                <div class="info-row"><strong>Phone:</strong> <?php echo $user['phone'] ?? 'Not provided'; ?></div>
-                <div class="info-row"><strong>Company:</strong> <?php echo $user['company'] ?? 'Not provided'; ?></div>
+                <div class="info-row">
+                    <strong>Email:</strong>
+                    <span><?php echo $user['email']; ?></span>
+                </div>
+                <div class="info-row">
+                    <strong>Phone:</strong>
+                    <span><?php echo $user['phone'] ?? 'Not provided'; ?></span>
+                </div>
+                <div class="info-row">
+                    <strong>Company:</strong>
+                    <span><?php echo $user['company'] ?? 'Not provided'; ?></span>
+                </div>
+                <div class="info-row">
+                    <strong>Address:</strong>
+                    <span><?php echo $user['address'] ?? 'Not provided'; ?></span>
+                </div>
             </div>
             
+            <!-- Membership Card -->
             <div class="card">
-                <h2>🎫 Membership</h2>
-                <div class="info-row"><strong>Returning Member:</strong> <?php echo $prefs['is_returning_member'] ? 'Yes' : 'No'; ?></div>
-                <div class="info-row"><strong>Training Required:</strong> <?php echo $prefs['needs_training'] ? 'Yes' : 'No'; ?></div>
+                <h2>🎫 Membership Status</h2>
                 <div class="info-row">
-                    <strong>Status:</strong> 
+                    <strong>Returning Member:</strong>
+                    <span><?php echo $prefs['is_returning_member'] ? 'Yes' : 'No'; ?></span>
+                </div>
+                <div class="info-row">
+                    <strong>Training Required:</strong>
+                    <span><?php echo $prefs['needs_training'] ? 'Yes' : 'No'; ?></span>
+                </div>
+                <div class="info-row">
+                    <strong>Account Status:</strong>
                     <span class="status-<?php echo $prefs['training_status']; ?>">
                         <?php echo ucfirst($prefs['training_status']); ?>
                     </span>
                 </div>
-            </div>
-            <!-- New Resources Section -->
-<div class="card" style="grid-column: span 2; margin-top: 20px;">
-    <h2>📚 Learning Resources</h2>
-    
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-        <!-- Videos -->
-        <div>
-            <h3 style="color: #2E7D32; margin-bottom: 15px;">🎥 Video Tutorials</h3>
-            <?php foreach($videos as $video): ?>
-            <div style="display: flex; align-items: center; padding: 10px; background: #f5f5f5; margin-bottom: 8px; border-radius: 8px;">
-                <span style="font-size: 1.5em; margin-right: 10px;">▶️</span>
-                <div style="flex: 1;">
-                    <strong><?php echo $video['title']; ?></strong>
-                    <small style="color: #666;"> <?php echo $video['duration']; ?></small>
+                <?php if($prefs['tier_id']): ?>
+                <div class="info-row">
+                    <strong>Membership Tier:</strong>
+                    <span>
+                        <?php 
+                        $tier = $conn->query("SELECT tier_name FROM membership_tiers WHERE tier_id = " . $prefs['tier_id'])->fetch_assoc();
+                        echo $tier['tier_name'] ?? 'Standard';
+                        ?>
+                    </span>
                 </div>
-                <button class="btn-small" style="padding: 5px 10px;">Watch</button>
+                <?php endif; ?>
             </div>
-            <?php endforeach; ?>
-        </div>
-        
-        <!-- Wiki -->
-        <div>
-            <h3 style="color: #2E7D32; margin-bottom: 15px;">📖 Wiki Articles</h3>
-            <?php foreach($wiki_articles as $article): ?>
-            <div style="display: flex; align-items: center; padding: 10px; background: #f5f5f5; margin-bottom: 8px; border-radius: 8px;">
-                <span style="font-size: 1.2em; margin-right: 10px;">📄</span>
-                <div style="flex: 1;">
-                    <?php echo $article['title']; ?>
-                    <?php if($article['new']): ?>
-                        <span style="background: #ff9800; color: white; padding: 2px 8px; border-radius: 12px; font-size: 10px; margin-left: 8px;">NEW</span>
-                    <?php endif; ?>
-                </div>
-                <button class="btn-small" style="padding: 5px 10px;">Read</button>
-            </div>
-            <?php endforeach; ?>
-        </div>
-    </div>
-</div>
 
-<!-- Quick Help -->
-<div class="card" style="grid-column: span 2;">
-    <h2>❓ Quick Help</h2>
-    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
-        <div style="padding: 15px; background: #f5f5f5; border-radius: 8px; cursor: pointer;">
-            "How do I book a machine?"
-        </div>
-        <div style="padding: 15px; background: #f5f5f5; border-radius: 8px; cursor: pointer;">
-            "What safety gear do I need?"
-        </div>
-        <div style="padding: 15px; background: #f5f5f5; border-radius: 8px; cursor: pointer;">
-            "Can I bring my own materials?"
+            <!-- Learning Resources -->
+            <div class="card" style="grid-column: span 2;">
+                <h2>📚 Learning Resources</h2>
+                
+                <div class="resources-grid">
+                    <!-- Videos -->
+                    <div>
+                        <div class="resource-header">
+                            <span style="font-size: 1.5em;">🎥</span>
+                            <h3>Video Tutorials</h3>
+                        </div>
+                        <div class="video-list">
+                            <?php foreach($videos as $video): ?>
+                            <div class="video-item" onclick="window.open('<?php echo $video['url']; ?>', '_blank')">
+                                <div class="video-thumb">▶️</div>
+                                <div class="video-info">
+                                    <div class="video-title"><?php echo $video['title']; ?></div>
+                                    <div class="video-meta">
+                                        <span>⏱️ <?php echo $video['duration']; ?></span>
+                                    </div>
+                                </div>
+                                <button class="watch-btn">Watch</button>
+                            </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                    
+                    <!-- Wiki Articles -->
+                    <div>
+                        <div class="resource-header">
+                            <span style="font-size: 1.5em;">📖</span>
+                            <h3>Wiki Articles</h3>
+                        </div>
+                        <div class="article-list">
+                            <?php foreach($wiki_articles as $article): ?>
+                            <div class="article-item" onclick="readArticle('<?php echo $article['title']; ?>')">
+                                <div class="video-thumb">📄</div>
+                                <div class="article-info">
+                                    <div class="article-title">
+                                        <?php echo $article['title']; ?>
+                                        <?php if($article['new']): ?>
+                                            <span class="new-badge">NEW</span>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                                <button class="read-btn">Read</button>
+                            </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Help -->
+            <div class="card" style="grid-column: span 2;">
+                <h2>❓ Quick Help</h2>
+                <div class="help-grid">
+                    <?php foreach($quick_help as $help): ?>
+                    <div class="help-card" onclick="showHelp('<?php echo $help['question']; ?>', '<?php echo $help['answer']; ?>')">
+                        <div class="help-icon"><?php echo $help['icon']; ?></div>
+                        <div class="help-question"><?php echo $help['question']; ?></div>
+                        <div class="help-answer-preview">
+                            Click for answer...
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
         </div>
     </div>
-</div>
+
+    <!-- Help Modal -->
+    <div id="helpModal" class="modal">
+        <div class="modal-content">
+            <h3 id="modalQuestion"></h3>
+            <p id="modalAnswer"></p>
+            <button class="modal-close" onclick="closeModal()">Close</button>
         </div>
     </div>
+
+    <script>
+        function showHelp(question, answer) {
+            document.getElementById('modalQuestion').textContent = question;
+            document.getElementById('modalAnswer').textContent = answer;
+            document.getElementById('helpModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('helpModal').style.display = 'none';
+        }
+
+        function readArticle(title) {
+            alert('Opening article: ' + title + '\n(This would open the wiki in a real implementation)');
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            var modal = document.getElementById('helpModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
 </body>
 </html>

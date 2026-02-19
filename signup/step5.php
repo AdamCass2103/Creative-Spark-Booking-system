@@ -87,7 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <h2>✅ Application Submitted Successfully!</h2>
                 <p>Thank you for joining Creative Spark FabLab. Your application is pending approval.</p>
                 <p>You will receive an email once your account is activated.</p>
-                <a href="../dashboard.php" class="btn" style="width: auto; padding: 12px 30px; margin-top: 20px;">Go to Dashboard</a>
+                <a href="../member/dashboard.php" class="btn" style="width: auto; padding: 12px 30px; margin-top: 20px;">Go to Your Dashboard</a>
             </div>
         <?php elseif (isset($error) && $error): ?>
             <div class="error-box">
