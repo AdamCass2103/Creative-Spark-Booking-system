@@ -102,6 +102,152 @@ textarea {
     min-height: 80px;
 }
 
+/* ========================================
+   MACHINE SKILL SELECTION STYLES
+   ======================================== */
+
+.machine-skill-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    border: 1px solid #e0e0e0;
+    transition: all 0.3s ease;
+}
+
+.machine-skill-row:hover {
+    background: #f0f7f0;
+    border-color: #2E7D32;
+    transform: translateX(5px);
+}
+
+.machine-name {
+    font-weight: 600;
+    color: #2E7D32;
+    margin-left: 8px;
+    font-size: 1em;
+    cursor: pointer;
+}
+
+.machine-skill-row input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #2E7D32;
+}
+
+.skill-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.skill-btn {
+    padding: 8px 20px;
+    border: 2px solid #e0e0e0;
+    background: white;
+    border-radius: 30px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9em;
+    transition: all 0.3s ease;
+    min-width: 100px;
+}
+
+/* Beginner button styles */
+.skill-btn.beginner {
+    color: #ff9800;
+    border-color: #ff9800;
+    background: white;
+}
+
+.skill-btn.beginner:hover,
+.skill-btn.beginner.selected {
+    background: #ff9800;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(255, 152, 0, 0.3);
+}
+
+/* Intermediate button styles */
+.skill-btn.intermediate {
+    color: #2196f3;
+    border-color: #2196f3;
+    background: white;
+}
+
+.skill-btn.intermediate:hover,
+.skill-btn.intermediate.selected {
+    background: #2196f3;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
+}
+
+/* Expert button styles */
+.skill-btn.expert {
+    color: #4caf50;
+    border-color: #4caf50;
+    background: white;
+}
+
+.skill-btn.expert:hover,
+.skill-btn.expert.selected {
+    background: #4caf50;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(76, 175, 80, 0.3);
+}
+
+/* Work description section */
+.work-description {
+    margin-top: 30px;
+    padding: 25px;
+    background: linear-gradient(135deg, #f0f7f0 0%, #e8f5e9 100%);
+    border-radius: 15px;
+    border-left: 5px solid #2E7D32;
+    box-shadow: 0 5px 15px rgba(46, 125, 50, 0.1);
+}
+
+.work-description textarea {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid #c8e6c9;
+    border-radius: 10px;
+    font-size: 1em;
+    line-height: 1.6;
+    resize: vertical;
+    transition: all 0.3s;
+}
+
+.work-description textarea:focus {
+    border-color: #2E7D32;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.1);
+}
+
+.work-description label {
+    font-weight: 600;
+    color: #2E7D32;
+    margin-bottom: 10px;
+    display: block;
+    font-size: 1.1em;
+}
+
+/* Animation for skill selection */
+@keyframes skillPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+}
+
+.skill-btn.selected {
+    animation: skillPulse 0.3s ease;
+}
+
 /* Checkbox Groups */
 .checkbox-group {
     background: #f9f9f9;
@@ -255,7 +401,7 @@ textarea {
     margin: 10px 0;
 }
 
-/* Areas Grid (Step 3) */
+/* Areas Grid (Old - kept for reference, but new machine-skill-row replaces this) */
 .areas-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -376,6 +522,24 @@ textarea {
     
     .step {
         min-width: 80px;
+    }
+    
+    .machine-skill-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    .skill-buttons {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .skill-btn {
+        flex: 1;
+        min-width: auto;
+        padding: 8px 12px;
+        font-size: 0.8em;
     }
     
     .areas-grid {

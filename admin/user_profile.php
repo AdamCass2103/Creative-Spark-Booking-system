@@ -15,7 +15,7 @@ if (!$user) {
 
 $prefs = $conn->query("SELECT * FROM user_preferences WHERE user_id = $user_id")->fetch_assoc();
 $tier = $conn->query("SELECT tier_name FROM membership_tiers WHERE tier_id = " . ($prefs['tier_id'] ?? 1))->fetch_assoc();
-$areas = $conn->query("SELECT area_name FROM user_areas WHERE user_id = $user_id");
+$areas = $conn->query("SELECT area_name, skill_level FROM user_areas WHERE user_id = $user_id");
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -24,6 +24,49 @@ $areas = $conn->query("SELECT area_name FROM user_areas WHERE user_id = $user_id
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Profile - <?php echo htmlspecialchars($user['name']); ?></title>
     <link rel="stylesheet" href="../css/user_profile.css">
+    <style>
+        /* Additional styles for skill badges */
+        .skill-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: bold;
+            margin-left: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .skill-badge.beginner {
+            background: #ff9800;
+            color: white;
+        }
+        .skill-badge.intermediate {
+            background: #2196f3;
+            color: white;
+        }
+        .skill-badge.expert {
+            background: #4caf50;
+            color: white;
+        }
+        .area-tag {
+            display: inline-flex;
+            align-items: center;
+            background: #e8f5e9;
+            color: #2E7D32;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 0.9em;
+            font-weight: 500;
+            margin: 5px;
+        }
+        .work-description-box {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #2E7D32;
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -138,35 +181,44 @@ $areas = $conn->query("SELECT area_name FROM user_areas WHERE user_id = $user_id
                 </div>
             </div>
 
-            <!-- Selected Areas -->
+            <!-- Selected Machines with Skill Levels - UPDATED -->
             <div class="card">
                 <div class="card-header">
                     <span class="header-icon">🔧</span>
-                    <h2>Selected Machines & Areas</h2>
+                    <h2>Selected Machines & Skill Levels</h2>
                 </div>
                 <?php if ($areas && $areas->num_rows > 0): ?>
                     <div class="areas-list">
-                        <?php while($area = $areas->fetch_assoc()): ?>
-                            <span class="area-tag"><?php echo $area['area_name']; ?></span>
+                        <?php 
+                        // Reset pointer to fetch again
+                        $areas->data_seek(0);
+                        while($area = $areas->fetch_assoc()): 
+                        ?>
+                            <span class="area-tag">
+                                <?php echo $area['area_name']; ?>
+                                <span class="skill-badge <?php echo $area['skill_level'] ?? 'beginner'; ?>">
+                                    <?php echo ucfirst($area['skill_level'] ?? 'beginner'); ?>
+                                </span>
+                            </span>
                         <?php endwhile; ?>
                     </div>
                 <?php else: ?>
-                    <p style="color: #999; text-align: center; padding: 20px;">No areas selected yet</p>
+                    <p style="color: #999; text-align: center; padding: 20px;">No machines selected yet</p>
                 <?php endif; ?>
             </div>
 
-            <!-- Experience -->
+            <!-- Work Description - UPDATED (removed experience) -->
             <div class="card">
                 <div class="card-header">
                     <span class="header-icon">📝</span>
-                    <h2>Experience & Work Description</h2>
+                    <h2>Work Description</h2>
                 </div>
-                <div class="experience-box">
-                    <p><strong>Experience:</strong></p>
-                    <p><?php echo nl2br($prefs['experience_text'] ?? 'No experience provided'); ?></p>
-                    
-                    <p style="margin-top: 15px;"><strong>Work Description:</strong></p>
-                    <p><?php echo nl2br($prefs['work_description'] ?? 'No work description provided'); ?></p>
+                <div class="work-description-box">
+                    <?php if (!empty($prefs['work_description'])): ?>
+                        <p><?php echo nl2br($prefs['work_description']); ?></p>
+                    <?php else: ?>
+                        <p style="color: #999; font-style: italic;">No work description provided</p>
+                    <?php endif; ?>
                 </div>
             </div>
 

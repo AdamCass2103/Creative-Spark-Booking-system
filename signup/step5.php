@@ -49,19 +49,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $needs_training = isset($data['needs_training']) ? $data['needs_training'] : 1;
         $terms_accepted = isset($data['terms_accepted']) ? $data['terms_accepted'] : 1;
         
-        $experience_text = $conn->real_escape_string($data['experience_text'] ?? '');
+        // Get work description (KEPT)
         $work_description = $conn->real_escape_string($data['work_description'] ?? '');
         
-        // Insert user_preferences with checkbox values
+        // Insert user_preferences with checkbox values - REMOVED experience_text
         $conn->query("INSERT INTO user_preferences 
-                      (user_id, is_returning_member, needs_training, terms_accepted, training_status, tier_id, payment_type, experience_text, work_description) 
-                      VALUES ($user_id, $is_returning, $needs_training, $terms_accepted, 'pending', $tier_id, '$payment_type', '$experience_text', '$work_description')");
+                      (user_id, is_returning_member, needs_training, terms_accepted, training_status, tier_id, payment_type, work_description) 
+                      VALUES ($user_id, $is_returning, $needs_training, $terms_accepted, 'pending', $tier_id, '$payment_type', '$work_description')");
         
-        // Insert selected areas
-        if (!empty($data['areas'])) {
-            foreach ($data['areas'] as $area) {
-                $area = $conn->real_escape_string($area);
-                $conn->query("INSERT INTO user_areas (user_id, area_name) VALUES ($user_id, '$area')");
+        // Insert selected areas with skill levels - UPDATED
+        if (!empty($data['areas_with_skills'])) {
+            foreach ($data['areas_with_skills'] as $area_data) {
+                $area = $conn->real_escape_string($area_data['area']);
+                $skill = $conn->real_escape_string($area_data['skill']);
+                $conn->query("INSERT INTO user_areas (user_id, area_name, skill_level) 
+                              VALUES ($user_id, '$area', '$skill')");
             }
         }
         
@@ -77,8 +79,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Title</title>
+    <title>Review Application - Creative Spark</title>
     <link rel="stylesheet" href="../css/signup.css">
+    <style>
+        .skill-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-left: 8px;
+            text-transform: uppercase;
+        }
+        .skill-badge.beginner {
+            background: #ff9800;
+            color: white;
+        }
+        .skill-badge.intermediate {
+            background: #2196f3;
+            color: white;
+        }
+        .skill-badge.expert {
+            background: #4caf50;
+            color: white;
+        }
+        .areas-with-skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .area-skill-item {
+            background: #f5f5f5;
+            padding: 8px 15px;
+            border-radius: 30px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -133,7 +172,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </div>
         
-        <!-- NEW SECTION: Membership Options with Checkboxes -->
         <div class="review-section">
             <h3>✅ Membership Options</h3>
             <div class="review-grid">
@@ -183,26 +221,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
         
         <div class="review-section">
-            <h3>🔧 Experience & Areas</h3>
-            <?php if (!empty($data['areas'])): ?>
-            <div class="review-item">
-                <strong>Areas selected</strong>
-                <span><?php echo implode(', ', $data['areas']); ?></span>
-            </div>
+            <h3>🔧 Machines & Skill Levels</h3>
+            <?php if (!empty($data['areas_with_skills'])): ?>
+                <div class="areas-with-skills">
+                    <?php foreach ($data['areas_with_skills'] as $area_data): ?>
+                        <div class="area-skill-item">
+                            <span><?php echo $area_data['area']; ?></span>
+                            <span class="skill-badge <?php echo $area_data['skill']; ?>">
+                                <?php echo ucfirst($area_data['skill']); ?>
+                            </span>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php else: ?>
+                <p>No machines selected</p>
             <?php endif; ?>
-            
-            <?php if (!empty($data['experience_text'])): ?>
-            <div class="review-item">
-                <strong>Experience</strong>
-                <span><?php echo nl2br(htmlspecialchars($data['experience_text'])); ?></span>
-            </div>
-            <?php endif; ?>
-            
+        </div>
+        
+        <div class="review-section">
+            <h3>📝 Work Description</h3>
             <?php if (!empty($data['work_description'])): ?>
-            <div class="review-item">
-                <strong>Work description</strong>
-                <span><?php echo nl2br(htmlspecialchars($data['work_description'])); ?></span>
-            </div>
+                <div class="review-item">
+                    <span><?php echo nl2br(htmlspecialchars($data['work_description'])); ?></span>
+                </div>
+            <?php else: ?>
+                <p>No work description provided</p>
             <?php endif; ?>
         </div>
         

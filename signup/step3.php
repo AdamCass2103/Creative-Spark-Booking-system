@@ -23,9 +23,21 @@ $areas = [
 ];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $_SESSION['signup']['experience_text'] = $_POST['experience_text'];
     $_SESSION['signup']['work_description'] = $_POST['work_description'];
-    $_SESSION['signup']['areas'] = $_POST['areas'] ?? [];
+    
+    // Process areas with skill levels
+    $areas_data = [];
+    if (isset($_POST['areas']) && is_array($_POST['areas'])) {
+        foreach ($_POST['areas'] as $area) {
+            $skill_key = str_replace(' ', '_', $area) . '_skill';
+            $skill_level = $_POST[$skill_key] ?? 'beginner';
+            $areas_data[] = [
+                'area' => $area,
+                'skill' => $skill_level
+            ];
+        }
+    }
+    $_SESSION['signup']['areas_with_skills'] = $areas_data;
     $_SESSION['step3_complete'] = true;
     
     header('Location: step4.php');
@@ -37,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Title</title>
+    <title>Your Experience - Creative Spark</title>
     <link rel="stylesheet" href="../css/signup.css">
 </head>
 <body>
@@ -52,27 +64,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="step">5. Review</div>
         </div>
         
-        <form method="POST">
+        <form method="POST" id="experienceForm">
             <div class="form-group">
-                <label>Which areas will you use? (Select all that apply)</label>
-                <div class="areas-grid">
-                    <?php foreach($areas as $area): ?>
-                    <label class="area-checkbox">
-                        <input type="checkbox" name="areas[]" value="<?php echo $area; ?>">
-                        <?php echo $area; ?>
-                    </label>
+                <label>Select machines you'll use and rate your skill level:</label>
+                <div style="margin: 20px 0;">
+                    <?php foreach($areas as $area): 
+                        $area_id = str_replace(' ', '_', $area);
+                    ?>
+                    <div class="machine-skill-row">
+                         <div>
+                         <input type="checkbox" name="areas[]" value="<?php echo $area; ?>" 
+                            id="area_<?php echo $area_id; ?>" 
+                                onchange="toggleSkill('<?php echo $area_id; ?>')">  <!-- FIXED: Added quotes -->
+                                <label for="area_<?php echo $area_id; ?>" class="machine-name"><?php echo $area; ?></label>
+                                     </div>
+                                    <div class="skill-buttons" id="skills_<?php echo $area_id; ?>" style="display: none;">
+                                <input type="hidden" name="<?php echo $area_id; ?>_skill" id="skill_<?php echo $area_id; ?>" value="beginner">
+                        <button type="button" class="skill-btn beginner" onclick="setSkill('<?php echo $area_id; ?>', 'beginner', this)">Beginner</button>
+                        <button type="button" class="skill-btn intermediate" onclick="setSkill('<?php echo $area_id; ?>', 'intermediate', this)">Intermediate</button>
+                        <button type="button" class="skill-btn expert" onclick="setSkill('<?php echo $area_id; ?>', 'expert', this)">Expert</button>
+                        </div>
+                        </div>
                     <?php endforeach; ?>
                 </div>
             </div>
             
-            <div class="form-group">
-                <label>Describe your experience with this equipment</label>
-                <textarea name="experience_text" rows="4" placeholder="e.g., I've used 3D printers at university, comfortable with CAD software..."></textarea>
-            </div>
-            
-            <div class="form-group">
-                <label>Brief description of your work/projects</label>
-                <textarea name="work_description" rows="4" placeholder="What type of work will you be doing in the FabLab?"></textarea>
+            <div class="work-description">
+                <div class="form-group">
+                    <label>Brief description of your work/projects</label>
+                    <textarea name="work_description" rows="4" placeholder="What type of work will you be doing in the FabLab?"></textarea>
+                </div>
             </div>
             
             <button type="submit" class="btn">Continue →</button>
@@ -80,5 +101,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         <a href="step2.php" class="back-link">← Back to Membership</a>
     </div>
+    
+    <script>
+        function toggleSkill(areaId) {
+            var checkbox = document.getElementById('area_' + areaId);
+            var skillDiv = document.getElementById('skills_' + areaId);
+            skillDiv.style.display = checkbox.checked ? 'flex' : 'none';
+            
+            // Set default skill if checked
+            if (checkbox.checked) {
+                setSkill(areaId, 'beginner', document.querySelector('#skills_' + areaId + ' .beginner'));
+            }
+        }
+        
+        function setSkill(areaId, level, btn) {
+            // Update hidden input
+            document.getElementById('skill_' + areaId).value = level;
+            
+            // Update button styles
+            var buttons = document.querySelectorAll('#skills_' + areaId + ' .skill-btn');
+            buttons.forEach(function(b) {
+                b.classList.remove('selected');
+            });
+            btn.classList.add('selected');
+        }
+    </script>
 </body>
 </html>
