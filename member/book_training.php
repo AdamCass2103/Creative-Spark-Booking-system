@@ -188,7 +188,8 @@ $user_bookings = getUserBookings($user_id);
                         <td>
                             <?php if ($status == 'pending_approval'): ?>
                             <form method="POST" action="cancel_booking.php" style="display: inline;">
-                                <input type="hidden" name="attendee_id" value="<?php echo $booking['id']; ?>">
+                                <input type="hidden" name="session_id" value="<?php echo $booking['session_id']; ?>">
+                                <input type="hidden" name="user_id" value="<?php echo $booking['user_id']; ?>">
                                 <button type="submit" name="cancel_booking" class="btn-cancel" 
                                         onclick="return confirm('Cancel this booking request?')">
                                     Cancel

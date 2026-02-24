@@ -122,6 +122,10 @@ window.onclick = function(event) {
                     📅 Training Sessions
                 </a>
                 <div style="position: relative; display: inline-block;">
+                <a href="pending_bookings.php" class="btn" style="background: #ff9800;">
+            ⏳ Pending Bookings
+        </a>
+        <div style="position: relative; display: inline-block;">
         <button class="btn" style="background: #2E7D32;" onclick="toggleAdminMenu()">
             👥 Admin ▼
         </button>
