@@ -33,16 +33,23 @@
    .fablab-logo {
        width: 120px;
        height: 120px;
-       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+       background: white;
        border-radius: 60px;
        margin: 0 auto 30px;
        display: flex;
        align-items: center;
        justify-content: center;
-       color: white;
-       font-size: 3em;
-       box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+       box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+       overflow: hidden;
    }
+   
+   .fablab-logo img {
+       width: 80%;
+       height: 80%;
+       object-fit: contain;
+       display: block;
+   }
+   
    .get-started-btn {
        display: inline-block;
        padding: 20px 60px;

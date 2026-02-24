@@ -11,9 +11,11 @@ require_once __DIR__ . '/../includes/db_connect.php';
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="fablab-logo">🔧</div>
-        
+<div class="container">
+    <div class="fablab-logo">
+        <img src="/booking-system/images/FabLab logo.png" alt="Creative Spark FabLab Logo">
+    </div>
+
         <h1>Creative Spark</h1>
         <h1 style="color: #764ba2;">Enterprise FabLab</h1>
         
