@@ -125,7 +125,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <button type="submit" class="btn">Continue →</button>
         </form>
         
-        <a href="../dashboard.php" class="back-link">Already have an account? Login</a>
+        <a href="../public/login.php" class="back-link">Already have an account? Login</a>
     </div>
 </body>
 </html>

@@ -11,6 +11,10 @@ $conn = new mysqli('localhost', 'root', '', 'booking_system');
 $user = $conn->query("SELECT * FROM users WHERE user_id = $user_id")->fetch_assoc();
 $prefs = $conn->query("SELECT * FROM user_preferences WHERE user_id = $user_id")->fetch_assoc();
 
+// Get pending booking count for badge - ADD THIS LINE
+$pending_bookings = $conn->query("SELECT COUNT(*) as count FROM session_attendees 
+                                  WHERE user_id = $user_id AND booking_status = 'pending_approval'")->fetch_assoc()['count'];
+
 // Learning Resources Data
 $videos = [
     ['title' => 'Laser Cutter Basics', 'duration' => '12:34', 'url' => '#'],
@@ -59,6 +63,19 @@ $quick_help = [
             <a href="logout.php" class="logout">Logout</a>
             <h1>👋 Welcome back, <?php echo htmlspecialchars($user['name']); ?></h1>
             <p class="welcome">Member since: <?php echo date('F j, Y', strtotime($user['created_at'])); ?></p>
+        </div>
+
+        <!-- Action Bar with Booking Buttons -->
+        <div class="action-bar">
+            <a href="book_training.php" class="btn-book">
+                📅 Book Training
+                <?php if (isset($pending_bookings) && $pending_bookings > 0): ?>
+                    <span class="badge"><?php echo $pending_bookings; ?> pending</span>
+                <?php endif; ?>
+            </a>
+            <a href="my_bookings.php" class="btn-book" style="background: #9c27b0;">
+                📋 My Bookings
+            </a>
         </div>
         
         <!-- Dashboard Grid -->
