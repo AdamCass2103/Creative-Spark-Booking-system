@@ -5,43 +5,45 @@ requireAdmin();
 
 $conn = new mysqli('localhost', 'root', '', 'booking_system');
 $admin_id = getCurrentAdminId();
-$admin_name = getCurrentAdminName();
+$admin_role = getCurrentAdminRole();
+$is_viewer = ($admin_role == 'viewer');
 
-// Handle status updates with logging
-if (isset($_POST['update_status'])) {
-    $user_id = $_POST['user_id'];
-    $status = $_POST['training_status'];
-    
-    // Get old status for logging
-    $old = $conn->query("SELECT training_status FROM user_preferences WHERE user_id = $user_id")->fetch_assoc();
-    $old_status = $old['training_status'] ?? 'unknown';
-    
-    $conn->query("UPDATE user_preferences SET training_status = '$status' WHERE user_id = $user_id");
-    
-    // Log the action
-    logAdminActivity($admin_id, 'update_status', 'user', $user_id, "Changed status from $old_status to $status");
-}
+// Only allow modifications if NOT a viewer
+if (!$is_viewer) {
+    // Handle status updates
+    if (isset($_POST['update_status'])) {
+        $user_id = $_POST['user_id'];
+        $status = $_POST['training_status'];
+        
+        // Get old status for logging
+        $old = $conn->query("SELECT training_status FROM user_preferences WHERE user_id = $user_id")->fetch_assoc();
+        $old_status = $old['training_status'] ?? 'unknown';
+        
+        $conn->query("UPDATE user_preferences SET training_status = '$status' WHERE user_id = $user_id");
+        
+        // Log the action
+        logAdminActivity($admin_id, 'update_status', 'user', $user_id, "Changed status from $old_status to $status");
+    }
 
-// Handle user deletion with logging
-if (isset($_POST['delete_user'])) {
-    $user_id = $_POST['user_id'];
-    
-    // Get user name for logging
-    $user = $conn->query("SELECT name FROM users WHERE user_id = $user_id")->fetch_assoc();
-    $user_name = $user['name'] ?? 'Unknown';
-    
-    // Delete user
-    $conn->query("DELETE FROM users WHERE user_id = $user_id");
-    
-    if ($conn->affected_rows > 0) {
-        // Log the deletion
-        logAdminActivity($admin_id, 'delete_user', 'user', $user_id, "Deleted user: $user_name");
-        $delete_success = "User deleted successfully!";
-    } else {
-        $delete_error = "Failed to delete user.";
+    // Handle user deletion
+    if (isset($_POST['delete_user'])) {
+        $user_id = $_POST['user_id'];
+        
+        // Get user name for logging
+        $user = $conn->query("SELECT name FROM users WHERE user_id = $user_id")->fetch_assoc();
+        $user_name = $user['name'] ?? 'Unknown';
+        
+        // Delete user
+        $conn->query("DELETE FROM users WHERE user_id = $user_id");
+        
+        if ($conn->affected_rows > 0) {
+            logAdminActivity($admin_id, 'delete_user', 'user', $user_id, "Deleted user: $user_name");
+            $delete_success = "User deleted successfully!";
+        } else {
+            $delete_error = "Failed to delete user.";
+        }
     }
 }
-
 
 // Get filter
 $filter = $_GET['filter'] ?? 'all';
@@ -59,7 +61,7 @@ switch ($filter) {
         break;
 }
 
-// Get all users
+// Get all users (viewers can still see this)
 $result = $conn->query("
     SELECT u.user_id, u.name, u.email, u.created_at,
            up.is_returning_member, up.needs_training, 
@@ -77,30 +79,41 @@ $result = $conn->query("
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel - Creative Spark</title>
     <link rel="stylesheet" href="../css/admin.css">
-</head>
-<script>
-function toggleAdminMenu() {
-    var menu = document.getElementById('adminMenu');
-    if (menu.style.display === 'none' || menu.style.display === '') {
-        menu.style.display = 'block';
-    } else {
-        menu.style.display = 'none';
-    }
-}
-
-// Close menu when clicking outside
-window.onclick = function(event) {
-    if (!event.target.matches('.btn')) {
-        var menu = document.getElementById('adminMenu');
-        if (menu && menu.style.display === 'block') {
-            menu.style.display = 'none';
+    <style>
+        /* Viewer mode styles */
+        .viewer-badge {
+            background: #9c27b0;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 30px;
+            font-size: 0.8em;
+            margin-left: 15px;
+            display: inline-block;
         }
-    }
-}
-</script>
+        .viewer-notice {
+            background: #e3f2fd;
+            color: #0d47a1;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2196f3;
+        }
+        .disabled-action {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+    </style>
+</head>
 <body>
     <div class="container">
-        <!-- Success/Error Messages - ADDED -->
+        <!-- Viewer Notice -->
+        <?php if ($is_viewer): ?>
+        <div class="viewer-notice">
+            <strong>👁️ Viewer Mode:</strong> You can view all data but cannot make changes. Contact a Super Admin to modify records.
+        </div>
+        <?php endif; ?>
+
+        <!-- Success/Error Messages -->
         <?php if (isset($delete_success)): ?>
             <div style="background: #d4edda; color: #155724; padding: 15px; border-radius: 5px; margin-bottom: 20px; border-left: 4px solid #28a745;">
                 ✅ <?php echo $delete_success; ?>
@@ -114,27 +127,31 @@ window.onclick = function(event) {
         <?php endif; ?>
         
         <div class="header">
-            <h1>Admin Panel</h1>
+            <h1>Admin Panel 
+                <?php if ($is_viewer): ?>
+                    <span class="viewer-badge">Viewer Mode</span>
+                <?php endif; ?>
+            </h1>
             <div class="nav">
                 <a href="../member/dashboard.php" class="btn back-btn">← Back to Dashboard</a>
+                <?php if (!$is_viewer): // Only show create user button to non-viewers ?>
                 <a href="../public/index.php" class="btn">➕ Create New User</a>
-                <a href="training_sessions.php" class="btn" style="background: #9c27b0;">
-                    📅 Training Sessions
-                </a>
+                <?php endif; ?>
+                <a href="training_sessions.php" class="btn" style="background: #9c27b0;">📅 Training Sessions</a>
+                <a href="pending_bookings.php" class="btn" style="background: #ff9800;">⏳ Pending Bookings</a>
+                
+                <!-- Admin Dropdown - Visible to all -->
                 <div style="position: relative; display: inline-block;">
-                <a href="pending_bookings.php" class="btn" style="background: #ff9800;">
-            ⏳ Pending Bookings
-        </a>
-        <div style="position: relative; display: inline-block;">
-        <button class="btn" style="background: #2E7D32;" onclick="toggleAdminMenu()">
-            👥 Admin ▼
-        </button>
-        <div id="adminMenu" style="display: none; position: absolute; background: white; min-width: 200px; box-shadow: 0 8px 16px rgba(0,0,0,0.2); z-index: 1; border-radius: 5px; margin-top: 5px; right: 0;">
-            <a href="manage_admins.php" style="color: #333; padding: 12px 16px; text-decoration: none; display: block; border-bottom: 1px solid #eee;">👥 Manage Admins</a>
-            <a href="activity_log.php" style="color: #333; padding: 12px 16px; text-decoration: none; display: block;">📋 Activity Log</a>
-        </div>
-    </div>
-</div> 
+                    <button class="btn" style="background: #2E7D32;" onclick="toggleAdminMenu()">
+                        👥 Admin ▼
+                    </button>
+                    <div id="adminMenu" style="display: none; position: absolute; background: white; min-width: 200px; box-shadow: 0 8px 16px rgba(0,0,0,0.2); z-index: 1; border-radius: 5px; margin-top: 5px; right: 0;">
+                        <a href="manage_admins.php" style="color: #333; padding: 12px 16px; text-decoration: none; display: block; border-bottom: 1px solid #eee;">👥 Manage Admins</a>
+                        <a href="activity_log.php" style="color: #333; padding: 12px 16px; text-decoration: none; display: block;">📋 Activity Log</a>
+                    </div>
+                </div>
+            </div>
+            
             <div class="filter-buttons">
                 <button class="filter-btn <?php echo $filter === 'all' ? 'active' : ''; ?>" onclick="window.location='?filter=all'">All Users</button>
                 <button class="filter-btn <?php echo $filter === 'needs_training' ? 'active' : ''; ?>" onclick="window.location='?filter=needs_training'">Need Training</button>
@@ -154,9 +171,11 @@ window.onclick = function(event) {
                         <th>Needs Training</th>
                         <th>Terms Accepted</th>
                         <th>Training Status</th>
+                        <?php if (!$is_viewer): // Only show action columns to non-viewers ?>
                         <th>Update Status</th>
                         <th>Action</th>
-                        <th>Delete</th>  <!-- NEW COLUMN -->
+                        <th>Delete</th>
+                        <?php endif; ?>
                     </tr>
                 </thead>
                 <tbody>
@@ -173,6 +192,7 @@ window.onclick = function(event) {
                                 <?php echo ucfirst($row['training_status']); ?>
                             </span>
                         </td>
+                        <?php if (!$is_viewer): // Action columns for non-viewers only ?>
                         <td>
                             <form method="POST" style="display: flex; gap: 10px; align-items: center;">
                                 <input type="hidden" name="user_id" value="<?php echo $row['user_id']; ?>">
@@ -197,6 +217,14 @@ window.onclick = function(event) {
                                 🗑️ Delete
                             </button>
                         </td>
+                        <?php else: // For viewers, just show View button ?>
+                        <td>
+                            <a href="user_profile.php?id=<?php echo $row['user_id']; ?>" 
+                               style="background: #9c27b0; color: white; padding: 5px 10px; border-radius: 4px; text-decoration: none; font-size: 13px;">
+                                View Profile
+                            </a>
+                        </td>
+                        <?php endif; ?>
                     </tr>
                     <?php endwhile; ?>
                 </tbody>
@@ -224,11 +252,10 @@ window.onclick = function(event) {
         </div>
     </div>
 
-    <!-- JavaScript for Delete Confirmation - ADDED -->
+    <!-- JavaScript for Delete Confirmation -->
     <script>
     function confirmDelete(userId, userName) {
         if (confirm(`Are you sure you want to delete ${userName}?\n\nThis action cannot be undone! All user data will be permanently removed.`)) {
-            // Create a form and submit it
             var form = document.createElement('form');
             form.method = 'POST';
             form.style.display = 'none';
@@ -247,6 +274,24 @@ window.onclick = function(event) {
             form.appendChild(deleteInput);
             document.body.appendChild(form);
             form.submit();
+        }
+    }
+
+    function toggleAdminMenu() {
+        var menu = document.getElementById('adminMenu');
+        if (menu.style.display === 'none' || menu.style.display === '') {
+            menu.style.display = 'block';
+        } else {
+            menu.style.display = 'none';
+        }
+    }
+
+    window.onclick = function(event) {
+        if (!event.target.matches('.btn')) {
+            var menu = document.getElementById('adminMenu');
+            if (menu && menu.style.display === 'block') {
+                menu.style.display = 'none';
+            }
         }
     }
     </script>
