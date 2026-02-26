@@ -1,12 +1,12 @@
 <?php
 require_once '../includes/auth.php';
-require_once '../includes/functions.php';  // ADD THIS LINE
+require_once '../includes/functions.php';
 
 $conn = new mysqli('localhost', 'root', '', 'booking_system');
 $error = '';
 
 if (isLoggedIn()) {
-    redirect('../member/dashboard.php');  // Now this works!
+    redirect('../member/dashboard.php');
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -26,11 +26,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['user_id'] = $user_id;
             $_SESSION['user_name'] = $name;
             $_SESSION['is_admin'] = ($email === 'admin@booking.com');
-            redirect('../member/dashboard.php');  // Using the function
+            
+            // ============================================
+            // ACCOUNT STATUS CHECK (ADDED)
+            // ============================================
+            
+            // Get user's account status
+            $status_query = $conn->query("SELECT account_status FROM users WHERE user_id = $user_id");
+            $status = $status_query->fetch_assoc();
+            
+            // Update last activity
+            $conn->query("UPDATE users SET last_activity = CURDATE() WHERE user_id = $user_id");
+            
+            // Redirect based on status
+            if ($status['account_status'] == 'inactive') {
+                redirect('../member/inactive_dashboard.php');
+            } else {
+                redirect('../member/dashboard.php');
+            }
+            
         } else {
             $error = 'Invalid email or password!';
         }
     }
+}
+// After successful login, check if we need to update history
+$today = date('Y-m-d');
+
+// Check if there's an open history record
+$open_history = $conn->query("
+    SELECT * FROM membership_history 
+    WHERE user_id = $user_id AND end_date IS NULL
+")->fetch_assoc();
+
+if (!$open_history) {
+    // No open record, create one
+    $status = ($user_status == 'active') ? 'active' : 'inactive';
+    $conn->query("
+        INSERT INTO membership_history (user_id, status, start_date) 
+        VALUES ($user_id, '$status', '$today')
+    ");
 }
 ?>
 <!DOCTYPE html>

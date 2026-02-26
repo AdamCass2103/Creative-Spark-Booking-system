@@ -4,6 +4,51 @@ require_once '../includes/config.php';
 require_once '../includes/db_connect.php';
 
 // ============================================
+// CREATE MACHINES TABLE IF NOT EXISTS
+// ============================================
+
+$conn->query("
+    CREATE TABLE IF NOT EXISTS machines (
+        machine_id INT PRIMARY KEY AUTO_INCREMENT,
+        machine_name VARCHAR(100) NOT NULL,
+        machine_category VARCHAR(50),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+");
+
+// Insert machines if table is empty
+$check = $conn->query("SELECT COUNT(*) as count FROM machines");
+$row = $check->fetch_assoc();
+if ($row['count'] == 0) {
+    $conn->query("INSERT INTO machines (machine_name, machine_category) VALUES
+        ('FDM 3D Printing', '3D Printing'),
+        ('SLA 3D Printing', '3D Printing'),
+        ('SLS 3D Printing', '3D Printing'),
+        ('Laser Cutting', 'Laser'),
+        ('Vinyl Cutting', 'Vinyl'),
+        ('Waterjet Cutting', 'Waterjet'),
+        ('Electronics Workbench', 'Electronics'),
+        ('Precision CNC Milling', 'CNC'),
+        ('Large CNC Milling', 'CNC'),
+        ('Vacuum Forming', 'Forming'),
+        ('Sublimation', 'Printing')
+    ");
+}
+
+// ============================================
+// FIX DATABASE STRUCTURE
+// ============================================
+
+// Drop the old foreign key constraint if it exists
+$conn->query("ALTER TABLE training_sessions DROP FOREIGN KEY IF EXISTS training_sessions_ibfk_1");
+
+// Make tier_id nullable
+$conn->query("ALTER TABLE training_sessions MODIFY tier_id INT NULL");
+
+// Add machine_id column if it doesn't exist
+$conn->query("ALTER TABLE training_sessions ADD COLUMN IF NOT EXISTS machine_id INT NULL AFTER tier_id");
+
+// ============================================
 // HANDLE FORM SUBMISSIONS
 // ============================================
 
@@ -11,19 +56,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     // Create new training session
     if (isset($_POST['create_session'])) {
-        $tier_id = $_POST['tier_id'];
+        $machine_id = $_POST['machine_id'];
         $session_date = $_POST['session_date'];
         $session_time = $_POST['session_time'];
         $max_attendees = $_POST['max_attendees'] ?? 4;
         $notes = $conn->real_escape_string($_POST['notes']);
         $trainer_id = $_SESSION['user_id'] ?? 1; // Oscar's ID
         
+        // Insert with machine_id, tier_id set to NULL
         $stmt = $conn->prepare("INSERT INTO training_sessions 
-            (tier_id, trainer_id, session_date, session_time, max_attendees, notes) 
-            VALUES (?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("iissis", $tier_id, $trainer_id, $session_date, $session_time, $max_attendees, $notes);
+            (machine_id, tier_id, trainer_id, session_date, session_time, max_attendees, notes) 
+            VALUES (?, NULL, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("iissis", $machine_id, $trainer_id, $session_date, $session_time, $max_attendees, $notes);
         $stmt->execute();
-        $success = "Training session created for " . ($_POST['tier_name'] ?? 'Fabber tier');
+        
+        // Get machine name for success message
+        $machine_result = $conn->query("SELECT machine_name FROM machines WHERE machine_id = $machine_id");
+        $machine_name = $machine_result->fetch_assoc()['machine_name'];
+        
+        $success = "Training session created for $machine_name";
     }
     
     // Mark attendance
@@ -37,27 +88,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                           completed_training = " . ($status == 'attended' ? '1' : '0') . "
                       WHERE session_id = $session_id AND user_id = $user_id");
         
-        // If attended, update their tier training status
+        // If attended, update their machine training status
         if ($status == 'attended') {
-            $session = $conn->query("SELECT tier_id FROM training_sessions WHERE session_id = $session_id")->fetch_assoc();
-            $tier_id = $session['tier_id'];
+            $session = $conn->query("SELECT machine_id FROM training_sessions WHERE session_id = $session_id")->fetch_assoc();
+            $machine_id = $session['machine_id'];
             
-            // Check if user already has training for this tier
+            // Check if user already has training for this machine
             $check = $conn->query("SELECT training_id FROM user_training_completed 
-                                   WHERE user_id = $user_id AND tier_id = $tier_id");
+                                   WHERE user_id = $user_id AND machine_id = $machine_id");
             
             if ($check->num_rows > 0) {
                 $conn->query("UPDATE user_training_completed 
                               SET training_date = CURDATE(),
                                   expiry_date = DATE_ADD(CURDATE(), INTERVAL 1 YEAR)
-                              WHERE user_id = $user_id AND tier_id = $tier_id");
+                              WHERE user_id = $user_id AND machine_id = $machine_id");
             } else {
                 $conn->query("INSERT INTO user_training_completed 
-                              (user_id, tier_id, training_date, expiry_date) 
-                              VALUES ($user_id, $tier_id, CURDATE(), DATE_ADD(CURDATE(), INTERVAL 1 YEAR))");
+                              (user_id, machine_id, training_date, expiry_date) 
+                              VALUES ($user_id, $machine_id, CURDATE(), DATE_ADD(CURDATE(), INTERVAL 1 YEAR))");
             }
             
-            // Update user_preferences status to 'completed'
+            // Update user_preferences training_status to 'completed'
             $conn->query("UPDATE user_preferences 
                           SET training_status = 'completed' 
                           WHERE user_id = $user_id");
@@ -77,15 +128,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Get all tiers for dropdown
-$tiers = $conn->query("SELECT * FROM membership_tiers ORDER BY tier_level");
+// Get all machines for dropdown
+$machines = $conn->query("SELECT * FROM machines ORDER BY machine_category, machine_name");
 
 // Get upcoming sessions
 $upcoming_sessions = $conn->query("
-    SELECT ts.*, mt.tier_name, mt.tier_level,
+    SELECT ts.*, m.machine_name, m.machine_category,
            (SELECT COUNT(*) FROM session_attendees WHERE session_id = ts.session_id) as registered_count
     FROM training_sessions ts
-    JOIN membership_tiers mt ON ts.tier_id = mt.tier_id
+    LEFT JOIN machines m ON ts.machine_id = m.machine_id
     WHERE ts.session_date >= CURDATE()
     ORDER BY ts.session_date ASC, ts.session_time ASC
 ");
@@ -107,6 +158,19 @@ $pending_training = $conn->query("
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Training Session Manager - Creative Spark FabLab</title>
     <link rel="stylesheet" href="../css/training.css">
+    <style>
+        .category-badge {
+            background: #e0e0e0;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.7em;
+            margin-left: 8px;
+        }
+        optgroup {
+            font-weight: bold;
+            color: #2E7D32;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -140,14 +204,15 @@ $pending_training = $conn->query("
             <?php elseif($upcoming_sessions): ?>
             <div class="session-grid">
                 <?php while($session = $upcoming_sessions->fetch_assoc()): 
-                    $tier_class = 'tier-badge-' . strtolower(str_replace(' ', '', $session['tier_name']));
                 ?>
                 <div class="session-card">
                     <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px;">
-                        <h3><?php echo $session['tier_name']; ?></h3>
-                        <span class="machine-tag <?php echo $tier_class; ?>">
-                            Tier <?php echo $session['tier_level']; ?>
-                        </span>
+                        <div>
+                            <h3><?php echo $session['machine_name'] ?? 'Unknown Machine'; ?></h3>
+                            <?php if($session['machine_category']): ?>
+                            <span class="category-badge"><?php echo $session['machine_category']; ?></span>
+                            <?php endif; ?>
+                        </div>
                     </div>
                     
                     <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
@@ -219,19 +284,29 @@ $pending_training = $conn->query("
                 
                 <form method="POST">
                     <div class="form-group">
-                        <label>Membership Tier</label>
-                        <select name="tier_id" required onchange="this.form.tier_name.value=this.options[this.selectedIndex].text">
-                            <option value="">-- Select a tier --</option>
+                        <label>Select Machine</label>
+                        <select name="machine_id" required>
+                            <option value="">-- Choose a machine --</option>
                             <?php 
-                            if($tiers) {
-                                $tiers->data_seek(0);
-                                while($tier = $tiers->fetch_assoc()): ?>
-                                <option value="<?php echo $tier['tier_id']; ?>">
-                                    <?php echo $tier['tier_name']; ?>
+                            if($machines) {
+                                $current_category = '';
+                                $machines->data_seek(0);
+                                while($machine = $machines->fetch_assoc()): 
+                                    // Group by category
+                                    if($current_category != $machine['machine_category']) {
+                                        if($current_category != '') echo '</optgroup>';
+                                        $current_category = $machine['machine_category'];
+                                        echo '<optgroup label="' . $current_category . '">';
+                                    }
+                            ?>
+                                <option value="<?php echo $machine['machine_id']; ?>">
+                                    <?php echo $machine['machine_name']; ?>
                                 </option>
-                            <?php endwhile; } ?>
+                            <?php 
+                                endwhile; 
+                                if($current_category != '') echo '</optgroup>';
+                            } ?>
                         </select>
-                        <input type="hidden" name="tier_name">
                     </div>
                     
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
@@ -253,7 +328,7 @@ $pending_training = $conn->query("
                     
                     <div class="form-group">
                         <label>Notes (optional)</label>
-                        <textarea name="notes" rows="4" placeholder="What to bring, prerequisites, meeting point, etc..."></textarea>
+                        <textarea name="notes" rows="4" placeholder="Prerequisites, what to bring, meeting point, etc..."></textarea>
                     </div>
                     
                     <button type="submit" name="create_session" class="btn" style="width: 100%; font-size: 16px; padding: 15px;">
