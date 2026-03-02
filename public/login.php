@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['is_admin'] = ($email === 'admin@booking.com');
             
             // ============================================
-            // ACCOUNT STATUS CHECK (ADDED)
+            // ACCOUNT STATUS CHECK
             // ============================================
             
             // Get user's account status
@@ -37,6 +37,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             // Update last activity
             $conn->query("UPDATE users SET last_activity = CURDATE() WHERE user_id = $user_id");
+            
+            // ============================================
+            // MEMBERSHIP HISTORY TRACKING - MOVED INSIDE
+            // ============================================
+            
+            $today = date('Y-m-d');
+            
+            // Check if there's an open history record
+            $history_check = $conn->query("
+                SELECT * FROM membership_history 
+                WHERE user_id = $user_id AND end_date IS NULL
+            ");
+            
+            if ($history_check && $history_check->num_rows == 0) {
+                // No open record, create one
+                $current_status = ($status['account_status'] == 'active') ? 'active' : 'inactive';
+                $conn->query("
+                    INSERT INTO membership_history (user_id, status, start_date) 
+                    VALUES ($user_id, '$current_status', '$today')
+                ");
+            }
             
             // Redirect based on status
             if ($status['account_status'] == 'inactive') {
@@ -49,23 +70,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $error = 'Invalid email or password!';
         }
     }
-}
-// After successful login, check if we need to update history
-$today = date('Y-m-d');
-
-// Check if there's an open history record
-$open_history = $conn->query("
-    SELECT * FROM membership_history 
-    WHERE user_id = $user_id AND end_date IS NULL
-")->fetch_assoc();
-
-if (!$open_history) {
-    // No open record, create one
-    $status = ($user_status == 'active') ? 'active' : 'inactive';
-    $conn->query("
-        INSERT INTO membership_history (user_id, status, start_date) 
-        VALUES ($user_id, '$status', '$today')
-    ");
 }
 ?>
 <!DOCTYPE html>

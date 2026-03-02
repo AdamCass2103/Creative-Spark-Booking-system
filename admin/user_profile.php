@@ -25,6 +25,22 @@ $history = $conn->query("
     WHERE mh.user_id = $user_id
     ORDER BY mh.start_date DESC
 ");
+
+// Determine account status
+$account_status = $user['account_status'] ?? 'unknown';
+$status_color = [
+    'active' => '#4caf50',
+    'inactive' => '#f44336',
+    'reactivating' => '#ff9800',
+    'unknown' => '#999'
+][$account_status];
+
+$status_icon = [
+    'active' => '🟢',
+    'inactive' => '🔴',
+    'reactivating' => '🟡',
+    'unknown' => '⚪'
+][$account_status];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -33,187 +49,59 @@ $history = $conn->query("
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Profile - <?php echo htmlspecialchars($user['name']); ?></title>
     <link rel="stylesheet" href="../css/user_profile.css">
-    <style>
-        /* Additional styles for skill badges */
-        .skill-badge {
-            display: inline-block;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 10px;
-            font-weight: bold;
-            margin-left: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .skill-badge.beginner {
-            background: #ff9800;
-            color: white;
-        }
-        .skill-badge.intermediate {
-            background: #2196f3;
-            color: white;
-        }
-        .skill-badge.expert {
-            background: #4caf50;
-            color: white;
-        }
-        .area-tag {
-            display: inline-flex;
-            align-items: center;
-            background: #e8f5e9;
-            color: #2E7D32;
-            padding: 8px 16px;
-            border-radius: 30px;
-            font-size: 0.9em;
-            font-weight: 500;
-            margin: 5px;
-        }
-        .work-description-box {
-            background: #f9f9f9;
-            padding: 20px;
-            border-radius: 10px;
-            border-left: 4px solid #2E7D32;
-            margin-top: 10px;
-        }
-        
-        /* History Section Styles */
-        .history-card {
-            grid-column: span 2;
-            margin-top: 20px;
-        }
-        
-        .history-timeline {
-            background: #f8f9fa;
-            border-radius: 15px;
-            padding: 20px;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-        
-        .history-item {
-            display: flex;
-            align-items: center;
-            padding: 15px;
-            border-bottom: 1px solid #e0e0e0;
-            transition: all 0.3s;
-        }
-        
-        .history-item:last-child {
-            border-bottom: none;
-        }
-        
-        .history-item.current {
-            background: #f0f7f0;
-            border-radius: 10px;
-            margin: 5px 0;
-        }
-        
-        .history-icon {
-            width: 40px;
-            font-size: 1.5em;
-            text-align: center;
-        }
-        
-        .history-status {
-            flex: 2;
-            font-weight: 600;
-        }
-        
-        .history-status.active { color: #4caf50; }
-        .history-status.inactive { color: #f44336; }
-        .history-status.reactivating { color: #ff9800; }
-        
-        .history-dates {
-            flex: 3;
-            color: #333;
-        }
-        
-        .history-duration {
-            color: #999;
-            margin-left: 10px;
-            font-size: 0.9em;
-        }
-        
-        .history-notes {
-            color: #666;
-            font-style: italic;
-            font-size: 0.9em;
-            margin-left: 15px;
-            flex: 2;
-        }
-        
-        .history-badge {
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 0.8em;
-            font-weight: bold;
-            margin-left: 10px;
-        }
-        
-        .history-badge.step {
-            background: #ff9800;
-            color: white;
-        }
-        
-        .stats-mini {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        
-        .stat-mini-card {
-            background: white;
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-        
-        .stat-mini-number {
-            font-size: 1.8em;
-            font-weight: bold;
-            color: #2E7D32;
-        }
-        
-        .stat-mini-label {
-            color: #666;
-            font-size: 0.9em;
-        }
-        
-        .action-button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s;
-            margin-right: 10px;
-        }
-        
-        .action-button.force {
-            background: #ff9800;
-            color: white;
-        }
-        
-        .action-button.archive {
-            background: #f44336;
-            color: white;
-        }
-        
-        .action-button.history {
-            background: #2196f3;
-            color: white;
-        }
-        
-        .action-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-    </style>
 </head>
 <body>
     <div class="container">
+        <!-- Account Status Banner - NEW -->
+        <div class="status-banner">
+            <div class="status-banner-left">
+                <span class="status-banner-icon"><?php echo $status_icon; ?></span>
+                <span class="status-banner-text">
+                    Account Status: <strong><?php echo ucfirst($account_status); ?></strong>
+                </span>
+            </div>
+            <div class="status-banner-badge">
+                <?php 
+                if ($account_status == 'active') echo '✅ Active Member';
+                elseif ($account_status == 'inactive') echo '⏳ Inactive';
+                elseif ($account_status == 'reactivating') echo '🔄 Reactivating';
+                else echo '⚪ Unknown';
+                ?>
+            </div>
+        </div>
+        
+        <!-- Inactive Notice with Quick Reactivate Button -->
+        <?php if ($account_status == 'inactive'): ?>
+        <div class="inactive-notice">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <strong style="color: #f44336; font-size: 1.1em;">⏳ Account Inactive</strong>
+                    <p style="color: #666; margin-top: 5px;">
+                        Inactive since: <?php echo $user['inactive_since'] ? date('F j, Y', strtotime($user['inactive_since'])) : 'Unknown'; ?>
+                    </p>
+                </div>
+                <a href="../reactivate/step1.php" class="reactivate-quick-btn">
+                    🔄 Quick Reactivate
+                </a>
+            </div>
+        </div>
+        <?php endif; ?>
+        
+        <!-- Reactivating Notice -->
+        <?php if ($account_status == 'reactivating'): ?>
+        <div class="inactive-notice" style="border-left-color: #ff9800;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <strong style="color: #ff9800; font-size: 1.1em;">🔄 Account Reactivating</strong>
+                    <p style="color: #666; margin-top: 5px;">
+                        Reactivation started: <?php echo $user['reactivation_started'] ? date('F j, Y', strtotime($user['reactivation_started'])) : 'Unknown'; ?>
+                        | Step: <?php echo $user['reactivation_step'] ?? 1; ?>/4
+                    </p>
+                </div>
+            </div>
+        </div>
+        <?php endif; ?>
+
         <!-- Profile Header -->
         <div class="profile-header">
             <span class="user-id">🔖 ID: #<?php echo str_pad($user['user_id'], 4, '0', STR_PAD_LEFT); ?></span>
@@ -247,11 +135,11 @@ $history = $conn->query("
                 <div class="stat-value status-<?php echo $prefs['training_status']; ?>">
                     <?php echo ucfirst($prefs['training_status']); ?>
                 </div>
-                <div class="stat-label">Account Status</div>
+                <div class="stat-label">Application Status</div>
             </div>
         </div>
 
-        <!-- Profile Grid -->
+        <!-- Profile Grid (rest of your existing code remains the same) -->
         <div class="profile-grid">
             <!-- Personal Details -->
             <div class="card">
@@ -315,7 +203,7 @@ $history = $conn->query("
                         </span>
                     </div>
                     <div class="info-row">
-                        <span class="info-label">Account Status</span>
+                        <span class="info-label">Application Status</span>
                         <span class="info-value">
                             <span class="status-badge status-<?php echo $prefs['training_status']; ?>">
                                 <?php echo ucfirst($prefs['training_status']); ?>
@@ -412,10 +300,7 @@ $history = $conn->query("
             </div>
         </div>
 
-        <!-- ============================================ -->
-        <!-- MEMBERSHIP HISTORY SECTION - NEW -->
-        <!-- ============================================ -->
-        
+        <!-- Membership History Section -->
         <?php if ($history && $history->num_rows > 0): 
             // Calculate statistics
             $total_months = 0;
@@ -495,41 +380,8 @@ $history = $conn->query("
                     <?php if($period['notes']): ?>
                         <div class="history-notes"><?php echo $period['notes']; ?></div>
                     <?php endif; ?>
-                    
-                    <?php if($period['status'] == 'reactivating' && $user['reactivation_step'] > 0): ?>
-                        <span class="history-badge step">Step <?php echo $user['reactivation_step']; ?>/4</span>
-                    <?php endif; ?>
                 </div>
                 <?php endwhile; ?>
-            </div>
-            
-            <!-- Admin Action Buttons -->
-            <div style="display: flex; gap: 15px; margin-top: 20px; justify-content: flex-end;">
-                <?php 
-                // Check if user is reactivating
-                $is_reactivating = false;
-                $history->data_seek(0);
-                while($period = $history->fetch_assoc()) {
-                    if($period['status'] == 'reactivating' && !$period['end_date']) {
-                        $is_reactivating = true;
-                        break;
-                    }
-                }
-                ?>
-                
-                <?php if($is_reactivating): ?>
-                    <button onclick="forceReactivate(<?php echo $user_id; ?>)" class="action-button force">
-                        🔄 Force Reactivate
-                    </button>
-                <?php endif; ?>
-                
-                <button onclick="archiveUser(<?php echo $user_id; ?>)" class="action-button archive">
-                    📦 Archive Account
-                </button>
-                
-                <a href="user_history.php?id=<?php echo $user_id; ?>" class="action-button history">
-                    📜 Full History
-                </a>
             </div>
         </div>
         <?php endif; ?>
@@ -542,19 +394,5 @@ $history = $conn->query("
             <?php endif; ?>
         </div>
     </div>
-
-    <script>
-    function forceReactivate(userId) {
-        if(confirm('Force reactivate this membership? This will override the current reactivation process.')) {
-            window.location.href = 'force_reactivate.php?id=' + userId;
-        }
-    }
-    
-    function archiveUser(userId) {
-        if(confirm('Archive this account? This will mark it as permanently archived.')) {
-            window.location.href = 'archive_user.php?id=' + userId;
-        }
-    }
-    </script>
 </body>
 </html>
