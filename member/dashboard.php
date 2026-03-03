@@ -76,6 +76,7 @@ $quick_help = [
             <a href="my_bookings.php" class="btn-book" style="background: #9c27b0;">
                 📋 My Bookings
             </a>
+            <a href="my_account.php" class="btn-book" style="background: #2E7D32;">👤 My Account</a>
         </div>
         
         <!-- Dashboard Grid -->
