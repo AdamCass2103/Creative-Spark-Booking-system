@@ -9,6 +9,13 @@ $conn = new mysqli('localhost', 'root', '', 'booking_system');
 $user = $conn->query("SELECT * FROM users WHERE user_id = $user_id")->fetch_assoc();
 $prefs = $conn->query("SELECT * FROM user_preferences WHERE user_id = $user_id")->fetch_assoc();
 
+// Get user's existing skills from user_areas table
+$user_areas = $conn->query("SELECT * FROM user_areas WHERE user_id = $user_id");
+$existing_skills = [];
+while ($area = $user_areas->fetch_assoc()) {
+    $existing_skills[$area['area_name']] = $area['skill_level'];
+}
+
 $message = '';
 $message_type = '';
 
@@ -77,10 +84,68 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Refresh prefs
         $prefs = $conn->query("SELECT * FROM user_preferences WHERE user_id = $user_id")->fetch_assoc();
     }
+    
+    // Update machine skills (using user_areas table)
+    if (isset($_POST['update_skills'])) {
+        // Define all possible machine areas (same as in signup)
+        $areas = [
+            'FDM 3D Printing',
+            'SLA 3D Printing',
+            'SLS 3D Printing',
+            'Laser Cutting',
+            'Vinyl Cutting',
+            'Waterjet Cutting',
+            'Electronics Workbench',
+            'Precision CNC Milling',
+            'Large CNC Milling',
+            'Vacuum Forming',
+            'Sublimation'
+        ];
+        
+        // Delete existing areas for this user
+        $conn->query("DELETE FROM user_areas WHERE user_id = $user_id");
+        
+        // Insert new areas with skill levels
+        if (isset($_POST['areas']) && is_array($_POST['areas'])) {
+            foreach ($_POST['areas'] as $area) {
+                $area_clean = $conn->real_escape_string($area);
+                $skill_key = str_replace(' ', '_', $area) . '_skill';
+                $skill_level = $conn->real_escape_string($_POST[$skill_key] ?? 'beginner');
+                
+                $conn->query("INSERT INTO user_areas (user_id, area_name, skill_level) 
+                             VALUES ($user_id, '$area_clean', '$skill_level')");
+            }
+        }
+        
+        $message = "Machine skills updated successfully!";
+        $message_type = "success";
+        
+        // Refresh skills
+        $user_areas = $conn->query("SELECT * FROM user_areas WHERE user_id = $user_id");
+        $existing_skills = [];
+        while ($area = $user_areas->fetch_assoc()) {
+            $existing_skills[$area['area_name']] = $area['skill_level'];
+        }
+    }
 }
 
 // Get tiers for dropdown
 $tiers = $conn->query("SELECT * FROM membership_tiers ORDER BY tier_level");
+
+// Define areas for skills section
+$areas = [
+    'FDM 3D Printing',
+    'SLA 3D Printing',
+    'SLS 3D Printing',
+    'Laser Cutting',
+    'Vinyl Cutting',
+    'Waterjet Cutting',
+    'Electronics Workbench',
+    'Precision CNC Milling',
+    'Large CNC Milling',
+    'Vacuum Forming',
+    'Sublimation'
+];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -89,6 +154,130 @@ $tiers = $conn->query("SELECT * FROM membership_tiers ORDER BY tier_level");
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Account - Creative Spark</title>
     <link rel="stylesheet" href="../css/my_account.css">
+    <style>
+        /* Machine Skills Editor Styles */
+        .skills-container {
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 10px;
+            margin: 15px 0;
+        }
+        
+        .machine-skill-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            margin-bottom: 8px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 3px solid #667eea;
+        }
+        
+        .machine-skill-row:hover {
+            background: #f0f2f5;
+        }
+        
+        .machine-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+        }
+        
+        .machine-checkbox input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        
+        .machine-name {
+            font-weight: 500;
+            color: #333;
+            cursor: pointer;
+        }
+        
+        .skill-selector {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        
+        .skill-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .skill-badge.beginner {
+            background: #ffd70020;
+            color: #b8860b;
+            border: 1px solid #ffd700;
+        }
+        
+        .skill-badge.beginner:hover, .skill-badge.beginner.selected {
+            background: #ffd700;
+            color: #333;
+        }
+        
+        .skill-badge.intermediate {
+            background: #87ceeb20;
+            color: #0066b3;
+            border: 1px solid #87ceeb;
+        }
+        
+        .skill-badge.intermediate:hover, .skill-badge.intermediate.selected {
+            background: #87ceeb;
+            color: #333;
+        }
+        
+        .skill-badge.expert {
+            background: #4caf5020;
+            color: #2e7d32;
+            border: 1px solid #4caf50;
+        }
+        
+        .skill-badge.expert:hover, .skill-badge.expert.selected {
+            background: #4caf50;
+            color: white;
+        }
+        
+        .selected-skills-summary {
+            margin-top: 15px;
+            padding: 10px;
+            background: #e8f4fd;
+            border-radius: 8px;
+            font-size: 0.9em;
+        }
+        
+        .selected-skills-summary span {
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .btn-update-skills {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 15px;
+        }
+        
+        .btn-update-skills:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+    </style>
 </head>
 <body>
     <div class="account-container">
@@ -211,6 +400,77 @@ $tiers = $conn->query("SELECT * FROM membership_tiers ORDER BY tier_level");
                 </form>
             </div>
             
+            <!-- Machine Skills Card (using user_areas table) -->
+            <div class="account-card">
+                <h2>🔧 Machine Skills</h2>
+                <p style="color: #666; margin-bottom: 15px; font-size: 0.9em;">
+                    Select the machines you use and rate your skill level:
+                </p>
+                
+                <form method="POST" id="skillsForm">
+                    <div class="skills-container">
+                        <?php foreach($areas as $area): 
+                            $area_id = str_replace(' ', '_', $area);
+                            $is_checked = isset($existing_skills[$area]);
+                            $current_skill = $existing_skills[$area] ?? 'beginner';
+                        ?>
+                        <div class="machine-skill-row">
+                            <div class="machine-checkbox">
+                                <input type="checkbox" name="areas[]" value="<?php echo $area; ?>" 
+                                       id="area_<?php echo $area_id; ?>" 
+                                       <?php echo $is_checked ? 'checked' : ''; ?>
+                                       onchange="toggleSkill('<?php echo $area_id; ?>')">
+                                <label for="area_<?php echo $area_id; ?>" class="machine-name"><?php echo $area; ?></label>
+                            </div>
+                            <div class="skill-selector" id="skills_<?php echo $area_id; ?>" 
+                                 style="display: <?php echo $is_checked ? 'flex' : 'none'; ?>;">
+                                <input type="hidden" name="<?php echo $area_id; ?>_skill" 
+                                       id="skill_<?php echo $area_id; ?>" value="<?php echo $current_skill; ?>">
+                                <button type="button" class="skill-badge beginner <?php echo $current_skill == 'beginner' ? 'selected' : ''; ?>" 
+                                        onclick="setSkill('<?php echo $area_id; ?>', 'beginner', this)">Beginner</button>
+                                <button type="button" class="skill-badge intermediate <?php echo $current_skill == 'intermediate' ? 'selected' : ''; ?>" 
+                                        onclick="setSkill('<?php echo $area_id; ?>', 'intermediate', this)">Intermediate</button>
+                                <button type="button" class="skill-badge expert <?php echo $current_skill == 'expert' ? 'selected' : ''; ?>" 
+                                        onclick="setSkill('<?php echo $area_id; ?>', 'expert', this)">Expert</button>
+                            </div>
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
+                    
+                    <!-- Summary of selected skills -->
+                    <div class="selected-skills-summary" id="skillsSummary">
+                        <?php 
+                        $count = count($existing_skills);
+                        if ($count > 0) {
+                            echo "<span>$count</span> machine" . ($count > 1 ? 's' : '') . " selected";
+                        } else {
+                            echo "No machines selected yet";
+                        }
+                        ?>
+                    </div>
+                    
+                    <!-- Skill Level Breakdown -->
+                    <?php if (count($existing_skills) > 0): 
+                        $beginners = 0; $intermediates = 0; $experts = 0;
+                        foreach ($existing_skills as $skill) {
+                            if ($skill == 'beginner') $beginners++;
+                            if ($skill == 'intermediate') $intermediates++;
+                            if ($skill == 'expert') $experts++;
+                        }
+                    ?>
+                    <div style="margin-top: 10px; display: flex; gap: 10px; justify-content: center; font-size: 0.8em;">
+                        <span style="background: #ffd70020; color: #b8860b; padding: 4px 8px; border-radius: 12px;">🔰 Beginner: <?php echo $beginners; ?></span>
+                        <span style="background: #87ceeb20; color: #0066b3; padding: 4px 8px; border-radius: 12px;">📘 Intermediate: <?php echo $intermediates; ?></span>
+                        <span style="background: #4caf5020; color: #2e7d32; padding: 4px 8px; border-radius: 12px;">⭐ Expert: <?php echo $experts; ?></span>
+                    </div>
+                    <?php endif; ?>
+                    
+                    <button type="submit" name="update_skills" class="btn-update-skills">
+                        Update Machine Skills
+                    </button>
+                </form>
+            </div>
+            
             <!-- Account Info Card -->
             <div class="account-card">
                 <h2>📊 Account Information</h2>
@@ -230,8 +490,8 @@ $tiers = $conn->query("SELECT * FROM membership_tiers ORDER BY tier_level");
                         </span>
                     </div>
                     <div style="display: flex; justify-content: space-between; padding: 10px 0;">
-                        <span style="color: #666;">Signature on file:</span>
-                        <span><?php echo $user['signature'] ? '✅ Yes' : '❌ No'; ?></span>
+                        <span style="color: #666;">Machines Known:</span>
+                        <span style="font-weight: 500;"><?php echo count($existing_skills); ?></span>
                     </div>
                 </div>
                 
@@ -241,5 +501,45 @@ $tiers = $conn->query("SELECT * FROM membership_tiers ORDER BY tier_level");
             </div>
         </div>
     </div>
+
+    <script>
+        function toggleSkill(areaId) {
+            var checkbox = document.getElementById('area_' + areaId);
+            var skillDiv = document.getElementById('skills_' + areaId);
+            skillDiv.style.display = checkbox.checked ? 'flex' : 'none';
+            
+            // Update summary
+            updateSkillsSummary();
+        }
+        
+        function setSkill(areaId, level, btn) {
+            // Update hidden input
+            document.getElementById('skill_' + areaId).value = level;
+            
+            // Update button styles
+            var buttons = document.querySelectorAll('#skills_' + areaId + ' .skill-badge');
+            buttons.forEach(function(b) {
+                b.classList.remove('selected');
+            });
+            btn.classList.add('selected');
+        }
+        
+        function updateSkillsSummary() {
+            var checkboxes = document.querySelectorAll('input[name="areas[]"]:checked');
+            var count = checkboxes.length;
+            var summary = document.getElementById('skillsSummary');
+            
+            if (count > 0) {
+                summary.innerHTML = '<span>' + count + '</span> machine' + (count > 1 ? 's' : '') + ' selected';
+            } else {
+                summary.innerHTML = 'No machines selected yet';
+            }
+        }
+        
+        // Add change listeners to all checkboxes
+        document.querySelectorAll('input[name="areas[]"]').forEach(function(checkbox) {
+            checkbox.addEventListener('change', updateSkillsSummary);
+        });
+    </script>
 </body>
 </html>

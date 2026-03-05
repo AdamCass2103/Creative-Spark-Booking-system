@@ -172,69 +172,78 @@ $quick_help = [
                 <?php endif; ?>
             </div>
 
-            <!-- Learning Resources -->
-            <div class="card" style="grid-column: span 2;">
-                <h2>📚 Learning Resources</h2>
-                
-                <div class="resources-grid">
-                    <!-- Videos -->
-                    <div>
-                        <div class="resource-header">
-                            <span style="font-size: 1.5em;">🎥</span>
-                            <h3>Video Tutorials</h3>
-                        </div>
-                        <div class="video-list">
-                            <?php foreach($videos as $video): ?>
-                            <div class="video-item" onclick="window.open('<?php echo $video['url']; ?>', '_blank')">
-                                <div class="video-thumb">▶️</div>
-                                <div class="video-info">
-                                    <div class="video-title"><?php echo $video['title']; ?></div>
-                                    <div class="video-meta">
-                                        <span>⏱️ <?php echo $video['duration']; ?></span>
-                                    </div>
-                                </div>
-                                <button class="watch-btn">Watch</button>
-                            </div>
-                            <?php endforeach; ?>
-                        </div>
-                    </div>
-                    
-                    <!-- Wiki Articles -->
-                    <div>
-                        <div class="resource-header">
-                            <span style="font-size: 1.5em;">📖</span>
-                            <h3>Wiki Articles</h3>
-                        </div>
-                        <div class="article-list">
-                            <?php foreach($wiki_articles as $article): ?>
-                            <div class="article-item" onclick="window.open('<?php echo $article['url']; ?>', '_blank')">
-                                <div class="video-thumb">📄</div>
-                                <div class="article-info">
-                                    <div class="article-title">
-                                        <?php echo $article['title']; ?>
-                                        <?php if($article['new']): ?>
-                                            <span class="new-badge">NEW</span>
-                                        <?php endif; ?>
-                                    </div>
-                                    <div class="article-meta" style="font-size: 0.8em; color: #666; margin-top: 3px;">
-                                        <?php echo $article['description']; ?>
-                                    </div>
-                                </div>
-                                <a href="<?php echo $article['url']; ?>" target="_blank" class="read-btn" onclick="event.stopPropagation();">Read</a>
-                            </div>
-                            <?php endforeach; ?>
-                        </div>
-                        
-                        <!-- Wiki Navigation Link -->
-                        <div style="margin-top: 15px; text-align: right;">
-                            <a href="<?php echo $wiki_base_url; ?>" target="_blank" class="btn-book" style="display: inline-block; padding: 8px 15px; font-size: 0.9em;">
-                                Visit Full Wiki 📚
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <!-- In your member-dashboard.php - Replace the Learning Resources section with this -->
 
+<!-- Learning Resources -->
+<div class="card" style="grid-column: span 2;">
+    <h2>📚 Learning Resources</h2>
+    
+    <div class="resources-grid">
+        <!-- Videos -->
+        <div>
+            <div class="resource-header">
+                <span style="font-size: 1.5em;">🎥</span>
+                <h3>Video Tutorials</h3>
+            </div>
+            <div class="video-list">
+                <?php foreach($videos as $video): ?>
+                <div class="video-item" onclick="window.open('<?php echo $video['url']; ?>', '_blank')">
+                    <div class="video-thumb">▶️</div>
+                    <div class="video-info">
+                        <div class="video-title"><?php echo $video['title']; ?></div>
+                        <div class="video-meta">
+                            <span>⏱️ <?php echo $video['duration']; ?></span>
+                        </div>
+                    </div>
+                    <button class="watch-btn">Watch</button>
+                </div>
+                <?php endforeach; ?>
+            </div>
+            
+            <!-- Machine Tutorials Library Button - Styled like Visit Wiki -->
+            <div style="margin-top: 20px;">
+                <a href="tutorials.php" class="btn-book" style="display: inline-block; padding: 10px 20px; font-size: 1em; background: #ff6b6b; width: 100%; text-align: center; box-sizing: border-box;">
+                    📚 Machine Tutorials Library
+                </a>
+                <p style="font-size: 0.8em; color: #666; margin-top: 5px; text-align: center;">Complete guides for all machines</p>
+            </div>
+        </div>
+        
+        <!-- Wiki Articles -->
+        <div>
+            <div class="resource-header">
+                <span style="font-size: 1.5em;">📖</span>
+                <h3>Wiki Articles</h3>
+            </div>
+            <div class="article-list">
+                <?php foreach($wiki_articles as $article): ?>
+                <div class="article-item" onclick="window.open('<?php echo $article['url']; ?>', '_blank')">
+                    <div class="video-thumb">📄</div>
+                    <div class="article-info">
+                        <div class="article-title">
+                            <?php echo $article['title']; ?>
+                            <?php if($article['new']): ?>
+                                <span class="new-badge">NEW</span>
+                            <?php endif; ?>
+                        </div>
+                        <div class="article-meta" style="font-size: 0.8em; color: #666; margin-top: 3px;">
+                            <?php echo $article['description']; ?>
+                        </div>
+                    </div>
+                    <a href="<?php echo $article['url']; ?>" target="_blank" class="read-btn" onclick="event.stopPropagation();">Read</a>
+                </div>
+                <?php endforeach; ?>
+            </div>
+            
+            <!-- Wiki Navigation Link -->
+            <div style="margin-top: 15px; text-align: right;">
+                <a href="<?php echo $wiki_base_url; ?>" target="_blank" class="btn-book" style="display: inline-block; padding: 8px 15px; font-size: 0.9em;">
+                    Visit Full Wiki 📚
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
             <!-- Quick Help -->
             <div class="card" style="grid-column: span 2;">
                 <h2>❓ Quick Help</h2>

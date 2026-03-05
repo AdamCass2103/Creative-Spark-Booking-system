@@ -143,3 +143,125 @@
         grid-template-columns: 1fr;
     }
 }
+/* Machine Skills Editor Styles */
+.skills-container {
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 10px;
+    margin: 15px 0;
+}
+
+.machine-skill-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px;
+    margin-bottom: 8px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 3px solid #667eea;
+}
+
+.machine-skill-row:hover {
+    background: #f0f2f5;
+}
+
+.machine-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+}
+
+.machine-checkbox input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.machine-name {
+    font-weight: 500;
+    color: #333;
+    cursor: pointer;
+}
+
+.skill-selector {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.skill-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.skill-badge.beginner {
+    background: #ffd70020;
+    color: #b8860b;
+    border: 1px solid #ffd700;
+}
+
+.skill-badge.beginner:hover, .skill-badge.beginner.selected {
+    background: #ffd700;
+    color: #333;
+}
+
+.skill-badge.intermediate {
+    background: #87ceeb20;
+    color: #0066b3;
+    border: 1px solid #87ceeb;
+}
+
+.skill-badge.intermediate:hover, .skill-badge.intermediate.selected {
+    background: #87ceeb;
+    color: #333;
+}
+
+.skill-badge.expert {
+    background: #4caf5020;
+    color: #2e7d32;
+    border: 1px solid #4caf50;
+}
+
+.skill-badge.expert:hover, .skill-badge.expert.selected {
+    background: #4caf50;
+    color: white;
+}
+
+.selected-skills-summary {
+    margin-top: 15px;
+    padding: 10px;
+    background: #e8f4fd;
+    border-radius: 8px;
+    font-size: 0.9em;
+}
+
+.selected-skills-summary span {
+    font-weight: bold;
+    color: #667eea;
+}
+
+.btn-update-skills {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 15px;
+}
+
+.btn-update-skills:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
