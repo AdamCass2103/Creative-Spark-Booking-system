@@ -11,23 +11,63 @@ $conn = new mysqli('localhost', 'root', '', 'booking_system');
 $user = $conn->query("SELECT * FROM users WHERE user_id = $user_id")->fetch_assoc();
 $prefs = $conn->query("SELECT * FROM user_preferences WHERE user_id = $user_id")->fetch_assoc();
 
-// Get pending booking count for badge - ADD THIS LINE
+// Get pending booking count for badge
 $pending_bookings = $conn->query("SELECT COUNT(*) as count FROM session_attendees 
                                   WHERE user_id = $user_id AND booking_status = 'pending_approval'")->fetch_assoc()['count'];
 
-// Learning Resources Data
+// Learning Resources Data with corrected wiki URLs (using /home/ structure)
+$wiki_base_url = "https://creative-spark-enterprise-fablab.gitbook.io/fablab-wiki/";
+
 $videos = [
-    ['title' => 'Laser Cutter Basics', 'duration' => '12:34', 'url' => '#'],
-    ['title' => '3D Printer Setup', 'duration' => '8:21', 'url' => '#'],
-    ['title' => 'CNC Router Safety', 'duration' => '15:45', 'url' => '#'],
-    ['title' => 'Vinyl Cutting Guide', 'duration' => '6:18', 'url' => '#'],
+        [
+            'title' => 'Laser Cutting for Beginners',
+            'duration' => '21:36',
+            'url' => 'https://learn.microsoft.com/en-us/shows/themakershow/mini-laser-cutting'
+        ],
+        [
+            'title' => '3D Printing Beginner Guide',
+            'duration' => '30:19',
+            'url' => 'https://www.youtube.com/watch?v=2vFdwz4U1VQ'
+        ],
+        [
+            'title' => 'CNC Milling Basics for Beginners',
+            'duration' => '18:45',
+            'url' => 'https://www.youtube.com/watch?v=cj0-wSGGe6g'
+        ],
+        [
+            'title' => 'Vinyl Cutter Tutorial for Beginners',
+            'duration' => '9:43',
+            'url' => 'https://www.youtube.com/watch?v=G9V-F7kWs8g'
+        ]
 ];
 
+// Wiki articles with CORRECT URLs based on your links
 $wiki_articles = [
-    ['title' => 'Machine Safety Guidelines', 'new' => true],
-    ['title' => 'Material Selection Guide', 'new' => false],
-    ['title' => 'Troubleshooting Common Issues', 'new' => false],
-    ['title' => 'Project Ideas & Inspiration', 'new' => true],
+    [
+        'title' => 'Glossary of Terms', 
+        'new' => true,
+        'url' => $wiki_base_url . 'home/glossary-of-terms',
+        'description' => 'Common terms in digital fabrication'
+    ],
+    [
+        'title' => 'Fabrication Processes', 
+        'new' => false,
+        'url' => $wiki_base_url . 'home/fabrication-processes',
+        'description' => 'Guides for using equipment safely'
+    ],
+    
+    [
+        'title' => 'Extra Resources', 
+        'new' => false,
+        'url' => $wiki_base_url . 'home/extra-resources',
+        'description' => 'Tutorials and community forums'
+    ],
+    [
+        'title' => 'Fab Academy Diploma', 
+        'new' => false,
+        'url' => $wiki_base_url . 'home/fab-academy-diploma',
+        'description' => 'Intensive 5-month program in digital fabrication'
+    ],
 ];
 
 $quick_help = [
@@ -167,7 +207,7 @@ $quick_help = [
                         </div>
                         <div class="article-list">
                             <?php foreach($wiki_articles as $article): ?>
-                            <div class="article-item" onclick="readArticle('<?php echo $article['title']; ?>')">
+                            <div class="article-item" onclick="window.open('<?php echo $article['url']; ?>', '_blank')">
                                 <div class="video-thumb">📄</div>
                                 <div class="article-info">
                                     <div class="article-title">
@@ -176,10 +216,20 @@ $quick_help = [
                                             <span class="new-badge">NEW</span>
                                         <?php endif; ?>
                                     </div>
+                                    <div class="article-meta" style="font-size: 0.8em; color: #666; margin-top: 3px;">
+                                        <?php echo $article['description']; ?>
+                                    </div>
                                 </div>
-                                <button class="read-btn">Read</button>
+                                <a href="<?php echo $article['url']; ?>" target="_blank" class="read-btn" onclick="event.stopPropagation();">Read</a>
                             </div>
                             <?php endforeach; ?>
+                        </div>
+                        
+                        <!-- Wiki Navigation Link -->
+                        <div style="margin-top: 15px; text-align: right;">
+                            <a href="<?php echo $wiki_base_url; ?>" target="_blank" class="btn-book" style="display: inline-block; padding: 8px 15px; font-size: 0.9em;">
+                                Visit Full Wiki 📚
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -212,6 +262,15 @@ $quick_help = [
         </div>
     </div>
 
+    <style>
+        /* Additional styles for wiki articles */
+        .article-meta {
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 3px;
+        }
+    </style>
+
     <script>
         function showHelp(question, answer) {
             document.getElementById('modalQuestion').textContent = question;
@@ -221,10 +280,6 @@ $quick_help = [
 
         function closeModal() {
             document.getElementById('helpModal').style.display = 'none';
-        }
-
-        function readArticle(title) {
-            alert('Opening article: ' + title + '\n(This would open the wiki in a real implementation)');
         }
 
         // Close modal when clicking outside
