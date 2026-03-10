@@ -36,6 +36,22 @@ $user_bookings = getUserBookings($user_id);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Book Training - Creative Spark</title>
     <link rel="stylesheet" href="../css/book_training.css">
+    <style>
+        .machine-category-badge {
+            background: #e0e0e0;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.7em;
+            margin-left: 8px;
+            color: #555;
+        }
+        .session-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+    </style>
 </head>
 <body>
     <div class="booking-container">
@@ -64,6 +80,8 @@ $user_bookings = getUserBookings($user_id);
                     <option value="3D">3D Printers</option>
                     <option value="CNC">CNC</option>
                     <option value="Vinyl">Vinyl Cutters</option>
+                    <option value="Electronics">Electronics</option>
+                    <option value="Waterjet">Waterjet</option>
                 </select>
                 
                 <select id="dateFilter" class="filter-select">
@@ -91,8 +109,12 @@ $user_bookings = getUserBookings($user_id);
                 ?>
                 <div class="session-card <?php echo $is_full ? 'full' : ''; ?>">
                     <div class="session-header">
-                        <span class="session-title"><?php echo $session['tier_name']; ?></span>
-                        <span class="tier-badge">Tier <?php echo $session['tier_level']; ?></span>
+                        <div class="session-title">
+                            <strong><?php echo $session['machine_name'] ?? 'Training Session'; ?></strong>
+                            <?php if(isset($session['machine_category']) && $session['machine_category']): ?>
+                                <span class="machine-category-badge"><?php echo $session['machine_category']; ?></span>
+                            <?php endif; ?>
+                        </div>
                     </div>
                     
                     <div class="session-details">
@@ -156,7 +178,7 @@ $user_bookings = getUserBookings($user_id);
                 <tbody>
                     <?php while($booking = $user_bookings->fetch_assoc()): ?>
                     <tr>
-                        <td><strong><?php echo $booking['tier_name']; ?></strong></td>
+                        <td><strong><?php echo $booking['tier_name'] ?? 'Training Session'; ?></strong></td>
                         <td>
                             <?php echo date('d/m/Y', strtotime($booking['session_date'])); ?> 
                             at <?php echo date('g:i A', strtotime($booking['session_time'])); ?>
