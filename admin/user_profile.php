@@ -301,91 +301,104 @@ $status_icon = [
         </div>
 
         <!-- Membership History Section -->
-        <?php if ($history && $history->num_rows > 0): 
-            // Calculate statistics
-            $total_months = 0;
-            $active_months = 0;
-            $inactive_months = 0;
-            
-            $history->data_seek(0);
-            while($period = $history->fetch_assoc()) {
-                $start = strtotime($period['start_date']);
-                $end = $period['end_date'] ? strtotime($period['end_date']) : time();
-                $months = floor(($end - $start) / (30 * 24 * 60 * 60));
-                $total_months += $months;
-                
-                if($period['status'] == 'active') $active_months += $months;
-                if($period['status'] == 'inactive') $inactive_months += $months;
-            }
-            $history->data_seek(0);
-        ?>
+<?php if ($history && $history->num_rows > 0): 
+    // Calculate statistics
+    $total_months = 0;
+    $active_months = 0;
+    $inactive_months = 0;
+    
+    $history->data_seek(0);
+    while($period = $history->fetch_assoc()) {
+        $start = strtotime($period['start_date']);
+        $end = $period['end_date'] ? strtotime($period['end_date']) : time();
         
-        <div class="history-card">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h2 style="color: #2E7D32;">📊 Membership History</h2>
-                <a href="user_history.php?id=<?php echo $user_id; ?>" class="btn" style="background: #2196f3;">View Full Timeline</a>
-            </div>
-            
-            <!-- Mini Stats -->
-            <div class="stats-mini">
-                <div class="stat-mini-card">
-                    <div class="stat-mini-number"><?php echo $total_months; ?></div>
-                    <div class="stat-mini-label">Total Months</div>
-                </div>
-                <div class="stat-mini-card">
-                    <div class="stat-mini-number"><?php echo $active_months; ?></div>
-                    <div class="stat-mini-label">Active Months</div>
-                </div>
-                <div class="stat-mini-card">
-                    <div class="stat-mini-number"><?php echo $inactive_months; ?></div>
-                    <div class="stat-mini-label">Inactive Months</div>
-                </div>
-            </div>
-            
-            <!-- History Timeline -->
-            <div class="history-timeline">
-                <?php while($period = $history->fetch_assoc()): 
-                    $start = date('M Y', strtotime($period['start_date']));
-                    $end = $period['end_date'] ? date('M Y', strtotime($period['end_date'])) : 'Present';
-                    
-                    $start_ts = strtotime($period['start_date']);
-                    $end_ts = $period['end_date'] ? strtotime($period['end_date']) : time();
-                    $months = floor(($end_ts - $start_ts) / (30 * 24 * 60 * 60));
-                    
-                    $status_icon = [
-                        'active' => '🟢',
-                        'inactive' => '🔴',
-                        'reactivating' => '🟡'
-                    ][$period['status']];
-                    
-                    $is_current = !$period['end_date'];
-                ?>
-                <div class="history-item <?php echo $is_current ? 'current' : ''; ?>">
-                    <div class="history-icon"><?php echo $status_icon; ?></div>
-                    
-                    <div class="history-status <?php echo $period['status']; ?>">
-                        <strong><?php echo ucfirst($period['status']); ?></strong>
-                        <?php if($period['tier_name']): ?>
-                            <span style="color: #666; margin-left: 8px; font-size: 0.9em;">
-                                <?php echo $period['tier_name']; ?>
-                            </span>
-                        <?php endif; ?>
-                    </div>
-                    
-                    <div class="history-dates">
-                        <?php echo $start; ?> - <?php echo $end; ?>
-                        <span class="history-duration">(<?php echo $months; ?> months)</span>
-                    </div>
-                    
-                    <?php if($period['notes']): ?>
-                        <div class="history-notes"><?php echo $period['notes']; ?></div>
-                    <?php endif; ?>
-                </div>
-                <?php endwhile; ?>
-            </div>
-        </div>
-        <?php endif; ?>
+        // Calculate months more accurately
+        $start_year = date('Y', $start);
+        $start_month = date('n', $start);
+        $end_year = date('Y', $end);
+        $end_month = date('n', $end);
+        
+        $months = (($end_year - $start_year) * 12) + ($end_month - $start_month);
+        $months = max(1, $months); // At least 1 month
+        
+        $total_months += $months;
+        
+        if($period['status'] == 'active') $active_months += $months;
+        if($period['status'] == 'inactive') $inactive_months += $months;
+    }
+    $history->data_seek(0);
+?>
 
+<div class="history-card">
+    <h2 style="color: #2E7D32; margin-bottom: 20px;">📊 Membership History</h2>
+    
+    <!-- Mini Stats -->
+    <div class="stats-mini">
+        <div class="stat-mini-card">
+            <div class="stat-mini-number"><?php echo $total_months; ?></div>
+            <div class="stat-mini-label">Total Months</div>
+        </div>
+        <div class="stat-mini-card">
+            <div class="stat-mini-number"><?php echo $active_months; ?></div>
+            <div class="stat-mini-label">Active Months</div>
+        </div>
+        <div class="stat-mini-card">
+            <div class="stat-mini-number"><?php echo $inactive_months; ?></div>
+            <div class="stat-mini-label">Inactive Months</div>
+        </div>
+    </div>
+    
+    <!-- History Timeline -->
+    <div class="history-timeline">
+        <?php while($period = $history->fetch_assoc()): 
+            $start = date('M Y', strtotime($period['start_date']));
+            $end = $period['end_date'] ? date('M Y', strtotime($period['end_date'])) : 'Present';
+            
+            $start_ts = strtotime($period['start_date']);
+            $end_ts = $period['end_date'] ? strtotime($period['end_date']) : time();
+            
+            // Calculate months for display
+            $start_year = date('Y', $start_ts);
+            $start_month = date('n', $start_ts);
+            $end_year = date('Y', $end_ts);
+            $end_month = date('n', $end_ts);
+            
+            $months = (($end_year - $start_year) * 12) + ($end_month - $start_month);
+            $months = max(1, $months);
+            
+            $status_icon = [
+                'active' => '🟢',
+                'inactive' => '🔴',
+                'reactivating' => '🟡'
+            ][$period['status']];
+            
+            $is_current = !$period['end_date'];
+        ?>
+        <div class="history-item <?php echo $is_current ? 'current' : ''; ?>">
+            <div class="history-icon"><?php echo $status_icon; ?></div>
+            
+            <div class="history-status <?php echo $period['status']; ?>">
+                <strong><?php echo ucfirst($period['status']); ?></strong>
+                <?php if($period['tier_name']): ?>
+                    <span style="color: #666; margin-left: 8px; font-size: 0.9em;">
+                        <?php echo $period['tier_name']; ?>
+                    </span>
+                <?php endif; ?>
+            </div>
+            
+            <div class="history-dates">
+                <?php echo $start; ?> - <?php echo $end; ?>
+                <span class="history-duration">(<?php echo $months; ?> month<?php echo $months > 1 ? 's' : ''; ?>)</span>
+            </div>
+            
+            <?php if($period['notes']): ?>
+                <div class="history-notes"><?php echo $period['notes']; ?></div>
+            <?php endif; ?>
+        </div>
+        <?php endwhile; ?>
+    </div>
+</div>
+<?php endif; ?>
         <!-- Action Buttons -->
         <div class="action-buttons">
             <a href="admin.php" class="btn btn-primary">← Back to Admin Panel</a>
