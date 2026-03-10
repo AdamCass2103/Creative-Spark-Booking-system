@@ -171,47 +171,84 @@ $status_icon = [
                 </div>
             </div>
 
-            <!-- Membership Details -->
-            <div class="card">
-                <div class="card-header">
-                    <span class="header-icon">🎫</span>
-                    <h2>Membership Details</h2>
-                </div>
-                <div class="info-grid">
-                    <div class="info-row">
-                        <span class="info-label">Membership Tier</span>
-                        <span class="info-value"><strong><?php echo $tier['tier_name'] ?? 'Not selected'; ?></strong></span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Payment Type</span>
-                        <span class="info-value"><?php echo ucfirst($prefs['payment_type'] ?? 'monthly'); ?></span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Returning Member</span>
-                        <span class="info-value">
-                            <span class="status-badge <?php echo $prefs['is_returning_member'] ? 'status-approved' : 'status-pending'; ?>">
-                                <?php echo $prefs['is_returning_member'] ? 'Yes' : 'No'; ?>
-                            </span>
-                        </span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Training Required</span>
-                        <span class="info-value">
-                            <span class="status-badge <?php echo $prefs['needs_training'] ? 'status-approved' : 'status-completed'; ?>">
-                                <?php echo $prefs['needs_training'] ? 'Yes' : 'No'; ?>
-                            </span>
-                        </span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Application Status</span>
-                        <span class="info-value">
-                            <span class="status-badge status-<?php echo $prefs['training_status']; ?>">
-                                <?php echo ucfirst($prefs['training_status']); ?>
-                            </span>
-                        </span>
-                    </div>
-                </div>
-            </div>
+           <!-- Membership Details -->
+<div class="card">
+    <div class="card-header">
+        <span class="header-icon">🎫</span>
+        <h2>Membership Details</h2>
+    </div>
+    <div class="info-grid">
+        <div class="info-row">
+            <span class="info-label">Membership Tier</span>
+            <span class="info-value"><strong><?php echo $tier['tier_name'] ?? 'Not selected'; ?></strong></span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Payment Type</span>
+            <span class="info-value"><?php echo ucfirst($prefs['payment_type'] ?? 'monthly'); ?></span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Returning Member</span>
+            <span class="info-value">
+                <span class="status-badge <?php echo $prefs['is_returning_member'] ? 'status-approved' : 'status-pending'; ?>">
+                    <?php echo $prefs['is_returning_member'] ? 'Yes' : 'No'; ?>
+                </span>
+            </span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Training Required</span>
+            <span class="info-value">
+                <span class="status-badge <?php echo $prefs['needs_training'] ? 'status-approved' : 'status-completed'; ?>">
+                    <?php echo $prefs['needs_training'] ? 'Yes' : 'No'; ?>
+                </span>
+            </span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Application Status</span>
+            <span class="info-value">
+                <span class="status-badge status-<?php echo $prefs['training_status']; ?>">
+                    <?php echo ucfirst($prefs['training_status']); ?>
+                </span>
+            </span>
+        </div>
+        
+        <!-- NEW: Payment Status for Admin -->
+        <div class="info-row" style="border-top: 2px dashed #2E7D32; padding-top: 15px; margin-top: 10px;">
+            <span class="info-label">💰 Payment Status</span>
+            <span class="info-value">
+                <?php 
+                $payment_status = $user['payment_status'] ?? 'pending';
+                $payment_amount = $user['payment_amount'] ?? ($prefs['tier_id'] == 1 ? '100' : ($prefs['tier_id'] == 2 ? '200' : ($prefs['tier_id'] == 3 ? '500' : 'Custom')));
+                
+                if ($payment_status == 'paid'): ?>
+                    <span style="color: #4caf50; font-weight: bold;">✅ Paid</span>
+                    <?php if ($user['payment_date']): ?>
+                        <br><small>Paid on: <?php echo date('F j, Y', strtotime($user['payment_date'])); ?></small>
+                    <?php endif; ?>
+                <?php elseif ($prefs['training_status'] == 'approved'): ?>
+                    <span style="color: #ff9800; font-weight: bold;">⏳ Awaiting Payment</span>
+                    <br><small>Amount: €<?php echo $payment_amount; ?></small>
+                    <?php if ($user['payment_due']): ?>
+                        <br><small>Due: <?php echo date('F j, Y', strtotime($user['payment_due'])); ?></small>
+                    <?php endif; ?>
+                <?php else: ?>
+                    <span style="color: #999;">Not applicable (pending approval)</span>
+                <?php endif; ?>
+            </span>
+        </div>
+        
+        <!-- Admin Action - Mark as Paid (only if approved and not paid) -->
+        <?php if ($prefs['training_status'] == 'approved' && $payment_status != 'paid'): ?>
+        <div style="margin-top: 15px;">
+            <form method="POST" action="mark_paid.php">
+                <input type="hidden" name="user_id" value="<?php echo $user_id; ?>">
+                <button type="submit" class="btn" style="background: #4caf50; width: 100%;">
+                    💰 Mark as Paid
+                </button>
+            </form>
+        </div>
+        <?php endif; ?>
+    </div>
+</div>
 
             <!-- Selected Machines with Skill Levels -->
             <div class="card">

@@ -134,13 +134,12 @@ $result = $conn->query("
             </h1>
             <div class="nav">
                 <a href="../member/dashboard.php" class="btn back-btn">← Back to Dashboard</a>
-                <?php if (!$is_viewer): // Only show create user button to non-viewers ?>
+                <?php if (!$is_viewer): ?>
                 <a href="../public/index.php" class="btn">➕ Create New User</a>
                 <?php endif; ?>
                 <a href="training_sessions.php" class="btn" style="background: #9c27b0;">📅 Training Sessions</a>
                 <a href="pending_bookings.php" class="btn" style="background: #ff9800;">⏳ Pending Bookings</a>
                 
-                <!-- Admin Dropdown - Visible to all -->
                 <div style="position: relative; display: inline-block;">
                     <button class="btn" style="background: #2E7D32;" onclick="toggleAdminMenu()">
                         👥 Admin ▼
@@ -171,7 +170,7 @@ $result = $conn->query("
                         <th>Needs Training</th>
                         <th>Terms Accepted</th>
                         <th>Training Status</th>
-                        <?php if (!$is_viewer): // Only show action columns to non-viewers ?>
+                        <?php if (!$is_viewer): ?>
                         <th>Update Status</th>
                         <th>Action</th>
                         <th>Delete</th>
@@ -192,7 +191,7 @@ $result = $conn->query("
                                 <?php echo ucfirst($row['training_status']); ?>
                             </span>
                         </td>
-                        <?php if (!$is_viewer): // Action columns for non-viewers only ?>
+                        <?php if (!$is_viewer): ?>
                         <td>
                             <form method="POST" style="display: flex; gap: 10px; align-items: center;">
                                 <input type="hidden" name="user_id" value="<?php echo $row['user_id']; ?>">
@@ -217,7 +216,7 @@ $result = $conn->query("
                                 🗑️ Delete
                             </button>
                         </td>
-                        <?php else: // For viewers, just show View button ?>
+                        <?php else: ?>
                         <td>
                             <a href="user_profile.php?id=<?php echo $row['user_id']; ?>" 
                                style="background: #9c27b0; color: white; padding: 5px 10px; border-radius: 4px; text-decoration: none; font-size: 13px;">
@@ -252,7 +251,6 @@ $result = $conn->query("
         </div>
     </div>
 
-    <!-- JavaScript for Delete Confirmation -->
     <script>
     function confirmDelete(userId, userName) {
         if (confirm(`Are you sure you want to delete ${userName}?\n\nThis action cannot be undone! All user data will be permanently removed.`)) {

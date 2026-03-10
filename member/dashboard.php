@@ -143,34 +143,72 @@ $quick_help = [
             </div>
             
             <!-- Membership Card -->
-            <div class="card">
-                <h2>🎫 Membership Status</h2>
-                <div class="info-row">
-                    <strong>Returning Member:</strong>
-                    <span><?php echo $prefs['is_returning_member'] ? 'Yes' : 'No'; ?></span>
-                </div>
-                <div class="info-row">
-                    <strong>Training Required:</strong>
-                    <span><?php echo $prefs['needs_training'] ? 'Yes' : 'No'; ?></span>
-                </div>
-                <div class="info-row">
-                    <strong>Account Status:</strong>
-                    <span class="status-<?php echo $prefs['training_status']; ?>">
-                        <?php echo ucfirst($prefs['training_status']); ?>
-                    </span>
-                </div>
-                <?php if($prefs['tier_id']): ?>
-                <div class="info-row">
-                    <strong>Membership Tier:</strong>
-                    <span>
-                        <?php 
-                        $tier = $conn->query("SELECT tier_name FROM membership_tiers WHERE tier_id = " . $prefs['tier_id'])->fetch_assoc();
-                        echo $tier['tier_name'] ?? 'Standard';
-                        ?>
-                    </span>
-                </div>
-                <?php endif; ?>
+<div class="card">
+    <h2>🎫 Membership Status</h2>
+    <div class="info-row">
+        <strong>Returning Member:</strong>
+        <span><?php echo $prefs['is_returning_member'] ? 'Yes' : 'No'; ?></span>
+    </div>
+    <div class="info-row">
+        <strong>Training Required:</strong>
+        <span><?php echo $prefs['needs_training'] ? 'Yes' : 'No'; ?></span>
+    </div>
+    <div class="info-row">
+        <strong>Account Status:</strong>
+        <span class="status-<?php echo $prefs['training_status']; ?>">
+            <?php echo ucfirst($prefs['training_status']); ?>
+        </span>
+    </div>
+    
+    <!-- PAYMENT SECTION - Only shows when approved -->
+    <?php if ($prefs['training_status'] == 'approved'): ?>
+    <div class="info-row" style="border-top: 2px dashed #2E7D32; padding-top: 15px; margin-top: 10px;">
+        <strong>Payment Status:</strong>
+        <span>
+            <?php 
+            // Check if already paid
+            $payment_check = $conn->query("SELECT payment_status FROM users WHERE user_id = $user_id")->fetch_assoc();
+            $payment_status = $payment_check['payment_status'] ?? 'pending';
+            
+            if ($payment_status == 'paid'): ?>
+                <span style="color: #4caf50; font-weight: bold;">✅ Paid</span>
+            <?php else: ?>
+                <span style="color: #ff9800; font-weight: bold;">⏳ Payment Required</span>
+            <?php endif; ?>
+        </span>
+    </div>
+    
+    <?php if ($payment_status != 'paid'): ?>
+    <div style="margin-top: 20px; text-align: center;">
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+            <div style="font-size: 1.8em; font-weight: bold; color: #2E7D32;">
+                €<?php 
+                // Get amount based on tier
+                $amount = $prefs['tier_id'] == 1 ? '100' : ($prefs['tier_id'] == 2 ? '200' : ($prefs['tier_id'] == 3 ? '500' : 'Custom'));
+                echo $amount;
+                ?>
             </div>
+            <div style="color: #666;"><?php echo ucfirst($prefs['payment_type'] ?? 'monthly'); ?> payment</div>
+        </div>
+        
+        <a href="payment.php" class="btn-book" style="background: #ff9800; width: 100%; text-align: center; justify-content: center;">
+            💳 Complete Payment Now
+        </a>
+        <p style="font-size: 0.8em; color: #999; margin-top: 8px;">
+            Your membership is approved! Complete payment to unlock full access.
+        </p>
+    </div>
+    <?php endif; ?>
+    
+    <?php elseif ($prefs['training_status'] == 'pending'): ?>
+    <div style="margin-top: 15px; padding: 10px; background: #fff3e0; border-radius: 8px; text-align: center;">
+        <span style="color: #ff9800;">⏳ Waiting for approval</span>
+        <p style="font-size: 0.85em; color: #666; margin-top: 5px;">
+            You'll be able to pay once your membership is approved.
+        </p>
+    </div>
+    <?php endif; ?>
+</div>
 
             <!-- In your member-dashboard.php - Replace the Learning Resources section with this -->
 
