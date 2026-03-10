@@ -226,15 +226,26 @@ $user_bookings = getUserBookings($user_id);
         <?php endif; ?>
     </div>
     
+    <!-- Simple JavaScript for filtering -->
     <script>
-        // Simple filter functionality (can be enhanced later)
+        // Filter by machine type
         document.getElementById('machineFilter').addEventListener('change', function() {
-            // This would filter the sessions - we can add this later
-            console.log('Filter by machine:', this.value);
+            let filter = this.value.toLowerCase();
+            let cards = document.querySelectorAll('.session-card');
+            
+            cards.forEach(card => {
+                let title = card.querySelector('.session-title strong')?.textContent.toLowerCase() || '';
+                if (filter === 'all' || title.includes(filter)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
         });
-        
+
+        // Date filter placeholder (can be enhanced later)
         document.getElementById('dateFilter').addEventListener('change', function() {
-            console.log('Filter by date:', this.value);
+            console.log('Date filter changed to:', this.value);
         });
     </script>
 </body>
