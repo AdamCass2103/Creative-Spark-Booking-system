@@ -3,6 +3,12 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 require_once __DIR__ . '/../includes/config.php';
+// Debug output (visible in page source)
+echo "<!-- Config loaded successfully -->\n";
+echo "<!-- Environment: " . ENVIRONMENT . " -->\n";
+echo "<!-- BASE_PATH: " . BASE_PATH . " -->\n";
+echo "<!-- SITE_URL: " . SITE_URL . " -->\n";
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
