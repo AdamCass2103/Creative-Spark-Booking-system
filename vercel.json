@@ -1,6 +1,9 @@
 {
   "functions": {
-    "public/**/*.php": {
+    "public/index.php": {
+      "runtime": "vercel-php@0.7.0"
+    },
+    "public/*.php": {
       "runtime": "vercel-php@0.7.0"
     }
   },
