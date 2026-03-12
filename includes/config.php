@@ -1,4 +1,21 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+require_once 'includes/config.php';
+
+// Debug: Check if config loaded
+echo "<!-- Config loaded successfully -->";
+echo "<!-- BASE_PATH: " . BASE_PATH . " -->";
+echo "<!-- SITE_URL: " . SITE_URL . " -->";
+
+// Test if base_path function exists
+if (function_exists('base_path')) {
+    echo "<!-- base_path() function exists -->";
+    echo "<!-- Test base_path: " . base_path('css/landing.css') . " -->";
+} else {
+    echo "<!-- ERROR: base_path() function NOT FOUND -->";
+}
 // Database configuration
 if (getenv('VERCEL_ENV')) {
     // We're on Vercel
