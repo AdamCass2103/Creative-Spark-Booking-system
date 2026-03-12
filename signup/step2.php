@@ -1,7 +1,6 @@
 <?php
 session_start();
-require_once '../includes/db_connect.php';
-
+require_once(__DIR__ . '/../includes/db_connect.php');
 // Check if step1 completed
 if (!isset($_SESSION['step1_complete'])) {
     header('Location: step1.php');

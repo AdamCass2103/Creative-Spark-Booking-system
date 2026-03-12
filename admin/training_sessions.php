@@ -1,7 +1,7 @@
 <?php
 session_start();
 require_once '../includes/config.php';
-require_once '../includes/db_connect.php';
+require_once(__DIR__ . '/../includes/db_connect.php');
 
 // ============================================
 // CREATE MACHINES TABLE IF NOT EXISTS

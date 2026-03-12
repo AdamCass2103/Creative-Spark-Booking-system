@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once '../includes/db_connect.php';
+require_once(__DIR__ . '/../includes/db_connect.php');
 
 // Clear any existing session data for new signup
 if (!isset($_SESSION['step1_complete'])) {
