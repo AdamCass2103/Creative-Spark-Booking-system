@@ -3,9 +3,9 @@
 error_reporting(0);
 ini_set('display_errors', 0);
 
-require_once '../includes/auth.php';
-require_once '../includes/booking_functions.php';
-require_once '../includes/admin_functions.php';
+require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../includes/admin_functions.php';
+require_once __DIR__ . '/../includes/functions.php';
 requireAdmin();
 
 $conn = new mysqli('localhost', 'root', '', 'booking_system');

@@ -1,6 +1,6 @@
 <?php
-require_once '../includes/auth.php';
-require_once '../includes/booking_functions.php';
+require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../includes/booking_functions.php';
 requireLogin();
 
 $user_id = getCurrentUserId();
