@@ -2,8 +2,6 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-require_once 'includes/config.php';
-
 // Debug: Check if config loaded
 echo "<!-- Config loaded successfully -->";
 echo "<!-- BASE_PATH: " . BASE_PATH . " -->";
