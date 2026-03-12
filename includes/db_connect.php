@@ -17,17 +17,30 @@ if (getenv('VERCEL_ENV')) {
     
     // Handle SSL certificate
     if (getenv('CA_CERT')) {
-        // Write certificate to temporary file
+        // Create a temporary file for the certificate
         $cert_path = '/tmp/ca.pem';
         file_put_contents($cert_path, getenv('CA_CERT'));
         $conn->ssl_set(NULL, NULL, $cert_path, NULL, NULL);
     } else {
-        // Local development - use local cert file
+        // If no CA_CERT env var, try local path (shouldn't happen on Vercel)
         $ssl_ca = __DIR__ . '/../certs/ca.pem';
-        $conn->ssl_set(NULL, NULL, $ssl_ca, NULL, NULL);
+        if (file_exists($ssl_ca)) {
+            $conn->ssl_set(NULL, NULL, $ssl_ca, NULL, NULL);
+        } else {
+            error_log("No SSL certificate found");
+            die("Database configuration error");
+        }
     }
     
-    $conn->real_connect($host, $user, $pass, $dbname, $port, NULL, MYSQLI_CLIENT_SSL);
+    // Enable exceptions for better error handling
+    mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+    
+    try {
+        $conn->real_connect($host, $user, $pass, $dbname, $port, NULL, MYSQLI_CLIENT_SSL);
+    } catch (mysqli_sql_exception $e) {
+        error_log("Connection failed: " . $e->getMessage());
+        die("Database connection error. Please try again later.");
+    }
     
 } else {
     // ============================================
@@ -39,14 +52,16 @@ if (getenv('VERCEL_ENV')) {
     $dbname = 'booking_system';
     $port = 3306;
     
-    $conn = new mysqli($host, $user, $pass, $dbname, $port);
+    mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+    
+    try {
+        $conn = new mysqli($host, $user, $pass, $dbname, $port);
+    } catch (mysqli_sql_exception $e) {
+        error_log("Local connection failed: " . $e->getMessage());
+        die("Database connection error. Please try again later.");
+    }
 }
 
-// Check connection
-if ($conn->connect_error) {
-    error_log("Connection failed: " . $conn->connect_error);
-    die("Database connection error. Please try again later.");
-}
-
+// Set charset
 $conn->set_charset("utf8mb4");
 ?>
