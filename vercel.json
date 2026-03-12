@@ -23,11 +23,40 @@
     },
     {
       "src": "/css/(.*)",
-      "dest": "/css/$1"
+      "dest": "/css/$1",
+      "headers": {
+        "Content-Type": "text/css"
+      }
     },
     {
       "src": "/images/(.*)",
       "dest": "/images/$1"
+    },
+    {
+      "src": "/js/(.*)",
+      "dest": "/js/$1"
+    },
+    {
+      "src": "/fonts/(.*)",
+      "dest": "/fonts/$1"
+    },
+    {
+      "src": "/(.*)\\.css$",
+      "dest": "/css/$1.css",
+      "headers": {
+        "Content-Type": "text/css"
+      }
+    },
+    {
+      "src": "/(.*)\\.js$",
+      "dest": "/js/$1.js",
+      "headers": {
+        "Content-Type": "application/javascript"
+      }
+    },
+    {
+      "src": "/(.*)\\.(png|jpg|jpeg|gif|svg|ico)$",
+      "dest": "/images/$1.$2"
     },
     {
       "src": "/(.*)",
