@@ -44,6 +44,21 @@
       }
     },
     {
+      "src": "/favicon\\.ico",
+      "dest": "/images/favicon.ico"
+    },
+    {
+      "src": "/(.*)\\.css$",
+      "dest": "/css/$1.css",
+      "headers": {
+        "content-type": "text/css"
+      }
+    },
+    {
+      "src": "/(.*)\\.(png|jpg|jpeg|gif|svg|ico)$",
+      "dest": "/images/$1.$2"
+    },
+    {
       "src": "/(.*)",
       "dest": "/$1"
     }
