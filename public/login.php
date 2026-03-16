@@ -1,9 +1,11 @@
 <?php
+require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../includes/auth.php';
-require_once __DIR__ . '/includes/functions.php';
+require_once __DIR__ . '/../includes/functions.php';
 
-$conn = new mysqli('localhost', 'root', '', 'booking_system');
+$conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
 $error = '';
+
 
 if (isLoggedIn()) {
     redirect('../member/dashboard.php');
