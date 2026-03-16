@@ -47,7 +47,7 @@ function timeAgo($timestamp) {
 }
 
 // ============================================
-// DATABASE CONNECTION HELPER - ADD THIS!
+// DATABASE CONNECTION HELPER
 // ============================================
 
 function getDatabaseConnection() {
@@ -86,12 +86,5 @@ function getDatabaseConnection() {
     return $conn;
 }
 
-// ============================================
-// FORMAT ACTIVITY TIME (for admin logs)
-// ============================================
-
-function formatActivityTime($timestamp) {
-    if (!$timestamp) return 'Unknown';
-    return date('M j, Y g:i a', strtotime($timestamp));
-}
+// REMOVED: formatActivityTime() - now only in admin_functions.php
 ?>
