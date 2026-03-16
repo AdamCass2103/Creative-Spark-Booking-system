@@ -45,4 +45,53 @@ function timeAgo($timestamp) {
         return ($years == 1) ? "1 year ago" : "$years years ago";
     }
 }
+
+// ============================================
+// DATABASE CONNECTION HELPER - ADD THIS!
+// ============================================
+
+function getDatabaseConnection() {
+    static $conn = null;
+    
+    if ($conn === null) {
+        mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+        
+        try {
+            if (getenv('VERCEL_ENV')) {
+                $conn = mysqli_init();
+                
+                // Handle SSL certificate
+                if (getenv('CA_CERT')) {
+                    $cert_path = '/tmp/ca.pem';
+                    file_put_contents($cert_path, getenv('CA_CERT'));
+                    $conn->ssl_set(NULL, NULL, $cert_path, NULL, NULL);
+                } else {
+                    $cert_path = __DIR__ . '/certs/ca.pem';
+                    if (file_exists($cert_path)) {
+                        $conn->ssl_set(NULL, NULL, $cert_path, NULL, NULL);
+                    }
+                }
+                
+                $conn->real_connect(DB_HOST, DB_USER, DB_PASS, DB_NAME, 25849, NULL, MYSQLI_CLIENT_SSL);
+            } else {
+                // Local XAMPP connection
+                $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+            }
+        } catch (mysqli_sql_exception $e) {
+            error_log("Database connection failed: " . $e->getMessage());
+            return null;
+        }
+    }
+    
+    return $conn;
+}
+
+// ============================================
+// FORMAT ACTIVITY TIME (for admin logs)
+// ============================================
+
+function formatActivityTime($timestamp) {
+    if (!$timestamp) return 'Unknown';
+    return date('M j, Y g:i a', strtotime($timestamp));
+}
 ?>
