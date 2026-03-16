@@ -47,20 +47,29 @@ if ($check) {
 
 // ============================================
 // FIX DATABASE STRUCTURE
-// ============================================
+//============================================
 
-// Drop the old foreign key constraint if it exists
-$conn->query("ALTER TABLE training_sessions DROP FOREIGN KEY IF EXISTS training_sessions_ibfk_1");
+// Check if the foreign key exists using information_schema
+$fk_check = $conn->query("
+    SELECT CONSTRAINT_NAME 
+    FROM information_schema.KEY_COLUMN_USAGE 
+    WHERE TABLE_SCHEMA = DATABASE()
+    AND TABLE_NAME = 'training_sessions' 
+    AND CONSTRAINT_NAME = 'training_sessions_ibfk_1'
+");
+
+if ($fk_check && $fk_check->num_rows > 0) {
+    $conn->query("ALTER TABLE training_sessions DROP FOREIGN KEY training_sessions_ibfk_1");
+}
 
 // Make tier_id nullable
 $conn->query("ALTER TABLE training_sessions MODIFY tier_id INT NULL");
 
 // Add machine_id column if it doesn't exist
 $result = $conn->query("SHOW COLUMNS FROM training_sessions LIKE 'machine_id'");
-if ($result->num_rows == 0) {
+if ($result && $result->num_rows == 0) {
     $conn->query("ALTER TABLE training_sessions ADD COLUMN machine_id INT NULL AFTER tier_id");
 }
-
 // ============================================
 // HANDLE FORM SUBMISSIONS
 // ============================================
