@@ -1,12 +1,40 @@
 <?php
+require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/functions.php';
 requireAdmin();
 
-$conn = new mysqli('localhost', 'root', '', 'booking_system');
+// Use the same database connection pattern
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+
+try {
+    if (getenv('VERCEL_ENV')) {
+        $conn = mysqli_init();
+        
+        // Handle SSL certificate
+        if (getenv('CA_CERT')) {
+            $cert_path = '/tmp/ca.pem';
+            file_put_contents($cert_path, getenv('CA_CERT'));
+            $conn->ssl_set(NULL, NULL, $cert_path, NULL, NULL);
+        } else {
+            $conn->ssl_set(NULL, NULL, __DIR__ . '/../certs/ca.pem', NULL, NULL);
+        }
+        
+        $conn->real_connect(DB_HOST, DB_USER, DB_PASS, DB_NAME, 25849, NULL, MYSQLI_CLIENT_SSL);
+    } else {
+        // Local XAMPP connection
+        $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+    }
+} catch (mysqli_sql_exception $e) {
+    error_log("Admin connection failed: " . $e->getMessage());
+    die("Database connection error. Please try again later.");
+}
+
 $admin_id = getCurrentAdminId();
 $admin_role = getCurrentAdminRole();
 $is_viewer = ($admin_role == 'viewer');
+
+
 
 // Only allow modifications if NOT a viewer
 if (!$is_viewer) {
