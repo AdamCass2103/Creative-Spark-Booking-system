@@ -1,9 +1,8 @@
 <?php
 require_once __DIR__ . '/../includes/config.php';
-require_once __DIR__ . '/../includes/auth.php';
-require_once __DIR__ . '/../includes/functions.php';
+require_once __DIR__ . '/../includes/functions.php';     // Load helper functions FIRST
+require_once __DIR__ . '/../includes/auth.php';          // Then auth (which might use functions)
 requireAdmin();
-
 // Use the same database connection pattern
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
