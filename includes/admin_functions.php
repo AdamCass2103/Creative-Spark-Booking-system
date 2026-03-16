@@ -3,14 +3,13 @@
 // ADMIN FUNCTIONS FOR ACTIVITY LOGGING
 // ============================================
 
-// No direct database connection here - will use getDatabaseConnection()
+require_once 'db_connect.php';
 
 /**
  * Log admin activity
  */
 function logAdminActivity($admin_id, $action, $target_type, $target_id = null, $details = null) {
-    $conn = getDatabaseConnection();
-    if (!$conn) return false;
+    global $conn;
     
     // Get admin name
     $admin_result = $conn->query("SELECT name FROM admin_users WHERE admin_id = $admin_id");
@@ -35,9 +34,7 @@ function logAdminActivity($admin_id, $action, $target_type, $target_id = null, $
  * Get recent admin activity
  */
 function getRecentActivity($limit = 20) {
-    $conn = getDatabaseConnection();
-    if (!$conn) return [];
-    
+    global $conn;
     $result = $conn->query("SELECT * FROM admin_activity_log 
                             ORDER BY created_at DESC 
                             LIMIT $limit");
@@ -52,9 +49,7 @@ function getRecentActivity($limit = 20) {
  * Get activity for specific target (user, session, etc.)
  */
 function getTargetActivity($target_type, $target_id, $limit = 50) {
-    $conn = getDatabaseConnection();
-    if (!$conn) return [];
-    
+    global $conn;
     $result = $conn->query("SELECT * FROM admin_activity_log 
                             WHERE target_type = '$target_type' AND target_id = $target_id
                             ORDER BY created_at DESC 
@@ -70,8 +65,6 @@ function getTargetActivity($target_type, $target_id, $limit = 50) {
  * Format activity for display
  */
 function formatActivityTime($timestamp) {
-    if (!$timestamp) return 'Unknown';
-    
     $time_ago = strtotime($timestamp);
     $current_time = time();
     $diff = $current_time - $time_ago;
@@ -97,8 +90,7 @@ function formatActivityTime($timestamp) {
 // ============================================
 
 function getPendingApprovals() {
-    $conn = getDatabaseConnection();
-    if (!$conn) return null;
+    global $conn;
     
     $query = "
         SELECT 
@@ -124,8 +116,7 @@ function getPendingApprovals() {
 }
 
 function approveBooking($session_id, $user_id, $admin_id) {
-    $conn = getDatabaseConnection();
-    if (!$conn) return ['success' => false, 'message' => 'Database error'];
+    global $conn;
     
     // Update booking status
     $conn->query("
@@ -143,8 +134,7 @@ function approveBooking($session_id, $user_id, $admin_id) {
 }
 
 function rejectBooking($session_id, $user_id, $admin_id, $reason = '') {
-    $conn = getDatabaseConnection();
-    if (!$conn) return ['success' => false, 'message' => 'Database error'];
+    global $conn;
     
     // Update booking status
     $conn->query("
