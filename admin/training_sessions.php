@@ -1,7 +1,14 @@
 <?php
 session_start();
-require_once '../includes/config.php';
-require_once(__DIR__ . '/../includes/db_connect.php');
+require_once __DIR__ . '/../includes/config.php';
+require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../includes/functions.php';
+requireAdmin();
+
+$conn = getDatabaseConnection();
+if (!$conn) {
+    die("Database connection error. Please try again later.");
+}
 
 // ============================================
 // CREATE MACHINES TABLE IF NOT EXISTS
@@ -18,21 +25,23 @@ $conn->query("
 
 // Insert machines if table is empty
 $check = $conn->query("SELECT COUNT(*) as count FROM machines");
-$row = $check->fetch_assoc();
-if ($row['count'] == 0) {
-    $conn->query("INSERT INTO machines (machine_name, machine_category) VALUES
-        ('FDM 3D Printing', '3D Printing'),
-        ('SLA 3D Printing', '3D Printing'),
-        ('SLS 3D Printing', '3D Printing'),
-        ('Laser Cutting', 'Laser'),
-        ('Vinyl Cutting', 'Vinyl'),
-        ('Waterjet Cutting', 'Waterjet'),
-        ('Electronics Workbench', 'Electronics'),
-        ('Precision CNC Milling', 'CNC'),
-        ('Large CNC Milling', 'CNC'),
-        ('Vacuum Forming', 'Forming'),
-        ('Sublimation', 'Printing')
-    ");
+if ($check) {
+    $row = $check->fetch_assoc();
+    if ($row['count'] == 0) {
+        $conn->query("INSERT INTO machines (machine_name, machine_category) VALUES
+            ('FDM 3D Printing', '3D Printing'),
+            ('SLA 3D Printing', '3D Printing'),
+            ('SLS 3D Printing', '3D Printing'),
+            ('Laser Cutting', 'Laser'),
+            ('Vinyl Cutting', 'Vinyl'),
+            ('Waterjet Cutting', 'Waterjet'),
+            ('Electronics Workbench', 'Electronics'),
+            ('Precision CNC Milling', 'CNC'),
+            ('Large CNC Milling', 'CNC'),
+            ('Vacuum Forming', 'Forming'),
+            ('Sublimation', 'Printing')
+        ");
+    }
 }
 
 // ============================================
@@ -46,7 +55,10 @@ $conn->query("ALTER TABLE training_sessions DROP FOREIGN KEY IF EXISTS training_
 $conn->query("ALTER TABLE training_sessions MODIFY tier_id INT NULL");
 
 // Add machine_id column if it doesn't exist
-$conn->query("ALTER TABLE training_sessions ADD COLUMN IF NOT EXISTS machine_id INT NULL AFTER tier_id");
+$result = $conn->query("SHOW COLUMNS FROM training_sessions LIKE 'machine_id'");
+if ($result->num_rows == 0) {
+    $conn->query("ALTER TABLE training_sessions ADD COLUMN machine_id INT NULL AFTER tier_id");
+}
 
 // ============================================
 // HANDLE FORM SUBMISSIONS
@@ -56,10 +68,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     // Create new training session
     if (isset($_POST['create_session'])) {
-        $machine_id = $_POST['machine_id'];
-        $session_date = $_POST['session_date'];
-        $session_time = $_POST['session_time'];
-        $max_attendees = $_POST['max_attendees'] ?? 4;
+        $machine_id = (int)$_POST['machine_id'];
+        $session_date = $conn->real_escape_string($_POST['session_date']);
+        $session_time = $conn->real_escape_string($_POST['session_time']);
+        $max_attendees = (int)($_POST['max_attendees'] ?? 4);
         $notes = $conn->real_escape_string($_POST['notes']);
         $trainer_id = $_SESSION['user_id'] ?? 1; // Oscar's ID
         
@@ -79,9 +91,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     // Mark attendance
     if (isset($_POST['mark_attendance'])) {
-        $session_id = $_POST['session_id'];
-        $user_id = $_POST['user_id'];
-        $status = $_POST['attendance_status'];
+        $session_id = (int)$_POST['session_id'];
+        $user_id = (int)$_POST['user_id'];
+        $status = $conn->real_escape_string($_POST['attendance_status']);
         
         $conn->query("UPDATE session_attendees 
                       SET attendance_status = '$status',
@@ -97,7 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $check = $conn->query("SELECT training_id FROM user_training_completed 
                                    WHERE user_id = $user_id AND machine_id = $machine_id");
             
-            if ($check->num_rows > 0) {
+            if ($check && $check->num_rows > 0) {
                 $conn->query("UPDATE user_training_completed 
                               SET training_date = CURDATE(),
                                   expiry_date = DATE_ADD(CURDATE(), INTERVAL 1 YEAR)
@@ -119,8 +131,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     // Register user for session
     if (isset($_POST['register_user'])) {
-        $session_id = $_POST['session_id'];
-        $user_id = $_POST['user_id'];
+        $session_id = (int)$_POST['session_id'];
+        $user_id = (int)$_POST['user_id'];
         
         $conn->query("INSERT IGNORE INTO session_attendees (session_id, user_id) 
                       VALUES ($session_id, $user_id)");
@@ -196,7 +208,7 @@ $pending_training = $conn->query("
         <div id="upcoming" class="tab-content active">
             <h2>Upcoming Training Sessions</h2>
             
-            <?php if($upcoming_sessions && $upcoming_sessions->num_rows == 0): ?>
+            <?php if(!$upcoming_sessions || $upcoming_sessions->num_rows == 0): ?>
             <div class="empty-state">
                 <p style="color: white;">No upcoming sessions scheduled.</p>
                 <p style="color: rgba(255,255,255,0.8);">Click the "Create Session" tab to add one!</p>
@@ -342,7 +354,7 @@ $pending_training = $conn->query("
         <div id="pending" class="tab-content">
             <h2>Users Needing Training</h2>
             
-            <?php if($pending_training && $pending_training->num_rows == 0): ?>
+            <?php if(!$pending_training || $pending_training->num_rows == 0): ?>
             <div class="empty-state">
                 <p style="color: white;">✅ All users are trained!</p>
                 <p style="color: rgba(255,255,255,0.8);">Great job, Oscar!</p>

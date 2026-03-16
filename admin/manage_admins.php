@@ -1,9 +1,14 @@
 <?php
+require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/functions.php';
 requireSuperAdmin(); // Only super admin can manage admins
 
-$conn = new mysqli('localhost', 'root', '', 'booking_system');
+$conn = getDatabaseConnection();
+if (!$conn) {
+    die("Database connection error. Please try again later.");
+}
+
 $admin_id = getCurrentAdminId();
 
 // Handle add admin
@@ -21,7 +26,7 @@ if (isset($_POST['add_admin'])) {
 
 // Handle delete admin
 if (isset($_POST['delete_admin'])) {
-    $target_admin_id = $_POST['admin_id'];
+    $target_admin_id = (int)$_POST['admin_id'];
     if ($target_admin_id != $admin_id) { // Can't delete yourself
         $admin = $conn->query("SELECT name FROM admin_users WHERE admin_id = $target_admin_id")->fetch_assoc();
         $conn->query("DELETE FROM admin_users WHERE admin_id = $target_admin_id");
@@ -105,26 +110,28 @@ $admins = $conn->query("SELECT * FROM admin_users ORDER BY created_at DESC");
         
         <!-- Admin List -->
         <div class="admin-grid">
-            <?php while($admin = $admins->fetch_assoc()): ?>
-            <div class="admin-card <?php echo $admin['role'] == 'super_admin' ? 'super' : ''; ?>">
-                <div style="display: flex; justify-content: space-between;">
-                    <h3><?php echo $admin['name']; ?></h3>
-                    <span class="role-badge <?php echo $admin['role'] == 'super_admin' ? 'super' : ''; ?>">
-                        <?php echo ucfirst($admin['role']); ?>
-                    </span>
+            <?php if($admins): ?>
+                <?php while($admin = $admins->fetch_assoc()): ?>
+                <div class="admin-card <?php echo $admin['role'] == 'super_admin' ? 'super' : ''; ?>">
+                    <div style="display: flex; justify-content: space-between;">
+                        <h3><?php echo $admin['name']; ?></h3>
+                        <span class="role-badge <?php echo $admin['role'] == 'super_admin' ? 'super' : ''; ?>">
+                            <?php echo ucfirst($admin['role']); ?>
+                        </span>
+                    </div>
+                    <p style="color: #666; margin: 5px 0;">@<?php echo $admin['username']; ?></p>
+                    <p style="color: #999; font-size: 0.9em;">
+                        Last login: <?php echo $admin['last_login'] ? date('M j, Y', strtotime($admin['last_login'])) : 'Never'; ?>
+                    </p>
+                    <?php if($admin['admin_id'] != $admin_id && $admin['role'] != 'super_admin'): ?>
+                    <form method="POST" style="margin-top: 10px;">
+                        <input type="hidden" name="admin_id" value="<?php echo $admin['admin_id']; ?>">
+                        <button type="submit" name="delete_admin" class="btn" style="background: #f44336; padding: 5px 10px;">Delete</button>
+                    </form>
+                    <?php endif; ?>
                 </div>
-                <p style="color: #666; margin: 5px 0;">@<?php echo $admin['username']; ?></p>
-                <p style="color: #999; font-size: 0.9em;">
-                    Last login: <?php echo $admin['last_login'] ? date('M j, Y', strtotime($admin['last_login'])) : 'Never'; ?>
-                </p>
-                <?php if($admin['admin_id'] != $admin_id && $admin['role'] != 'super_admin'): ?>
-                <form method="POST" style="margin-top: 10px;">
-                    <input type="hidden" name="admin_id" value="<?php echo $admin['admin_id']; ?>">
-                    <button type="submit" name="delete_admin" class="btn" style="background: #f44336; padding: 5px 10px;">Delete</button>
-                </form>
-                <?php endif; ?>
-            </div>
-            <?php endwhile; ?>
+                <?php endwhile; ?>
+            <?php endif; ?>
         </div>
     </div>
 </body>

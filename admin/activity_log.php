@@ -1,9 +1,14 @@
 <?php
+require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/admin_functions.php';
 requireAdmin();
 
-$conn = new mysqli('localhost', 'root', '', 'booking_system');
+$conn = getDatabaseConnection();
+if (!$conn) {
+    die("Database connection error. Please try again later.");
+}
+
 $admin_id = getCurrentAdminId();
 
 // Get filter
@@ -13,10 +18,10 @@ $filter_admin = $_GET['admin'] ?? 'all';
 // Build query
 $query = "SELECT * FROM admin_activity_log WHERE 1=1";
 if ($filter_action != 'all') {
-    $query .= " AND action = '$filter_action'";
+    $query .= " AND action = '" . $conn->real_escape_string($filter_action) . "'";
 }
 if ($filter_admin != 'all') {
-    $query .= " AND admin_id = $filter_admin";
+    $query .= " AND admin_id = " . (int)$filter_admin;
 }
 $query .= " ORDER BY created_at DESC LIMIT 100";
 
@@ -100,11 +105,13 @@ $admins = $conn->query("SELECT admin_id, name FROM admin_users");
                 
                 <select name="admin">
                     <option value="all" <?php echo $filter_admin == 'all' ? 'selected' : ''; ?>>All Admins</option>
-                    <?php while($admin = $admins->fetch_assoc()): ?>
-                    <option value="<?php echo $admin['admin_id']; ?>" <?php echo $filter_admin == $admin['admin_id'] ? 'selected' : ''; ?>>
-                        <?php echo $admin['name']; ?>
-                    </option>
-                    <?php endwhile; ?>
+                    <?php if($admins): ?>
+                        <?php while($admin = $admins->fetch_assoc()): ?>
+                        <option value="<?php echo $admin['admin_id']; ?>" <?php echo $filter_admin == $admin['admin_id'] ? 'selected' : ''; ?>>
+                            <?php echo $admin['name']; ?>
+                        </option>
+                        <?php endwhile; ?>
+                    <?php endif; ?>
                 </select>
                 
                 <button type="submit" class="btn" style="padding: 8px 20px;">Filter</button>
@@ -113,9 +120,9 @@ $admins = $conn->query("SELECT admin_id, name FROM admin_users");
         
         <!-- Activity List -->
         <div class="table-container">
-            <?php if($activities->num_rows == 0): ?>
+            <?php if($activities && $activities->num_rows == 0): ?>
                 <p style="text-align: center; padding: 40px; color: #666;">No activity found</p>
-            <?php else: ?>
+            <?php elseif($activities): ?>
                 <?php while($log = $activities->fetch_assoc()): 
                     $icon_class = '';
                     if(strpos($log['action'], 'approve') !== false) $icon_class = 'approve';

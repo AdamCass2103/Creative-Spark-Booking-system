@@ -3,21 +3,26 @@
 error_reporting(0);
 ini_set('display_errors', 0);
 
+require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/admin_functions.php';
 require_once __DIR__ . '/../includes/functions.php';
 requireAdmin();
 
-$conn = new mysqli('localhost', 'root', '', 'booking_system');
+$conn = getDatabaseConnection();
+if (!$conn) {
+    die("Database connection error. Please try again later.");
+}
+
 $admin_id = getCurrentAdminId();
 
 $message = '';
 $message_type = '';
 
-// Handle approval - UPDATED to use session_id and user_id
+// Handle approval
 if (isset($_POST['approve_booking'])) {
-    $session_id = $_POST['session_id'];
-    $user_id = $_POST['user_id'];
+    $session_id = (int)$_POST['session_id'];
+    $user_id = (int)$_POST['user_id'];
     $result = approveBooking($session_id, $user_id, $admin_id);
     
     if ($result['success']) {
@@ -29,10 +34,10 @@ if (isset($_POST['approve_booking'])) {
     }
 }
 
-// Handle rejection - UPDATED to use session_id and user_id
+// Handle rejection
 if (isset($_POST['reject_booking'])) {
-    $session_id = $_POST['session_id'];
-    $user_id = $_POST['user_id'];
+    $session_id = (int)$_POST['session_id'];
+    $user_id = (int)$_POST['user_id'];
     $reason = $_POST['rejection_reason'] ?? '';
     $result = rejectBooking($session_id, $user_id, $admin_id, $reason);
     
@@ -67,7 +72,7 @@ $pending = getPendingApprovals();
             </div>
         <?php endif; ?>
         
-        <?php if ($pending->num_rows == 0): ?>
+        <?php if (!$pending || $pending->num_rows == 0): ?>
             <div class="empty-state">
                 <h2>✨ All caught up!</h2>
                 <p>No pending booking requests at the moment.</p>
@@ -116,7 +121,6 @@ $pending = getPendingApprovals();
                 </div>
                 
                 <div class="action-buttons">
-                    <!-- UPDATED: Using session_id and user_id instead of attendee_id -->
                     <form method="POST" style="display: inline;">
                         <input type="hidden" name="session_id" value="<?php echo (int)$request['session_id']; ?>">
                         <input type="hidden" name="user_id" value="<?php echo (int)$request['user_id']; ?>">
@@ -132,7 +136,7 @@ $pending = getPendingApprovals();
                     </button>
                 </div>
                 
-                <!-- Rejection Form (Hidden by default) - UPDATED to use session_id and user_id -->
+                <!-- Rejection Form (Hidden by default) -->
                 <div id="reject-form-<?php echo (int)$request['session_id']; ?>-<?php echo (int)$request['user_id']; ?>" class="rejection-form">
                     <form method="POST">
                         <input type="hidden" name="session_id" value="<?php echo (int)$request['session_id']; ?>">

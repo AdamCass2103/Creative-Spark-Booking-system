@@ -1,10 +1,15 @@
 <?php
+require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/functions.php';
 requireAdmin();
 
-$conn = new mysqli('localhost', 'root', '', 'booking_system');
-$user_id = $_GET['id'] ?? 0;
+$conn = getDatabaseConnection();
+if (!$conn) {
+    die("Database connection error. Please try again later.");
+}
+
+$user_id = (int)($_GET['id'] ?? 0);
 
 // Get user details with error handling
 $user = $conn->query("SELECT * FROM users WHERE user_id = $user_id")->fetch_assoc();
@@ -14,7 +19,7 @@ if (!$user) {
 }
 
 $prefs = $conn->query("SELECT * FROM user_preferences WHERE user_id = $user_id")->fetch_assoc();
-$tier = $conn->query("SELECT tier_name FROM membership_tiers WHERE tier_id = " . ($prefs['tier_id'] ?? 1))->fetch_assoc();
+$tier = $conn->query("SELECT tier_name FROM membership_tiers WHERE tier_id = " . (int)($prefs['tier_id'] ?? 1))->fetch_assoc();
 $areas = $conn->query("SELECT area_name, skill_level FROM user_areas WHERE user_id = $user_id");
 
 // Get membership history
@@ -52,7 +57,7 @@ $status_icon = [
 </head>
 <body>
     <div class="container">
-        <!-- Account Status Banner - NEW -->
+        <!-- Account Status Banner -->
         <div class="status-banner">
             <div class="status-banner-left">
                 <span class="status-banner-icon"><?php echo $status_icon; ?></span>
@@ -127,7 +132,7 @@ $status_icon = [
             </div>
             <div class="stat-card">
                 <div class="stat-icon">🎓</div>
-                <div class="stat-value"><?php echo $areas->num_rows; ?></div>
+                <div class="stat-value"><?php echo $areas ? $areas->num_rows : 0; ?></div>
                 <div class="stat-label">Machines Selected</div>
             </div>
             <div class="stat-card">
@@ -139,7 +144,7 @@ $status_icon = [
             </div>
         </div>
 
-        <!-- Profile Grid (rest of your existing code remains the same) -->
+        <!-- Profile Grid -->
         <div class="profile-grid">
             <!-- Personal Details -->
             <div class="card">
@@ -171,84 +176,72 @@ $status_icon = [
                 </div>
             </div>
 
-           <!-- Membership Details -->
-<div class="card">
-    <div class="card-header">
-        <span class="header-icon">🎫</span>
-        <h2>Membership Details</h2>
-    </div>
-    <div class="info-grid">
-        <div class="info-row">
-            <span class="info-label">Membership Tier</span>
-            <span class="info-value"><strong><?php echo $tier['tier_name'] ?? 'Not selected'; ?></strong></span>
-        </div>
-        <div class="info-row">
-            <span class="info-label">Payment Type</span>
-            <span class="info-value"><?php echo ucfirst($prefs['payment_type'] ?? 'monthly'); ?></span>
-        </div>
-        <div class="info-row">
-            <span class="info-label">Returning Member</span>
-            <span class="info-value">
-                <span class="status-badge <?php echo $prefs['is_returning_member'] ? 'status-approved' : 'status-pending'; ?>">
-                    <?php echo $prefs['is_returning_member'] ? 'Yes' : 'No'; ?>
-                </span>
-            </span>
-        </div>
-        <div class="info-row">
-            <span class="info-label">Training Required</span>
-            <span class="info-value">
-                <span class="status-badge <?php echo $prefs['needs_training'] ? 'status-approved' : 'status-completed'; ?>">
-                    <?php echo $prefs['needs_training'] ? 'Yes' : 'No'; ?>
-                </span>
-            </span>
-        </div>
-        <div class="info-row">
-            <span class="info-label">Application Status</span>
-            <span class="info-value">
-                <span class="status-badge status-<?php echo $prefs['training_status']; ?>">
-                    <?php echo ucfirst($prefs['training_status']); ?>
-                </span>
-            </span>
-        </div>
-        
-        <!-- NEW: Payment Status for Admin -->
-        <div class="info-row" style="border-top: 2px dashed #2E7D32; padding-top: 15px; margin-top: 10px;">
-            <span class="info-label">💰 Payment Status</span>
-            <span class="info-value">
-                <?php 
-                $payment_status = $user['payment_status'] ?? 'pending';
-                $payment_amount = $user['payment_amount'] ?? ($prefs['tier_id'] == 1 ? '100' : ($prefs['tier_id'] == 2 ? '200' : ($prefs['tier_id'] == 3 ? '500' : 'Custom')));
-                
-                if ($payment_status == 'paid'): ?>
-                    <span style="color: #4caf50; font-weight: bold;">✅ Paid</span>
-                    <?php if ($user['payment_date']): ?>
-                        <br><small>Paid on: <?php echo date('F j, Y', strtotime($user['payment_date'])); ?></small>
-                    <?php endif; ?>
-                <?php elseif ($prefs['training_status'] == 'approved'): ?>
-                    <span style="color: #ff9800; font-weight: bold;">⏳ Awaiting Payment</span>
-                    <br><small>Amount: €<?php echo $payment_amount; ?></small>
-                    <?php if ($user['payment_due']): ?>
-                        <br><small>Due: <?php echo date('F j, Y', strtotime($user['payment_due'])); ?></small>
-                    <?php endif; ?>
-                <?php else: ?>
-                    <span style="color: #999;">Not applicable (pending approval)</span>
-                <?php endif; ?>
-            </span>
-        </div>
-        
-        <!-- Admin Action - Mark as Paid (only if approved and not paid) -->
-        <?php if ($prefs['training_status'] == 'approved' && $payment_status != 'paid'): ?>
-        <div style="margin-top: 15px;">
-            <form method="POST" action="mark_paid.php">
-                <input type="hidden" name="user_id" value="<?php echo $user_id; ?>">
-                <button type="submit" class="btn" style="background: #4caf50; width: 100%;">
-                    💰 Mark as Paid
-                </button>
-            </form>
-        </div>
-        <?php endif; ?>
-    </div>
-</div>
+            <!-- Membership Details -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="header-icon">🎫</span>
+                    <h2>Membership Details</h2>
+                </div>
+                <div class="info-grid">
+                    <div class="info-row">
+                        <span class="info-label">Membership Tier</span>
+                        <span class="info-value"><strong><?php echo $tier['tier_name'] ?? 'Not selected'; ?></strong></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Payment Type</span>
+                        <span class="info-value"><?php echo ucfirst($prefs['payment_type'] ?? 'monthly'); ?></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Returning Member</span>
+                        <span class="info-value">
+                            <span class="status-badge <?php echo $prefs['is_returning_member'] ? 'status-approved' : 'status-pending'; ?>">
+                                <?php echo $prefs['is_returning_member'] ? 'Yes' : 'No'; ?>
+                            </span>
+                        </span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Training Required</span>
+                        <span class="info-value">
+                            <span class="status-badge <?php echo $prefs['needs_training'] ? 'status-approved' : 'status-completed'; ?>">
+                                <?php echo $prefs['needs_training'] ? 'Yes' : 'No'; ?>
+                            </span>
+                        </span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Application Status</span>
+                        <span class="info-value">
+                            <span class="status-badge status-<?php echo $prefs['training_status']; ?>">
+                                <?php echo ucfirst($prefs['training_status']); ?>
+                            </span>
+                        </span>
+                    </div>
+                    
+                    <!-- Payment Status -->
+                    <div class="info-row" style="border-top: 2px dashed #2E7D32; padding-top: 15px; margin-top: 10px;">
+                        <span class="info-label">💰 Payment Status</span>
+                        <span class="info-value">
+                            <?php 
+                            $payment_status = $user['payment_status'] ?? 'pending';
+                            $payment_amount = $user['payment_amount'] ?? ($prefs['tier_id'] == 1 ? '100' : ($prefs['tier_id'] == 2 ? '200' : ($prefs['tier_id'] == 3 ? '500' : 'Custom')));
+                            
+                            if ($payment_status == 'paid'): ?>
+                                <span style="color: #4caf50; font-weight: bold;">✅ Paid</span>
+                                <?php if ($user['payment_date']): ?>
+                                    <br><small>Paid on: <?php echo date('F j, Y', strtotime($user['payment_date'])); ?></small>
+                                <?php endif; ?>
+                            <?php elseif ($prefs['training_status'] == 'approved'): ?>
+                                <span style="color: #ff9800; font-weight: bold;">⏳ Awaiting Payment</span>
+                                <br><small>Amount: €<?php echo $payment_amount; ?></small>
+                                <?php if ($user['payment_due']): ?>
+                                    <br><small>Due: <?php echo date('F j, Y', strtotime($user['payment_due'])); ?></small>
+                                <?php endif; ?>
+                            <?php else: ?>
+                                <span style="color: #999;">Not applicable (pending approval)</span>
+                            <?php endif; ?>
+                        </span>
+                    </div>
+                </div>
+            </div>
 
             <!-- Selected Machines with Skill Levels -->
             <div class="card">
@@ -338,104 +331,105 @@ $status_icon = [
         </div>
 
         <!-- Membership History Section -->
-<?php if ($history && $history->num_rows > 0): 
-    // Calculate statistics
-    $total_months = 0;
-    $active_months = 0;
-    $inactive_months = 0;
-    
-    $history->data_seek(0);
-    while($period = $history->fetch_assoc()) {
-        $start = strtotime($period['start_date']);
-        $end = $period['end_date'] ? strtotime($period['end_date']) : time();
-        
-        // Calculate months more accurately
-        $start_year = date('Y', $start);
-        $start_month = date('n', $start);
-        $end_year = date('Y', $end);
-        $end_month = date('n', $end);
-        
-        $months = (($end_year - $start_year) * 12) + ($end_month - $start_month);
-        $months = max(1, $months); // At least 1 month
-        
-        $total_months += $months;
-        
-        if($period['status'] == 'active') $active_months += $months;
-        if($period['status'] == 'inactive') $inactive_months += $months;
-    }
-    $history->data_seek(0);
-?>
-
-<div class="history-card">
-    <h2 style="color: #2E7D32; margin-bottom: 20px;">📊 Membership History</h2>
-    
-    <!-- Mini Stats -->
-    <div class="stats-mini">
-        <div class="stat-mini-card">
-            <div class="stat-mini-number"><?php echo $total_months; ?></div>
-            <div class="stat-mini-label">Total Months</div>
-        </div>
-        <div class="stat-mini-card">
-            <div class="stat-mini-number"><?php echo $active_months; ?></div>
-            <div class="stat-mini-label">Active Months</div>
-        </div>
-        <div class="stat-mini-card">
-            <div class="stat-mini-number"><?php echo $inactive_months; ?></div>
-            <div class="stat-mini-label">Inactive Months</div>
-        </div>
-    </div>
-    
-    <!-- History Timeline -->
-    <div class="history-timeline">
-        <?php while($period = $history->fetch_assoc()): 
-            $start = date('M Y', strtotime($period['start_date']));
-            $end = $period['end_date'] ? date('M Y', strtotime($period['end_date'])) : 'Present';
+        <?php if ($history && $history->num_rows > 0): 
+            // Calculate statistics
+            $total_months = 0;
+            $active_months = 0;
+            $inactive_months = 0;
             
-            $start_ts = strtotime($period['start_date']);
-            $end_ts = $period['end_date'] ? strtotime($period['end_date']) : time();
-            
-            // Calculate months for display
-            $start_year = date('Y', $start_ts);
-            $start_month = date('n', $start_ts);
-            $end_year = date('Y', $end_ts);
-            $end_month = date('n', $end_ts);
-            
-            $months = (($end_year - $start_year) * 12) + ($end_month - $start_month);
-            $months = max(1, $months);
-            
-            $status_icon = [
-                'active' => '🟢',
-                'inactive' => '🔴',
-                'reactivating' => '🟡'
-            ][$period['status']];
-            
-            $is_current = !$period['end_date'];
+            $history->data_seek(0);
+            while($period = $history->fetch_assoc()) {
+                $start = strtotime($period['start_date']);
+                $end = $period['end_date'] ? strtotime($period['end_date']) : time();
+                
+                // Calculate months more accurately
+                $start_year = date('Y', $start);
+                $start_month = date('n', $start);
+                $end_year = date('Y', $end);
+                $end_month = date('n', $end);
+                
+                $months = (($end_year - $start_year) * 12) + ($end_month - $start_month);
+                $months = max(1, $months); // At least 1 month
+                
+                $total_months += $months;
+                
+                if($period['status'] == 'active') $active_months += $months;
+                if($period['status'] == 'inactive') $inactive_months += $months;
+            }
+            $history->data_seek(0);
         ?>
-        <div class="history-item <?php echo $is_current ? 'current' : ''; ?>">
-            <div class="history-icon"><?php echo $status_icon; ?></div>
+
+        <div class="history-card">
+            <h2 style="color: #2E7D32; margin-bottom: 20px;">📊 Membership History</h2>
             
-            <div class="history-status <?php echo $period['status']; ?>">
-                <strong><?php echo ucfirst($period['status']); ?></strong>
-                <?php if($period['tier_name']): ?>
-                    <span style="color: #666; margin-left: 8px; font-size: 0.9em;">
-                        <?php echo $period['tier_name']; ?>
-                    </span>
-                <?php endif; ?>
+            <!-- Mini Stats -->
+            <div class="stats-mini">
+                <div class="stat-mini-card">
+                    <div class="stat-mini-number"><?php echo $total_months; ?></div>
+                    <div class="stat-mini-label">Total Months</div>
+                </div>
+                <div class="stat-mini-card">
+                    <div class="stat-mini-number"><?php echo $active_months; ?></div>
+                    <div class="stat-mini-label">Active Months</div>
+                </div>
+                <div class="stat-mini-card">
+                    <div class="stat-mini-number"><?php echo $inactive_months; ?></div>
+                    <div class="stat-mini-label">Inactive Months</div>
+                </div>
             </div>
             
-            <div class="history-dates">
-                <?php echo $start; ?> - <?php echo $end; ?>
-                <span class="history-duration">(<?php echo $months; ?> month<?php echo $months > 1 ? 's' : ''; ?>)</span>
+            <!-- History Timeline -->
+            <div class="history-timeline">
+                <?php while($period = $history->fetch_assoc()): 
+                    $start = date('M Y', strtotime($period['start_date']));
+                    $end = $period['end_date'] ? date('M Y', strtotime($period['end_date'])) : 'Present';
+                    
+                    $start_ts = strtotime($period['start_date']);
+                    $end_ts = $period['end_date'] ? strtotime($period['end_date']) : time();
+                    
+                    // Calculate months for display
+                    $start_year = date('Y', $start_ts);
+                    $start_month = date('n', $start_ts);
+                    $end_year = date('Y', $end_ts);
+                    $end_month = date('n', $end_ts);
+                    
+                    $months = (($end_year - $start_year) * 12) + ($end_month - $start_month);
+                    $months = max(1, $months);
+                    
+                    $status_icon = [
+                        'active' => '🟢',
+                        'inactive' => '🔴',
+                        'reactivating' => '🟡'
+                    ][$period['status']];
+                    
+                    $is_current = !$period['end_date'];
+                ?>
+                <div class="history-item <?php echo $is_current ? 'current' : ''; ?>">
+                    <div class="history-icon"><?php echo $status_icon; ?></div>
+                    
+                    <div class="history-status <?php echo $period['status']; ?>">
+                        <strong><?php echo ucfirst($period['status']); ?></strong>
+                        <?php if($period['tier_name']): ?>
+                            <span style="color: #666; margin-left: 8px; font-size: 0.9em;">
+                                <?php echo $period['tier_name']; ?>
+                            </span>
+                        <?php endif; ?>
+                    </div>
+                    
+                    <div class="history-dates">
+                        <?php echo $start; ?> - <?php echo $end; ?>
+                        <span class="history-duration">(<?php echo $months; ?> month<?php echo $months > 1 ? 's' : ''; ?>)</span>
+                    </div>
+                    
+                    <?php if($period['notes']): ?>
+                        <div class="history-notes"><?php echo $period['notes']; ?></div>
+                    <?php endif; ?>
+                </div>
+                <?php endwhile; ?>
             </div>
-            
-            <?php if($period['notes']): ?>
-                <div class="history-notes"><?php echo $period['notes']; ?></div>
-            <?php endif; ?>
         </div>
-        <?php endwhile; ?>
-    </div>
-</div>
-<?php endif; ?>
+        <?php endif; ?>
+        
         <!-- Action Buttons -->
         <div class="action-buttons">
             <a href="admin.php" class="btn btn-primary">← Back to Admin Panel</a>
