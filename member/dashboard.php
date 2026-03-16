@@ -1,13 +1,40 @@
 <?php
+require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/functions.php';
 requireLogin();
+
+// Use the same database connection pattern as your login.php
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+
+try {
+    // For Vercel/Aiven connection
+    if (getenv('VERCEL_ENV')) {
+        $conn = mysqli_init();
+        
+        // Handle SSL certificate
+        if (getenv('CA_CERT')) {
+            $cert_path = '/tmp/ca.pem';
+            file_put_contents($cert_path, getenv('CA_CERT'));
+            $conn->ssl_set(NULL, NULL, $cert_path, NULL, NULL);
+        } else {
+            $conn->ssl_set(NULL, NULL, __DIR__ . '/../certs/ca.pem', NULL, NULL);
+        }
+        
+        $conn->real_connect(DB_HOST, DB_USER, DB_PASS, DB_NAME, 25849, NULL, MYSQLI_CLIENT_SSL);
+    } else {
+        // Local XAMPP connection
+        $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+    }
+} catch (mysqli_sql_exception $e) {
+    error_log("Dashboard connection failed: " . $e->getMessage());
+    die("Database connection error. Please try again later.");
+}
 
 $user_id = getCurrentUserId();
 $user_name = getCurrentUserName();
 
 // Get user data from database
-$conn = new mysqli('localhost', 'root', '', 'booking_system');
 $user = $conn->query("SELECT * FROM users WHERE user_id = $user_id")->fetch_assoc();
 $prefs = $conn->query("SELECT * FROM user_preferences WHERE user_id = $user_id")->fetch_assoc();
 
@@ -15,6 +42,7 @@ $prefs = $conn->query("SELECT * FROM user_preferences WHERE user_id = $user_id")
 $pending_bookings = $conn->query("SELECT COUNT(*) as count FROM session_attendees 
                                   WHERE user_id = $user_id AND booking_status = 'pending_approval'")->fetch_assoc()['count'];
 
+// ... rest of your code continues
 // Learning Resources Data with corrected wiki URLs (using /home/ structure)
 $wiki_base_url = "https://creative-spark-enterprise-fablab.gitbook.io/fablab-wiki/";
 
