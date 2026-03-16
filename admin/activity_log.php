@@ -1,14 +1,24 @@
 <?php
 require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../includes/functions.php'; // YOU'RE MISSING THIS!
 require_once __DIR__ . '/../includes/admin_functions.php';
 requireAdmin();
+
+// Debug - check if functions.php loaded
+if (function_exists('getDatabaseConnection')) {
+    echo "<!-- getDatabaseConnection FOUND -->";
+} else {
+    echo "<!-- getDatabaseConnection NOT FOUND in functions.php -->";
+    // List all loaded functions for debugging
+    $all_functions = get_defined_functions();
+    echo "<!-- Loaded functions: " . implode(', ', array_slice($all_functions['user'], -10)) . " -->";
+}
 
 $conn = getDatabaseConnection();
 if (!$conn) {
     die("Database connection error. Please try again later.");
 }
-
 $admin_id = getCurrentAdminId();
 
 // Get filter
