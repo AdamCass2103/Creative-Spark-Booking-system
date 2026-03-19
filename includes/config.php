@@ -69,17 +69,6 @@ function getDatabaseConnection() {
     
     return $conn;
 }
-
-// ============================================
-// CREATE GLOBAL CONNECTION
-// ============================================
-
-// Only create global connection if not in a function context
-// This will be available for scripts that use global $conn
-if (!isset($GLOBALS['conn']) && !defined('IN_FUNCTION')) {
-    $conn = getDatabaseConnection();
-}
-
 // Debug - remove after testing
 error_log("Config loaded - Environment: " . ENVIRONMENT);
 error_log("BASE_PATH: " . BASE_PATH);
