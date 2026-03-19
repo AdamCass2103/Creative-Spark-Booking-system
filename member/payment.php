@@ -1,9 +1,12 @@
 <?php
 require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../includes/config.php'; // Add this line
 requireLogin();
 
 $user_id = getCurrentUserId();
-$conn = new mysqli('localhost', 'root', '', 'booking_system');
+
+// Use the database connection from config
+$conn = getDatabaseConnection();
 
 $user = $conn->query("SELECT * FROM users WHERE user_id = $user_id")->fetch_assoc();
 $prefs = $conn->query("SELECT * FROM user_preferences WHERE user_id = $user_id")->fetch_assoc();
