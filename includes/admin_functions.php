@@ -108,73 +108,43 @@ function getPendingApprovals() {
         JOIN users u ON sa.user_id = u.user_id
         JOIN training_sessions ts ON sa.session_id = ts.session_id
         JOIN membership_tiers mt ON ts.tier_id = mt.tier_id
-        WHERE sa.booking_status IN ('pending', 'pending_approval')
+        WHERE sa.booking_status = 'pending_approval'
         ORDER BY sa.registered_at ASC
     ";
     
-    $result = $conn->query($query);
-    
-    if (!$result) {
-        error_log("Error in getPendingApprovals: " . $conn->error);
-        return false;
-    }
-    
-    return $result;
+    return $conn->query($query);
 }
 
 function approveBooking($session_id, $user_id, $admin_id) {
     global $conn;
     
-    // Check if session has available spots
-    $check_query = "
-        SELECT 
-            ts.max_attendees,
-            (SELECT COUNT(*) FROM session_attendees WHERE session_id = ts.session_id AND booking_status = 'approved') as approved_count
-        FROM training_sessions ts 
-        WHERE ts.session_id = $session_id
-    ";
-    $check_result = $conn->query($check_query);
-    $session = $check_result->fetch_assoc();
-    
-    if ($session['approved_count'] >= $session['max_attendees']) {
-        return ['success' => false, 'message' => 'Cannot approve: Session is now full'];
-    }
-    
     // Update booking status
-    $update_query = "
+    $conn->query("
         UPDATE session_attendees 
         SET booking_status = 'approved'
-        WHERE session_id = $session_id AND user_id = $user_id AND booking_status = 'pending_approval'
-    ";
+        WHERE session_id = $session_id AND user_id = $user_id
+    ");
     
-    if ($conn->query($update_query) && $conn->affected_rows > 0) {
-        // Log activity
-        logAdminActivity($admin_id, 'approve_booking', 'booking', $session_id, "Approved booking for user $user_id");
-        return ['success' => true, 'message' => 'Booking approved successfully'];
-    } else {
-        return ['success' => false, 'message' => 'Error approving booking or booking already processed'];
-    }
+    // Log activity
+    logAdminActivity($admin_id, 'approve_booking', 'booking', $session_id, "Approved booking for user $user_id");
+    
+    return ['success' => true, 'message' => 'Booking approved successfully'];
 }
 
 function rejectBooking($session_id, $user_id, $admin_id, $reason = '') {
     global $conn;
     
-    $escaped_reason = $conn->real_escape_string($reason);
-    
     // Update booking status
-    $update_query = "
+    $conn->query("
         UPDATE session_attendees 
         SET booking_status = 'rejected',
-            rejection_reason = '$escaped_reason'
-        WHERE session_id = $session_id AND user_id = $user_id AND booking_status = 'pending_approval'
-    ";
+            rejection_reason = '" . $conn->real_escape_string($reason) . "'
+        WHERE session_id = $session_id AND user_id = $user_id
+    ");
     
-    if ($conn->query($update_query) && $conn->affected_rows > 0) {
-        // Log activity
-        logAdminActivity($admin_id, 'reject_booking', 'booking', $session_id, "Rejected booking for user $user_id: $reason");
-        return ['success' => true, 'message' => 'Booking rejected successfully'];
-    } else {
-        return ['success' => false, 'message' => 'Error rejecting booking or booking already processed'];
-    }
+    // Log activity
+    logAdminActivity($admin_id, 'reject_booking', 'booking', $session_id, "Rejected booking for user $user_id: $reason");
+    
+    return ['success' => true, 'message' => 'Booking rejected'];
 }
 ?>
