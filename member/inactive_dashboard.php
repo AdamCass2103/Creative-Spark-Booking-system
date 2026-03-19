@@ -1,9 +1,16 @@
 <?php
+require_once __DIR__ . '/../includes/config.php';
+require_once __DIR__ . '/../includes/functions.php';  // Add this for getDatabaseConnection()
 require_once __DIR__ . '/../includes/auth.php';
 requireLogin();
 
 $user_id = getCurrentUserId();
-$conn = new mysqli('localhost', 'root', '', 'booking_system');
+
+// Use the shared database connection
+$conn = getDatabaseConnection();
+if (!$conn) {
+    die("Database connection error. Please try again later.");
+}
 
 // Get user data
 $user = $conn->query("SELECT * FROM users WHERE user_id = $user_id")->fetch_assoc();
@@ -18,7 +25,7 @@ if ($prefs && isset($prefs['tier_id'])) {
     }
 }
 
-// Get last activity from users table - FIXED
+// Get last activity from users table
 $last_active = $user['last_activity'] ?? 'Unknown';
 if ($last_active != 'Unknown') {
     $last_active = date('F Y', strtotime($last_active));
