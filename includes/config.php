@@ -55,4 +55,5 @@ function base_path($path = '') {
 error_log("Config loaded - Environment: " . ENVIRONMENT);
 error_log("BASE_PATH: " . BASE_PATH);
 error_log("SITE_URL: " . SITE_URL);
+$conn = getDatabaseConnection();
 ?>
