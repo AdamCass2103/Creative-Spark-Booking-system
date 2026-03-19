@@ -7,7 +7,9 @@ $user_id = getCurrentUserId();
 $user_name = getCurrentUserName();
 
 // Get user data for personalization
-$conn = new mysqli('localhost', 'root', '', 'booking_system');
+// Use your existing database connection from config
+require_once __DIR__ . '/../includes/config.php';
+$conn = getDatabaseConnection();
 $user = $conn->query("SELECT * FROM users WHERE user_id = $user_id")->fetch_assoc();
 ?>
 <!DOCTYPE html>
