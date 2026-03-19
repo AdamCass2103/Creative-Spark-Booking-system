@@ -3,7 +3,7 @@
 // TRAINING BOOKING FUNCTIONS
 // ============================================
 
-require_once __DIR__ . '/config.php';
+require_once 'db_connect.php';
 
 /**
  * Get all available training sessions for a user
