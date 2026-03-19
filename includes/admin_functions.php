@@ -108,13 +108,12 @@ function getPendingApprovals() {
         JOIN users u ON sa.user_id = u.user_id
         JOIN training_sessions ts ON sa.session_id = ts.session_id
         JOIN membership_tiers mt ON ts.tier_id = mt.tier_id
-        WHERE sa.booking_status = 'pending_approval'
+        WHERE sa.booking_status IN ('pending', 'pending_approval')
         ORDER BY sa.registered_at ASC
     ";
     
     $result = $conn->query($query);
     
-    // Debug: Check if query works
     if (!$result) {
         error_log("Error in getPendingApprovals: " . $conn->error);
         return false;
