@@ -19,26 +19,40 @@ if ($path == '/' || $path == '') {
     exit;
 }
 
-// First check if the file exists in the public/images folder
-$public_file = __DIR__ . '/../public' . $path;
-if (file_exists($public_file) && is_file($public_file)) {
-    // Serve file from public folder
-    $ext = pathinfo($public_file, PATHINFO_EXTENSION);
-    $mime_types = [
-        'css' => 'text/css',
-        'js' => 'application/javascript',
-        'png' => 'image/png',
-        'jpg' => 'image/jpeg',
-        'jpeg' => 'image/jpeg',
-        'gif' => 'image/gif',
-        'ico' => 'image/x-icon',
-    ];
+// Handle image requests specifically
+if (strpos($path, '/images/') === 0) {
+    $image_file = __DIR__ . '/..' . $path;
+    error_log("Looking for image at: " . $image_file);
     
-    if (isset($mime_types[$ext])) {
-        header('Content-Type: ' . $mime_types[$ext]);
+    if (file_exists($image_file) && is_file($image_file)) {
+        $ext = pathinfo($image_file, PATHINFO_EXTENSION);
+        $mime_types = [
+            'png' => 'image/png',
+            'jpg' => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'gif' => 'image/gif',
+            'ico' => 'image/x-icon',
+            'svg' => 'image/svg+xml'
+        ];
+        
+        if (isset($mime_types[$ext])) {
+            header('Content-Type: ' . $mime_types[$ext]);
+        }
+        readfile($image_file);
+        exit;
+    } else {
+        error_log("Image not found at: " . $image_file);
     }
-    readfile($public_file);
-    exit;
+}
+
+// Handle CSS requests
+if (strpos($path, '/css/') === 0) {
+    $css_file = __DIR__ . '/..' . $path;
+    if (file_exists($css_file) && is_file($css_file)) {
+        header('Content-Type: text/css');
+        readfile($css_file);
+        exit;
+    }
 }
 
 // Check if the file exists in the root directory
