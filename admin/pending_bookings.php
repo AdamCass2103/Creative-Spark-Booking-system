@@ -47,38 +47,6 @@ if (isset($_POST['reject_booking'])) {
 
 // Get pending approvals
 $pending = getPendingApprovals();
-global $conn;
-    
-$query = "
-    SELECT 
-        sa.session_id,
-        sa.user_id,
-        u.name as user_name,
-        u.email,
-        COALESCE(mt.tier_name, 'Training Session') as tier_name,
-        ts.session_date,
-        ts.session_time,
-        ts.max_attendees,
-        sa.registered_at,
-        (SELECT COUNT(*) FROM session_attendees WHERE session_id = ts.session_id AND booking_status = 'approved') as approved_count
-    FROM session_attendees sa
-    JOIN users u ON sa.user_id = u.user_id
-    JOIN training_sessions ts ON sa.session_id = ts.session_id
-    LEFT JOIN membership_tiers mt ON ts.tier_id = mt.tier_id
-    WHERE sa.booking_status = 'pending_approval'
-    ORDER BY sa.registered_at ASC
-";
-
-$result = $conn->query($query);
-
-if (!$result) {
-    error_log("Error in getPendingApprovals: " . $conn->error);
-    return false;
-}
-
-return $result;
-}
-
 ?>
 <!DOCTYPE html>
 <html lang="en">

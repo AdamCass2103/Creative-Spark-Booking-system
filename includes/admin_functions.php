@@ -98,7 +98,7 @@ function getPendingApprovals() {
             sa.user_id,
             u.name as user_name,
             u.email,
-            mt.tier_name,
+            COALESCE(mt.tier_name, 'Training Session') as tier_name,
             ts.session_date,
             ts.session_time,
             ts.max_attendees,
@@ -107,12 +107,19 @@ function getPendingApprovals() {
         FROM session_attendees sa
         JOIN users u ON sa.user_id = u.user_id
         JOIN training_sessions ts ON sa.session_id = ts.session_id
-        JOIN membership_tiers mt ON ts.tier_id = mt.tier_id
+        LEFT JOIN membership_tiers mt ON ts.tier_id = mt.tier_id
         WHERE sa.booking_status = 'pending_approval'
         ORDER BY sa.registered_at ASC
     ";
     
-    return $conn->query($query);
+    $result = $conn->query($query);
+    
+    if (!$result) {
+        error_log("Error in getPendingApprovals: " . $conn->error);
+        return false;
+    }
+    
+    return $result;
 }
 
 function approveBooking($session_id, $user_id, $admin_id) {
