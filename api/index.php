@@ -10,23 +10,14 @@ $path = parse_url($request_uri, PHP_URL_PATH);
 // Log what we're trying to load
 error_log("Requested path: " . $path);
 
-// Remove base path if it exists (for local compatibility)
-$path = preg_replace('#^/booking-system#', '', $path);
+// Serve static files directly from public folder
+$public_file = __DIR__ . '/../public' . $path;
 
-// If it's the root or empty, load index.php
-if ($path == '/' || $path == '') {
-    require __DIR__ . '/../index.php';
-    exit;
-}
-
-// Check if the file exists in the root directory
-$root_file = __DIR__ . '/../' . ltrim($path, '/');
-if (file_exists($root_file) && is_file($root_file)) {
-    // If it's a PHP file, require it
-    if (pathinfo($root_file, PATHINFO_EXTENSION) == 'php') {
-        require $root_file;
-    } else {
-        // For non-PHP files, serve them with proper content type
+// Check if it's a static file request (css, js, images)
+if (preg_match('/\.(css|js|png|jpg|jpeg|gif|ico|svg)$/', $path)) {
+    if (file_exists($public_file) && is_file($public_file)) {
+        // Set proper content type
+        $ext = pathinfo($public_file, PATHINFO_EXTENSION);
         $mime_types = [
             'css' => 'text/css',
             'js' => 'application/javascript',
@@ -35,17 +26,32 @@ if (file_exists($root_file) && is_file($root_file)) {
             'jpeg' => 'image/jpeg',
             'gif' => 'image/gif',
             'ico' => 'image/x-icon',
+            'svg' => 'image/svg+xml'
         ];
         
-        $ext = pathinfo($root_file, PATHINFO_EXTENSION);
         if (isset($mime_types[$ext])) {
             header('Content-Type: ' . $mime_types[$ext]);
         }
-        readfile($root_file);
+        
+        // Add cache headers
+        header('Cache-Control: public, max-age=86400');
+        readfile($public_file);
+        exit;
+    } else {
+        error_log("Static file not found: " . $public_file);
+        // Try root directory as fallback
+        $root_file = __DIR__ . '/../' . ltrim($path, '/');
+        if (file_exists($root_file) && is_file($root_file)) {
+            $ext = pathinfo($root_file, PATHINFO_EXTENSION);
+            if (isset($mime_types[$ext])) {
+                header('Content-Type: ' . $mime_types[$ext]);
+            }
+            readfile($root_file);
+            exit;
+        }
     }
-    exit;
 }
 
-// If we get here, try to load index.php as a fallback
-require __DIR__ . '/../index.php';
+// For everything else, load the main index.php
+require __DIR__ . '/../public/index.php';
 ?>
