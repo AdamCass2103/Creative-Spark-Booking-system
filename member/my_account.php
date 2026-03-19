@@ -1,9 +1,16 @@
 <?php
+require_once __DIR__ . '/../includes/config.php';
+require_once __DIR__ . '/../includes/functions.php';  // Add this for getDatabaseConnection()
 require_once __DIR__ . '/../includes/auth.php';
 requireLogin();
 
 $user_id = getCurrentUserId();
-$conn = new mysqli('localhost', 'root', '', 'booking_system');
+
+// Use the shared database connection
+$conn = getDatabaseConnection();
+if (!$conn) {
+    die("Database connection error. Please try again later.");
+}
 
 // Get current user data
 $user = $conn->query("SELECT * FROM users WHERE user_id = $user_id")->fetch_assoc();
@@ -15,6 +22,7 @@ $existing_skills = [];
 while ($area = $user_areas->fetch_assoc()) {
     $existing_skills[$area['area_name']] = $area['skill_level'];
 }
+
 
 $message = '';
 $message_type = '';
