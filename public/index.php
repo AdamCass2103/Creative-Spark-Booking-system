@@ -1,4 +1,4 @@
-<<?php
+<?php
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
@@ -21,7 +21,7 @@ echo "<!-- SITE_URL: " . SITE_URL . " -->\n";
 <body>
 <div class="container">
     <div class="fablab-logo">
-        <img src="/booking-system/images/FabLab logo.png" alt="Creative Spark FabLab Logo">
+    <img src="/booking-system/images/FabLab logo-small.png" alt="Creative Spark FabLab Logo">
     </div>
 
         <h1>Creative Spark</h1>
