@@ -89,4 +89,40 @@ echo "<!-- SITE_URL: " . SITE_URL . " -->\n";
         }
     </script>
 </body>
+<?php
+echo "<!-- ===== VERGEL FILE DEBUG ===== -->\n";
+
+// Show current directory
+echo "<!-- Current directory: " . __DIR__ . " -->\n";
+
+// List files in current directory (public folder)
+$public_files = scandir(__DIR__);
+echo "<!-- Files in public folder: " . implode(', ', $public_files) . " -->\n";
+
+// Check if images folder exists in public
+if (is_dir(__DIR__ . '/images')) {
+    echo "<!-- images folder EXISTS in public -->\n";
+    $image_files = scandir(__DIR__ . '/images');
+    echo "<!-- Files in public/images: " . implode(', ', $image_files) . " -->\n";
+} else {
+    echo "<!-- images folder DOES NOT exist in public -->\n";
+}
+
+// Check one level up
+$parent_dir = dirname(__DIR__);
+echo "<!-- Parent directory: " . $parent_dir . " -->\n";
+if (is_dir($parent_dir . '/images')) {
+    echo "<!-- images folder EXISTS in parent directory -->\n";
+    $parent_images = scandir($parent_dir . '/images');
+    echo "<!-- Files in parent/images: " . implode(', ', $parent_images) . " -->\n";
+}
+
+// Check root level
+echo "<!-- Document root: " . $_SERVER['DOCUMENT_ROOT'] . " -->\n";
+if (is_dir($_SERVER['DOCUMENT_ROOT'] . '/images')) {
+    echo "<!-- images folder EXISTS at document root -->\n";
+}
+
+echo "<!-- ===== END DEBUG ===== -->\n";
+?>
 </html>
