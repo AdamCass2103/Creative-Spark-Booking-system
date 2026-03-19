@@ -21,7 +21,7 @@ echo "<!-- SITE_URL: " . SITE_URL . " -->\n";
 <body>
 <div class="container">
     <div class="fablab-logo">
-    <img src="FabLab%20logo-small.png" alt="Creative Spark FabLab Logo">
+    <img src="/images/FabLab%20logo-small.png" alt="Creative Spark FabLab Logo">
     </div>
 
         <h1>Creative Spark</h1>

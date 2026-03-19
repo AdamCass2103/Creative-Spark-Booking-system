@@ -19,6 +19,28 @@ if ($path == '/' || $path == '') {
     exit;
 }
 
+// First check if the file exists in the public/images folder
+$public_file = __DIR__ . '/../public' . $path;
+if (file_exists($public_file) && is_file($public_file)) {
+    // Serve file from public folder
+    $ext = pathinfo($public_file, PATHINFO_EXTENSION);
+    $mime_types = [
+        'css' => 'text/css',
+        'js' => 'application/javascript',
+        'png' => 'image/png',
+        'jpg' => 'image/jpeg',
+        'jpeg' => 'image/jpeg',
+        'gif' => 'image/gif',
+        'ico' => 'image/x-icon',
+    ];
+    
+    if (isset($mime_types[$ext])) {
+        header('Content-Type: ' . $mime_types[$ext]);
+    }
+    readfile($public_file);
+    exit;
+}
+
 // Check if the file exists in the root directory
 $root_file = __DIR__ . '/../' . ltrim($path, '/');
 if (file_exists($root_file) && is_file($root_file)) {
