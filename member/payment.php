@@ -1,11 +1,11 @@
 <?php
 require_once __DIR__ . '/../includes/auth.php';
-require_once __DIR__ . '/../includes/config.php'; // Add this line
+require_once __DIR__ . '/../includes/functions.php'; // Try this instead
 requireLogin();
 
 $user_id = getCurrentUserId();
 
-// Use the database connection from config
+// Use the database connection from functions.php
 $conn = getDatabaseConnection();
 
 $user = $conn->query("SELECT * FROM users WHERE user_id = $user_id")->fetch_assoc();
