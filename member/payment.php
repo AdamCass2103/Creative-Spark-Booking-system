@@ -1,6 +1,7 @@
 <?php
+require_once __DIR__ . '/../includes/config.php';  // This MUST come first
 require_once __DIR__ . '/../includes/auth.php';
-require_once __DIR__ . '/../includes/functions.php'; // Try this instead
+require_once __DIR__ . '/../includes/functions.php';
 requireLogin();
 
 $user_id = getCurrentUserId();
@@ -56,7 +57,7 @@ $amount = $prefs['tier_id'] == 1 ? '100' : ($prefs['tier_id'] == 2 ? '200' : ($p
             <div class="amount">€<?php echo $amount; ?></div>
             
             <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 20px 0;">
-                <p><strong>Plan:</strong> <?php echo $tier['tier_name'] ?? 'Fabber'; ?></p>
+                <p><strong>Plan:</strong> <?php echo $prefs['tier_name'] ?? 'Fabber'; ?></p>
                 <p><strong>Payment:</strong> <?php echo ucfirst($prefs['payment_type'] ?? 'monthly'); ?></p>
             </div>
             
