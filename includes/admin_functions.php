@@ -103,11 +103,11 @@ function getPendingApprovals() {
             ts.session_time,
             ts.max_attendees,
             sa.registered_at,
-            (SELECT COUNT(*) FROM session_attendees WHERE session_id = ts.id AND booking_status = 'approved') as approved_count
+            (SELECT COUNT(*) FROM session_attendees WHERE session_id = ts.session_id AND booking_status = 'approved') as approved_count
         FROM session_attendees sa
-        JOIN users u ON sa.user_id = u.id
-        JOIN training_sessions ts ON sa.session_id = ts.id
-        JOIN membership_tiers mt ON ts.tier_id = mt.id
+        JOIN users u ON sa.user_id = u.user_id
+        JOIN training_sessions ts ON sa.session_id = ts.session_id
+        JOIN membership_tiers mt ON ts.tier_id = mt.tier_id
         WHERE sa.booking_status = 'pending_approval'
         ORDER BY sa.registered_at ASC
     ";
@@ -130,9 +130,9 @@ function approveBooking($session_id, $user_id, $admin_id) {
     $check_query = "
         SELECT 
             ts.max_attendees,
-            (SELECT COUNT(*) FROM session_attendees WHERE session_id = ts.id AND booking_status = 'approved') as approved_count
+            (SELECT COUNT(*) FROM session_attendees WHERE session_id = ts.session_id AND booking_status = 'approved') as approved_count
         FROM training_sessions ts 
-        WHERE ts.id = $session_id
+        WHERE ts.session_id = $session_id
     ";
     $check_result = $conn->query($check_query);
     $session = $check_result->fetch_assoc();
@@ -153,7 +153,7 @@ function approveBooking($session_id, $user_id, $admin_id) {
         logAdminActivity($admin_id, 'approve_booking', 'booking', $session_id, "Approved booking for user $user_id");
         return ['success' => true, 'message' => 'Booking approved successfully'];
     } else {
-        return ['success' => false, 'message' => 'Error approving booking'];
+        return ['success' => false, 'message' => 'Error approving booking or booking already processed'];
     }
 }
 
@@ -175,7 +175,7 @@ function rejectBooking($session_id, $user_id, $admin_id, $reason = '') {
         logAdminActivity($admin_id, 'reject_booking', 'booking', $session_id, "Rejected booking for user $user_id: $reason");
         return ['success' => true, 'message' => 'Booking rejected successfully'];
     } else {
-        return ['success' => false, 'message' => 'Error rejecting booking'];
+        return ['success' => false, 'message' => 'Error rejecting booking or booking already processed'];
     }
 }
 ?>
