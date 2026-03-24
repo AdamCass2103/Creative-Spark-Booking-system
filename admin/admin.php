@@ -174,6 +174,7 @@ $result = $conn->query("
                     </button>
                     <div id="adminMenu" style="display: none; position: absolute; background: white; min-width: 200px; box-shadow: 0 8px 16px rgba(0,0,0,0.2); z-index: 1; border-radius: 5px; margin-top: 5px; right: 0;">
                         <a href="manage_admins.php" style="color: #333; padding: 12px 16px; text-decoration: none; display: block; border-bottom: 1px solid #eee;">👥 Manage Admins</a>
+                        <a href="manage_payments.php" style="color: #333; padding: 12px 16px; text-decoration: none; display: block; border-bottom: 1px solid #eee;">💳 Manage Payments</a>
                         <a href="activity_log.php" style="color: #333; padding: 12px 16px; text-decoration: none; display: block;">📋 Activity Log</a>
                     </div>
                 </div>
