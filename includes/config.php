@@ -50,18 +50,6 @@ function base_path($path = '') {
     }
     return BASE_PATH . '/' . ltrim($path, '/');
 }
-function getDatabaseConnection() {
-    global $conn;
-    if (isset($conn) && $conn) {
-        return $conn;
-    }
-    
-    $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
-    return $conn;
-}
 
 // Debug - remove after testing
 error_log("Config loaded - Environment: " . ENVIRONMENT);
