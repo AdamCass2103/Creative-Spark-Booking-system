@@ -55,30 +55,13 @@ if (strpos($path, '/css/') === 0) {
     }
 }
 
-// Handle FabMan requests
-if (strpos($path, '/fabman/') === 0) {
-    $fabman_file = __DIR__ . '/../fabman/' . str_replace('/fabman/', '', $path);
-    if (file_exists($fabman_file) && is_file($fabman_file)) {
-        if (pathinfo($fabman_file, PATHINFO_EXTENSION) == 'php') {
-            require $fabman_file;
-        } else {
-            $mime_types = [
-                'css' => 'text/css',
-                'js' => 'application/javascript',
-                'png' => 'image/png',
-                'jpg' => 'image/jpeg',
-                'jpeg' => 'image/jpeg',
-                'gif' => 'image/gif',
-            ];
-            $ext = pathinfo($fabman_file, PATHINFO_EXTENSION);
-            if (isset($mime_types[$ext])) {
-                header('Content-Type: ' . $mime_types[$ext]);
-            }
-            readfile($fabman_file);
-        }
-        exit;
-    }
+// ========== ADD THIS FABMAN HANDLER ==========
+// Handle FabMan requests (just for redirect - FabMan is external)
+if ($path == '/fabman' || $path == '/fabman/') {
+    header('Location: https://www.fabman.io/login');
+    exit;
 }
+// ========== END FABMAN HANDLER ==========
 
 // Check if the file exists in the root directory
 $root_file = __DIR__ . '/../' . ltrim($path, '/');
