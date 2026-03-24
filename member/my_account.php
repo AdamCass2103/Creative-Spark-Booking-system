@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/../includes/config.php';
-require_once __DIR__ . '/../includes/functions.php';  // Add this for getDatabaseConnection()
+require_once __DIR__ . '/../includes/functions.php';
 require_once __DIR__ . '/../includes/auth.php';
 requireLogin();
 
@@ -22,7 +22,6 @@ $existing_skills = [];
 while ($area = $user_areas->fetch_assoc()) {
     $existing_skills[$area['area_name']] = $area['skill_level'];
 }
-
 
 $message = '';
 $message_type = '';
@@ -159,15 +158,41 @@ $areas = [
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>My Account - Creative Spark</title>
     <link rel="stylesheet" href="../css/my_account.css">
+    <style>
+        /* Additional mobile-specific styles */
+        @media (max-width: 480px) {
+            .account-container {
+                padding: 15px;
+            }
+            
+            .account-card {
+                padding: 18px;
+            }
+            
+            .skill-badge {
+                padding: 5px 10px;
+                font-size: 0.75em;
+            }
+            
+            .selected-skills-summary {
+                font-size: 0.85em;
+            }
+            
+            .status-approved, .status-pending, .status-completed {
+                font-size: 0.85em;
+                padding: 3px 10px;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="account-container">
         <div class="account-header">
             <h1>👤 My Account</h1>
-            <a href="dashboard.php" class="btn back-btn">← Back to Dashboard</a>
+            <a href="dashboard.php" class="back-btn">← Back to Dashboard</a>
         </div>
         
         <?php if ($message): ?>
@@ -193,7 +218,7 @@ $areas = [
                     
                     <div class="form-group">
                         <label>Phone Number</label>
-                        <input type="text" name="phone" value="<?php echo htmlspecialchars($user['phone'] ?? ''); ?>">
+                        <input type="tel" name="phone" value="<?php echo htmlspecialchars($user['phone'] ?? ''); ?>">
                     </div>
                     
                     <div class="form-group">
@@ -207,7 +232,7 @@ $areas = [
                     </div>
                     
                     <button type="submit" name="update_details" class="btn-save">
-                        Save Changes
+                        💾 Save Changes
                     </button>
                 </form>
             </div>
@@ -232,16 +257,16 @@ $areas = [
                     </div>
                     
                     <div class="password-requirements">
-                        <strong>Password must:</strong>
-                        <ul style="margin-top: 5px; margin-left: 20px;">
-                            <li>Be at least 8 characters long</li>
-                            <li>Include at least one number</li>
-                            <li>Include at least one capital letter</li>
+                        <strong>🔒 Password requirements:</strong>
+                        <ul>
+                            <li>At least 8 characters long</li>
+                            <li>At least one number</li>
+                            <li>At least one capital letter</li>
                         </ul>
                     </div>
                     
                     <button type="submit" name="change_password" class="btn-save">
-                        Update Password
+                        🔄 Update Password
                     </button>
                 </form>
             </div>
@@ -275,19 +300,19 @@ $areas = [
                     </div>
                     
                     <div class="info-text">
-                        Changing your membership tier will take effect from your next billing cycle.
+                        ℹ️ Changing your membership tier will take effect from your next billing cycle.
                     </div>
                     
-                    <button type="submit" name="update_tier" class="btn-save" style="margin-top: 15px;">
-                        Update Membership
+                    <button type="submit" name="update_tier" class="btn-save">
+                        💳 Update Membership
                     </button>
                 </form>
             </div>
             
-            <!-- Machine Skills Card (using user_areas table) -->
+            <!-- Machine Skills Card -->
             <div class="account-card">
                 <h2>🔧 Machine Skills</h2>
-                <p style="color: #666; margin-bottom: 15px; font-size: 0.9em;">
+                <p class="info-text" style="margin-bottom: 15px;">
                     Select the machines you use and rate your skill level:
                 </p>
                 
@@ -295,6 +320,7 @@ $areas = [
                     <div class="skills-container">
                         <?php foreach($areas as $area): 
                             $area_id = str_replace(' ', '_', $area);
+                            $area_id = str_replace('/', '_', $area_id);
                             $is_checked = isset($existing_skills[$area]);
                             $current_skill = $existing_skills[$area] ?? 'beginner';
                         ?>
@@ -326,9 +352,9 @@ $areas = [
                         <?php 
                         $count = count($existing_skills);
                         if ($count > 0) {
-                            echo "<span>$count</span> machine" . ($count > 1 ? 's' : '') . " selected";
+                            echo "📌 <span>$count</span> machine" . ($count > 1 ? 's' : '') . " selected";
                         } else {
-                            echo "No machines selected yet";
+                            echo "📌 No machines selected yet";
                         }
                         ?>
                     </div>
@@ -342,15 +368,15 @@ $areas = [
                             if ($skill == 'expert') $experts++;
                         }
                     ?>
-                    <div style="margin-top: 10px; display: flex; gap: 10px; justify-content: center; font-size: 0.8em;">
-                        <span style="background: #ffd70020; color: #b8860b; padding: 4px 8px; border-radius: 12px;">🔰 Beginner: <?php echo $beginners; ?></span>
-                        <span style="background: #87ceeb20; color: #0066b3; padding: 4px 8px; border-radius: 12px;">📘 Intermediate: <?php echo $intermediates; ?></span>
-                        <span style="background: #4caf5020; color: #2e7d32; padding: 4px 8px; border-radius: 12px;">⭐ Expert: <?php echo $experts; ?></span>
+                    <div class="skill-breakdown">
+                        <span class="skill-breakdown-badge beginner-badge">🔰 Beginner: <?php echo $beginners; ?></span>
+                        <span class="skill-breakdown-badge intermediate-badge">📘 Intermediate: <?php echo $intermediates; ?></span>
+                        <span class="skill-breakdown-badge expert-badge">⭐ Expert: <?php echo $experts; ?></span>
                     </div>
                     <?php endif; ?>
                     
                     <button type="submit" name="update_skills" class="btn-update-skills">
-                        Update Machine Skills
+                        💾 Update Machine Skills
                     </button>
                 </form>
             </div>
@@ -358,29 +384,29 @@ $areas = [
             <!-- Account Info Card -->
             <div class="account-card">
                 <h2>📊 Account Information</h2>
-                <div style="padding: 10px 0;">
-                    <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f0f0f0;">
-                        <span style="color: #666;">Member Since:</span>
-                        <span style="font-weight: 500;"><?php echo date('F j, Y', strtotime($user['created_at'])); ?></span>
+                <div class="info-list">
+                    <div class="info-item">
+                        <span class="info-label">Member Since:</span>
+                        <span class="info-value"><?php echo date('F j, Y', strtotime($user['created_at'])); ?></span>
                     </div>
-                    <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f0f0f0;">
-                        <span style="color: #666;">Account Status:</span>
-                        <span style="color: #4caf50; font-weight: 500;">Active</span>
+                    <div class="info-item">
+                        <span class="info-label">Account Status:</span>
+                        <span class="info-value status-active">✓ Active</span>
                     </div>
-                    <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f0f0f0;">
-                        <span style="color: #666;">Training Status:</span>
-                        <span class="status-<?php echo $prefs['training_status']; ?>">
+                    <div class="info-item">
+                        <span class="info-label">Training Status:</span>
+                        <span class="info-value status-<?php echo $prefs['training_status']; ?>">
                             <?php echo ucfirst($prefs['training_status']); ?>
                         </span>
                     </div>
-                    <div style="display: flex; justify-content: space-between; padding: 10px 0;">
-                        <span style="color: #666;">Machines Known:</span>
-                        <span style="font-weight: 500;"><?php echo count($existing_skills); ?></span>
+                    <div class="info-item">
+                        <span class="info-label">Machines Known:</span>
+                        <span class="info-value"><?php echo count($existing_skills); ?></span>
                     </div>
                 </div>
                 
-                <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #f0f0f0;">
-                    <a href="logout.php" style="color: #f44336; text-decoration: none;">🚪 Logout</a>
+                <div class="logout-link">
+                    <a href="logout.php">🚪 Logout</a>
                 </div>
             </div>
         </div>
@@ -414,9 +440,9 @@ $areas = [
             var summary = document.getElementById('skillsSummary');
             
             if (count > 0) {
-                summary.innerHTML = '<span>' + count + '</span> machine' + (count > 1 ? 's' : '') + ' selected';
+                summary.innerHTML = '📌 <span>' + count + '</span> machine' + (count > 1 ? 's' : '') + ' selected';
             } else {
-                summary.innerHTML = 'No machines selected yet';
+                summary.innerHTML = '📌 No machines selected yet';
             }
         }
         
