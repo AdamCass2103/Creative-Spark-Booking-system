@@ -145,6 +145,10 @@ $quick_help = [
                 📋 My Bookings
             </a>
             <a href="my_account.php" class="btn-book" style="background: #2E7D32;">👤 My Account</a>
+            <a href="my_account.php" class="btn-book" style="background: #2E7D32;">👤 My Account</a>
+            <a href="fabman_login.php" class="btn-book" style="background: #ff9800;">
+                🔧 My Booking (FabMan)
+            </a>
         </div>
         
         <!-- Dashboard Grid -->
