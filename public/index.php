@@ -62,7 +62,7 @@ echo "<!-- SITE_URL: " . SITE_URL . " -->\n";
                     <div class="option-icon">👨‍💼</div>
                     <div class="option-title">Staff Access</div>
                     <div class="option-desc">
-                        Oscar and team only<br>
+                        FabLab Team Only<br>
                         <strong>Admin panel</strong>
                     </div>
                 </a>
