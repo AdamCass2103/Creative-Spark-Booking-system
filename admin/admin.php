@@ -4,7 +4,6 @@ require_once __DIR__ . '/../includes/functions.php';
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/admin_functions.php';
 requireAdmin();
-
 // Use the same database connection pattern
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
@@ -34,6 +33,8 @@ try {
 $admin_id = getCurrentAdminId();
 $admin_role = getCurrentAdminRole();
 $is_viewer = ($admin_role == 'viewer');
+
+
 
 // Only allow modifications if NOT a viewer
 if (!$is_viewer) {
@@ -84,21 +85,15 @@ switch ($filter) {
         $where = 'WHERE up.needs_training = 0';
         break;
     case 'pending':
-        // FIXED: Use correct status value 'pending_approval'
-        $where = 'WHERE up.training_status = "pending_approval"';
-        break;
-    case 'has_bookings':
-        // Show users with pending booking approvals
-        $where = 'WHERE u.user_id IN (SELECT DISTINCT user_id FROM session_attendees WHERE booking_status IN ("pending", "pending_approval"))';
+        $where = 'WHERE up.training_status = "pending"';
         break;
 }
 
-// Get all users
+// Get all users (viewers can still see this)
 $result = $conn->query("
     SELECT u.user_id, u.name, u.email, u.created_at,
            up.is_returning_member, up.needs_training, 
-           up.terms_accepted, up.training_status,
-           (SELECT COUNT(*) FROM session_attendees WHERE user_id = u.user_id AND booking_status IN ('pending', 'pending_approval')) as pending_bookings
+           up.terms_accepted, up.training_status
     FROM users u
     JOIN user_preferences up ON u.user_id = up.user_id
     $where
@@ -134,14 +129,6 @@ $result = $conn->query("
         .disabled-action {
             opacity: 0.5;
             pointer-events: none;
-        }
-        .pending-badge {
-            background: #ff9800;
-            color: white;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 0.7em;
-            margin-left: 5px;
         }
     </style>
 </head>
@@ -197,7 +184,6 @@ $result = $conn->query("
                 <button class="filter-btn <?php echo $filter === 'needs_training' ? 'active' : ''; ?>" onclick="window.location='?filter=needs_training'">Need Training</button>
                 <button class="filter-btn <?php echo $filter === 'no_training' ? 'active' : ''; ?>" onclick="window.location='?filter=no_training'">No Training Needed</button>
                 <button class="filter-btn <?php echo $filter === 'pending' ? 'active' : ''; ?>" onclick="window.location='?filter=pending'">Pending Approval</button>
-                <button class="filter-btn <?php echo $filter === 'has_bookings' ? 'active' : ''; ?>" onclick="window.location='?filter=has_bookings'">📌 Has Pending Bookings</button>
             </div>
         </div>
         
@@ -212,7 +198,6 @@ $result = $conn->query("
                         <th>Needs Training</th>
                         <th>Terms Accepted</th>
                         <th>Training Status</th>
-                        <th>Pending Bookings</th>
                         <?php if (!$is_viewer): ?>
                         <th>Update Status</th>
                         <th>Action</th>
@@ -224,29 +209,22 @@ $result = $conn->query("
                     <?php while ($row = $result->fetch_assoc()): ?>
                     <tr>
                         <td><?php echo $row['user_id']; ?></td>
-                        <td><?php echo htmlspecialchars($row['name']); ?></td>
-                        <td><?php echo htmlspecialchars($row['email']); ?></td>
+                        <td><?php echo $row['name']; ?></td>
+                        <td><?php echo $row['email']; ?></td>
                         <td><?php echo $row['is_returning_member'] ? 'Yes' : 'No'; ?></td>
                         <td><?php echo $row['needs_training'] ? 'Yes' : 'No'; ?></td>
                         <td><?php echo $row['terms_accepted'] ? 'Yes' : 'No'; ?></td>
                         <td>
                             <span class="status-<?php echo $row['training_status']; ?>">
-                                <?php echo ucfirst(str_replace('_', ' ', $row['training_status'])); ?>
+                                <?php echo ucfirst($row['training_status']); ?>
                             </span>
-                        </td>
-                        <td>
-                            <?php if ($row['pending_bookings'] > 0): ?>
-                                <span class="pending-badge"><?php echo $row['pending_bookings']; ?> pending</span>
-                            <?php else: ?>
-                                -
-                            <?php endif; ?>
                         </td>
                         <?php if (!$is_viewer): ?>
                         <td>
                             <form method="POST" style="display: flex; gap: 10px; align-items: center;">
                                 <input type="hidden" name="user_id" value="<?php echo $row['user_id']; ?>">
                                 <select name="training_status">
-                                    <option value="pending_approval" <?php echo $row['training_status'] == 'pending_approval' ? 'selected' : ''; ?>>Pending Approval</option>
+                                    <option value="pending" <?php echo $row['training_status'] == 'pending' ? 'selected' : ''; ?>>Pending</option>
                                     <option value="approved" <?php echo $row['training_status'] == 'approved' ? 'selected' : ''; ?>>Approved</option>
                                     <option value="rejected" <?php echo $row['training_status'] == 'rejected' ? 'selected' : ''; ?>>Rejected</option>
                                     <option value="completed" <?php echo $row['training_status'] == 'completed' ? 'selected' : ''; ?>>Completed</option>
@@ -284,8 +262,7 @@ $result = $conn->query("
             <?php
             $total = $conn->query("SELECT COUNT(*) as count FROM users")->fetch_assoc()['count'];
             $need_training = $conn->query("SELECT COUNT(*) as count FROM user_preferences WHERE needs_training = 1")->fetch_assoc()['count'];
-            $pending = $conn->query("SELECT COUNT(*) as count FROM user_preferences WHERE training_status = 'pending_approval'")->fetch_assoc()['count'];
-            $pending_bookings = $conn->query("SELECT COUNT(DISTINCT user_id) as count FROM session_attendees WHERE booking_status IN ('pending', 'pending_approval')")->fetch_assoc()['count'];
+            $pending = $conn->query("SELECT COUNT(*) as count FROM user_preferences WHERE training_status = 'pending'")->fetch_assoc()['count'];
             ?>
             <div class="stat-card">
                 <h3>Total Users</h3>
@@ -296,12 +273,8 @@ $result = $conn->query("
                 <p><?php echo $need_training; ?></p>
             </div>
             <div class="stat-card">
-                <h3>Training Pending</h3>
+                <h3>Pending Approval</h3>
                 <p><?php echo $pending; ?></p>
-            </div>
-            <div class="stat-card">
-                <h3>📌 Booking Requests</h3>
-                <p><?php echo $pending_bookings; ?></p>
             </div>
         </div>
     </div>
@@ -349,4 +322,4 @@ $result = $conn->query("
     }
     </script>
 </body>
-</html>
+</html> 
