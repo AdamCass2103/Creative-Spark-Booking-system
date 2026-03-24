@@ -241,7 +241,6 @@ $quick_help = [
     <?php endif; ?>
 </div>
 
-            <!-- In your member-dashboard.php - Replace the Learning Resources section with this -->
 
 <!-- Learning Resources -->
 <div class="card" style="grid-column: span 2;">
