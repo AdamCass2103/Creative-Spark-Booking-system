@@ -348,4 +348,143 @@
     .account-card {
         padding: 20px;
     }
+    /* Account Info List */
+.info-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.info-item:last-child {
+    border-bottom: none;
+}
+
+.info-label {
+    color: #6c757d;
+    font-size: 0.9em;
+    font-weight: 500;
+}
+
+.info-value {
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.status-active {
+    color: #28a745;
+}
+
+/* Logout Link */
+.logout-link {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #f0f0f0;
+    text-align: center;
+}
+
+.logout-link a {
+    color: #dc3545;
+    text-decoration: none;
+    font-weight: 500;
+    padding: 8px 20px;
+    border-radius: 50px;
+    transition: all 0.3s;
+    display: inline-block;
+}
+
+.logout-link a:hover {
+    background: #dc3545;
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* Password Requirements List */
+.password-requirements ul {
+    margin-top: 8px;
+    margin-left: 20px;
+    color: #6c757d;
+    font-size: 0.85em;
+}
+
+.password-requirements li {
+    margin: 4px 0;
+}
+
+/* Skill Breakdown */
+.skill-breakdown {
+    margin-top: 12px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.skill-breakdown-badge {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.8em;
+    font-weight: 500;
+}
+
+.beginner-badge {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.intermediate-badge {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+.expert-badge {
+    background: #d4edda;
+    color: #155724;
+}
+
+/* Improved spacing */
+.account-card {
+    display: flex;
+    flex-direction: column;
+}
+
+.account-card form {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.btn-save, .btn-update-skills {
+    margin-top: auto;
+}
+
+/* Better mobile spacing */
+@media (max-width: 768px) {
+    .info-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+        padding: 10px 0;
+    }
+    
+    .skill-breakdown {
+        gap: 8px;
+    }
+    
+    .skill-breakdown-badge {
+        padding: 4px 10px;
+        font-size: 0.75em;
+    }
+    
+    .account-card h2 {
+        font-size: 1.2em;
+    }
+}
 }
