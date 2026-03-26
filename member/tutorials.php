@@ -669,7 +669,7 @@ $user = $conn->query("SELECT * FROM users WHERE user_id = $user_id")->fetch_asso
     
     <!-- Bottom navigation -->
     <div class="bottom-nav">
-        <a href="member-dashboard.php" class="bottom-back-btn">
+        <a href="dashboard.php" class="bottom-back-btn">
             <span class="back-arrow">←</span> Return to Dashboard
         </a>
     </div>
