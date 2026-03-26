@@ -166,175 +166,139 @@ $user = $conn->query("SELECT * FROM users WHERE user_id = $user_id")->fetch_asso
     <div class="tutorials-grid">
         
     <div class="machine-card fabber1 3d" data-tier="Fabber 1" data-category="3D Printer">
-        <div class="machine-header">
-            <h2>Prusa i3 MK3S+</h2>
-            <span class="tier-badge fabber1">Fabber 1</span>
-        </div>
-        <p class="machine-type">3D Printer - FDM</p>
-        <div class="tutorial-links">
-            <h3>📹 Video Tutorials</h3>
-            <a href="https://www.youtube.com/watch?v=GE-lrRbU124" target="_blank" class="tutorial-link video">Complete Beginner's Guide (15:22)</a>
-            <a href="https://www.youtube.com/watch?v=3S_0H0fI-Rk" target="_blank" class="tutorial-link video">PrusaSlicer Tutorial (12:45)</a>
-            <a href="https://www.youtube.com/watch?v=z0z8D-E5r8M" target="_blank" class="tutorial-link video">Maintenance & Calibration (10:30)</a>
-            
-            <h3>📖 Written Guides</h3>
-            <a href="https://help.prusa3d.com/en/category/prusa-i3-mk3s-mk3s_220" target="_blank" class="tutorial-link guide">Official Prusa Knowledge Base</a>
-            <a href="https://help.prusa3d.com/article/first-print-with-prusaslicer_1753" target="_blank" class="tutorial-link guide">PrusaSlicer Settings Guide</a>
-            <a href="https://help.prusa3d.com/product/mk3s-2/calibration_199" target="_blank" class="tutorial-link guide">3D Printing Tuning Guide</a>
-        </div>
+    <div class="machine-header">
+        <h2>Prusa i3 MK3S+</h2>
+        <span class="tier-badge fabber1">Fabber 1</span>
     </div>
+    <p class="machine-type">3D Printer - FDM</p>
+    <div class="tutorial-links">
+        <h3>📹 Video Tutorials</h3>
+        <a href="https://www.youtube.com/watch?v=GE-lrRbU124" target="_blank" class="tutorial-link video">Complete Beginner's Guide (15:22)</a>
 
-    <div class="machine-card fabber1 3d" data-tier="Fabber 1" data-category="3D Printer">
-        <div class="machine-header">
-            <h2>Ultimaker S3 Extended</h2>
-            <span class="tier-badge fabber1">Fabber 1</span>
-        </div>
-        <p class="machine-type">3D Printer - FDM</p>
-        <div class="tutorial-links">
-            <h3>📹 Video Tutorials</h3>
-            <a href="https://www.youtube.com/watch?v=m-MoI1FgjAY" target="_blank" class="tutorial-link video">Cura Tutorial for Beginners (8:21)</a>
-            <a href="https://www.youtube.com/watch?v=4UaH_vFm0_Y" target="_blank" class="tutorial-link video">First Print Setup (6:30)</a>
-            
-            <h3>📖 Written Guides</h3>
-            <a href="https://support.ultimaker.com/s/article/1667411295942" target="_blank" class="tutorial-link guide">Ultimaker S3 User Manual</a>
-            <a href="https://ultimaker.com/software/ultimaker-cura" target="_blank" class="tutorial-link guide">Cura Software Documentation</a>
-            <a href="https://support.ultimaker.com/s/topic/0TO5b000000U6fMGAS/3d-printing-basics" target="_blank" class="tutorial-link guide">Ultimate 3D Printing Guide</a>
-        </div>
+        <h3>📖 Written Guides</h3>
+        <a href="https://help.prusa3d.com/en/category/prusa-i3-mk3s-mk3s_220" target="_blank" class="tutorial-link guide">Official Prusa Knowledge Base</a>
+        <a href="https://help.prusa3d.com/article/first-print-with-prusaslicer_1753" target="_blank" class="tutorial-link guide">PrusaSlicer Settings Guide</a>
+        <a href="https://help.prusa3d.com/product/mk3s-2/calibration_199" target="_blank" class="tutorial-link guide">3D Printing Tuning Guide</a>
     </div>
+</div>
 
-    <div class="machine-card fabber1 3d" data-tier="Fabber 1" data-category="3D Printer">
-        <div class="machine-header">
-            <h2>MakerBot Replicator+</h2>
-            <span class="tier-badge fabber1">Fabber 1</span>
-        </div>
-        <p class="machine-type">3D Printer - FDM</p>
-        <div class="tutorial-links">
-            <h3>📹 Video Tutorials</h3>
-            <a href="https://www.youtube.com/watch?v=pSAnpAnC_xQ" target="_blank" class="tutorial-link video">Getting Started Guide (7:15)</a>
-            <a href="https://www.youtube.com/watch?v=R4w7Y-y_x2c" target="_blank" class="tutorial-link video">MakerBot Print Software (8:30)</a>
-            
-            <h3>📖 Written Guides</h3>
-            <a href="https://support.makerbot.com/s/" target="_blank" class="tutorial-link guide">MakerBot Support Center</a>
-            <a href="https://support.makerbot.com/s/article/MakerBot-Replicator-Plus-User-Manual" target="_blank" class="tutorial-link guide">General FDM Printing Guide</a>
-        </div>
-    </div>
 
-    <div class="machine-card fabber1 3d" data-tier="Fabber 1" data-category="3D Printer">
-        <div class="machine-header">
-            <h2>Formlabs Form 3B+</h2>
-            <span class="tier-badge fabber1">Fabber 1</span>
-        </div>
-        <p class="machine-type">3D Printer - SLA</p>
-        <div class="tutorial-links">
-            <h3>📹 Video Tutorials</h3>
-            <a href="https://www.youtube.com/watch?v=QehUfBqKsoQ" target="_blank" class="tutorial-link video">Setup & First Print (8:30)</a>
-            <a href="https://www.youtube.com/watch?v=vV77m6_pL7Q" target="_blank" class="tutorial-link video">PreForm Software Tutorial (10:15)</a>
-            <a href="https://www.youtube.com/watch?v=5G8u6Gatb9s" target="_blank" class="tutorial-link video">Post-Processing Guide (7:45)</a>
-            
-            <h3>📖 Written Guides</h3>
-            <a href="https://formlabs.com/blog/ultimate-guide-to-stereolithography-sla-3d-printing/" target="_blank" class="tutorial-link guide">Complete SLA Printing Guide</a>
-            <a href="https://support.formlabs.com/s/article/Using-PreForm" target="_blank" class="tutorial-link guide">PreForm Software Manual</a>
-            <a href="https://formlabs.com/services/training/form-3/" target="_blank" class="tutorial-link guide">Formlabs Training Hub</a>
-        </div>
+<div class="machine-card fabber1 3d" data-tier="Fabber 1" data-category="3D Printer">
+    <div class="machine-header">
+        <h2>Ultimaker S3 Extended</h2>
+        <span class="tier-badge fabber1">Fabber 1</span>
     </div>
+    <p class="machine-type">3D Printer - FDM</p>
+    <div class="tutorial-links">
+        <h3>📹 Video Tutorials</h3>
+        <a href="https://www.youtube.com/watch?v=m-MoI1FgjAY" target="_blank" class="tutorial-link video">Cura Tutorial for Beginners (8:21)</a>
 
-    <div class="machine-card fabber1 laser" data-tier="Fabber 1" data-category="Laser Cutter">
-        <div class="machine-header">
-            <h2>Epilog Zing 16-40W</h2>
-            <span class="tier-badge fabber1">Fabber 1</span>
-        </div>
-        <p class="machine-type">Laser Cutter</p>
-        <div class="tutorial-links">
-            <h3>📹 Video Tutorials</h3>
-            <a href="https://www.youtube.com/watch?v=q6eY0Vp34is" target="_blank" class="tutorial-link video">Beginner's Tutorial (14:30)</a>
-            <a href="https://www.youtube.com/watch?v=z7kE8W4eC8E" target="_blank" class="tutorial-link video">Laser Cutting Basics (21:36)</a>
-            
-            <h3>📖 Written Guides</h3>
-            <a href="https://www.epiloglaser.com/tech-support/zing-manual.htm" target="_blank" class="tutorial-link guide">Epilog Laser Tutorials</a>
-            <a href="https://www.epiloglaser.com/resources/sample-club.htm" target="_blank" class="tutorial-link guide">Laser Projects Guide</a>
-            <a href="https://www.epiloglaser.com/tech-support/laser-material-settings/" target="_blank" class="tutorial-link guide">Material Settings Database</a>
-        </div>
+        <h3>📖 Written Guides</h3>
+        <a href="https://support.ultimaker.com/s/article/1667411295942" target="_blank" class="tutorial-link guide">Ultimaker S3 User Manual</a>
+        <a href="https://ultimaker.com/software/ultimaker-cura" target="_blank" class="tutorial-link guide">Cura Software Documentation</a>
     </div>
+</div>
 
-    <div class="machine-card fabber1 laser" data-tier="Fabber 1" data-category="Laser Cutter">
-        <div class="machine-header">
-            <h2>Flux Beamo / Beambox</h2>
-            <span class="tier-badge fabber1">Fabber 1</span>
-        </div>
-        <p class="machine-type">Laser Cutter</p>
-        <div class="tutorial-links">
-            <h3>📹 Video Tutorials</h3>
-            <a href="https://www.youtube.com/watch?v=uP7-k1ReEGQ" target="_blank" class="tutorial-link video">Beginner Tutorial (12:00)</a>
-            
-            <h3>📖 Written Guides</h3>
-            <a href="https://support.flux3dp.com/hc/en-us" target="_blank" class="tutorial-link guide">Flux Support Center</a>
-            <a href="https://support.flux3dp.com/hc/en-us/articles/360001550136-Beam-Studio-Manual" target="_blank" class="tutorial-link guide">General Laser Cutting Guide</a>
-        </div>
-    </div>
 
-    <div class="machine-card fabber1 laser" data-tier="Fabber 1" data-category="Waterjet">
-        <div class="machine-header">
-            <h2>Wazer Desktop Waterjet</h2>
-            <span class="tier-badge fabber1">Fabber 1</span>
-        </div>
-        <p class="machine-type">Waterjet Cutter</p>
-        <div class="tutorial-links">
-            <h3>📹 Video Tutorials</h3>
-            <a href="https://www.youtube.com/watch?v=o7uLgTIdD0Q" target="_blank" class="tutorial-link video">Desktop Waterjet Tutorial (10:30)</a>
-            
-            <h3>📖 Written Guides</h3>
-            <a href="https://www.wazer.com/support" target="_blank" class="tutorial-link guide">Wazer Support Center</a>
-        </div>
+<div class="machine-card fabber1 3d" data-tier="Fabber 1" data-category="3D Printer">
+    <div class="machine-header">
+        <h2>MakerBot Replicator+</h2>
+        <span class="tier-badge fabber1">Fabber 1</span>
     </div>
+    <p class="machine-type">3D Printer - FDM</p>
+    <div class="tutorial-links">
+        <h3>📖 Written Guides</h3>
+        <a href="https://support.makerbot.com/s/" target="_blank" class="tutorial-link guide">MakerBot Support Center</a>
+    </div>
+</div>
 
-    <div class="machine-card fabber1 cnc" data-tier="Fabber 1" data-category="CNC">
-        <div class="machine-header">
-            <h2>Roland Monofab SRM-20</h2>
-            <span class="tier-badge fabber1">Fabber 1</span>
-        </div>
-        <p class="machine-type">CNC Milling - High Definition</p>
-        <div class="tutorial-links">
-            <h3>📹 Video Tutorials</h3>
-            <a href="https://www.youtube.com/watch?v=j_Kz58-H_00" target="_blank" class="tutorial-link video">Milling Tutorial (13:45)</a>
-            <a href="https://www.youtube.com/watch?v=o0L6m_u-HMo" target="_blank" class="tutorial-link video">SRP Player Software Guide (8:20)</a>
-            
-            <h3>📖 Written Guides</h3>
-            <a href="https://support.rolanddga.com/hc/en-us/categories/204207187-SRM-20" target="_blank" class="tutorial-link guide">Roland SRM-20 Manuals</a>
-            <a href="https://www.youtube.com/watch?v=CNCFeedsSpeeds" target="_blank" class="tutorial-link guide">Feeds & Speeds Explained</a>
-        </div>
-    </div>
 
-    <div class="machine-card fabber1 vinyl" data-tier="Fabber 1" data-category="Vinyl">
-        <div class="machine-header">
-            <h2>Roland CAMM1 GS2-24</h2>
-            <span class="tier-badge fabber1">Fabber 1</span>
-        </div>
-        <p class="machine-type">Vinyl Cutter</p>
-        <div class="tutorial-links">
-            <h3>📹 Video Tutorials</h3>
-            <a href="https://www.youtube.com/watch?v=vU1IA0sr_v0" target="_blank" class="tutorial-link video">Vinyl Cutter Tutorial (9:30)</a>
-            <a href="https://www.youtube.com/watch?v=T1D-5Vv2Uio" target="_blank" class="tutorial-link video">Vinyl Cutting for Beginners (4:08)</a>
-            
-            <h3>📖 Written Guides</h3>
-            <a href="https://support.rolanddga.com/hc/en-us/categories/204207167-GS-24" target="_blank" class="tutorial-link guide">Complete Vinyl Cutting Guide</a>
-        </div>
+<div class="machine-card fabber1 3d" data-tier="Fabber 1" data-category="3D Printer">
+    <div class="machine-header">
+        <h2>Formlabs Form 3B+</h2>
+        <span class="tier-badge fabber1">Fabber 1</span>
     </div>
+    <p class="machine-type">3D Printer - SLA</p>
+    <div class="tutorial-links">
+        <h3>📖 Written Guides</h3>
+        <a href="https://formlabs.com/blog/ultimate-guide-to-stereolithography-sla-3d-printing/" target="_blank" class="tutorial-link guide">Complete SLA Printing Guide</a>
+        <a href="https://formlabs.com/services/training/form-3/" target="_blank" class="tutorial-link guide">Formlabs Training Hub</a>
+    </div>
+</div>
 
-    <div class="machine-card fabber1 vinyl" data-tier="Fabber 1" data-category="Vinyl">
-        <div class="machine-header">
-            <h2>Roland Versa Studio BN-20</h2>
-            <span class="tier-badge fabber1">Fabber 1</span>
-        </div>
-        <p class="machine-type">Vinyl Cutting & Printing</p>
-        <div class="tutorial-links">
-            <h3>📹 Video Tutorials</h3>
-            <a href="https://www.youtube.com/watch?v=QD6Fwgq-7BU" target="_blank" class="tutorial-link video">BN-20 Getting Started (11:20)</a>
-            
-            <h3>📖 Written Guides</h3>
-            <a href="https://www.rolanddga.com/support" target="_blank" class="tutorial-link guide">Roland Support Center</a>
-        </div>
+
+<div class="machine-card fabber1 laser" data-tier="Fabber 1" data-category="Laser Cutter">
+    <div class="machine-header">
+        <h2>Epilog Zing 16-40W</h2>
+        <span class="tier-badge fabber1">Fabber 1</span>
     </div>
-    <div class="machine-card fabber1 vinyl" data-tier="Fabber 1" data-category="Embroidery">
+    <p class="machine-type">Laser Cutter</p>
+    <div class="tutorial-links">
+        <h3>📹 Video Tutorials</h3>
+        <a href="https://www.youtube.com/watch?v=z7kE8W4eC8E" target="_blank" class="tutorial-link video">Laser Cutting Basics (21:36)</a>
+    </div>
+</div>
+
+
+<div class="machine-card fabber1 laser" data-tier="Fabber 1" data-category="Laser Cutter">
+    <div class="machine-header">
+        <h2>Flux Beamo / Beambox</h2>
+        <span class="tier-badge fabber1">Fabber 1</span>
+    </div>
+    <p class="machine-type">Laser Cutter</p>
+    <div class="tutorial-links">
+        <h3>📹 Video Tutorials</h3>
+        <a href="https://www.youtube.com/watch?v=uP7-k1ReEGQ" target="_blank" class="tutorial-link video">Beginner Tutorial (12:00)</a>
+
+        <h3>📖 Written Guides</h3>
+        <a href="https://support.flux3dp.com/hc/en-us" target="_blank" class="tutorial-link guide">Flux Support Center</a>
+    </div>
+</div>
+
+
+<div class="machine-card fabber1 laser" data-tier="Fabber 1" data-category="Waterjet">
+    <div class="machine-header">
+        <h2>Wazer Desktop Waterjet</h2>
+        <span class="tier-badge fabber1">Fabber 1</span>
+    </div>
+    <p class="machine-type">Waterjet Cutter</p>
+    <div class="tutorial-links">
+        <h3>📖 Written Guides</h3>
+        <a href="https://www.wazer.com/support" target="_blank" class="tutorial-link guide">Wazer Support Center</a>
+    </div>
+</div>
+
+
+<div class="machine-card fabber1 vinyl" data-tier="Fabber 1" data-category="Vinyl">
+    <div class="machine-header">
+        <h2>Roland CAMM1 GS2-24</h2>
+        <span class="tier-badge fabber1">Fabber 1</span>
+    </div>
+    <p class="machine-type">Vinyl Cutter</p>
+    <div class="tutorial-links">
+        <h3>📹 Video Tutorials</h3>
+        <a href="https://www.youtube.com/watch?v=vU1IA0sr_v0" target="_blank" class="tutorial-link video">Vinyl Cutter Tutorial (9:30)</a>
+    </div>
+</div>
+
+
+<div class="machine-card fabber1 vinyl" data-tier="Fabber 1" data-category="Vinyl">
+    <div class="machine-header">
+        <h2>Roland Versa Studio BN-20</h2>
+        <span class="tier-badge fabber1">Fabber 1</span>
+    </div>
+    <p class="machine-type">Vinyl Cutting & Printing</p>
+    <div class="tutorial-links">
+        <h3>📹 Video Tutorials</h3>
+        <a href="https://www.youtube.com/watch?v=QD6Fwgq-7BU" target="_blank" class="tutorial-link video">BN-20 Getting Started (11:20)</a>
+
+        <h3>📖 Written Guides</h3>
+        <a href="https://www.rolanddga.com/support" target="_blank" class="tutorial-link guide">Roland Support Center</a>
+    </div>
+</div>
+
+
+<div class="machine-card fabber1 vinyl" data-tier="Fabber 1" data-category="Embroidery">
     <div class="machine-header">
         <h2>Brother XJ1 / VR Embroidery</h2>
         <span class="tier-badge fabber1">Fabber 1</span>
@@ -343,26 +307,12 @@ $user = $conn->query("SELECT * FROM users WHERE user_id = $user_id")->fetch_asso
     <div class="tutorial-links">
         <h3>📹 Video Tutorials</h3>
         <a href="https://www.youtube.com/watch?v=0ZdHzlwVkdA" target="_blank" class="tutorial-link video">Embroidery Machine Tutorial (15:00)</a>
-        
+
         <h3>📖 Written Guides</h3>
         <a href="https://support.brother.com/g/b/productseries.aspx?c=us&lang=en&pcatid=43" target="_blank" class="tutorial-link guide">Brother Support</a>
     </div>
-</div> 
+</div>
 
-<div class="machine-card fabber1" data-tier="Fabber 1" data-category="Thermoforming">
-    <div class="machine-header">
-        <h2>Mayku Formbox</h2>
-        <span class="tier-badge fabber1">Fabber 1</span>
-    </div>
-    <p class="machine-type">Thermoforming</p>
-    <div class="tutorial-links">
-        <h3>📹 Video Tutorials</h3>
-        <a href="https://www.youtube.com/watch?v=vV9W8V3h_20" target="_blank" class="tutorial-link video">Thermoforming Guide (6:45)</a>
-        
-        <h3>📖 Written Guides</h3>
-        <a href="https://www.mayku.com/pages/learn" target="_blank" class="tutorial-link guide">Mayku Learning Center</a>
-    </div>
-</div> 
 
 <div class="machine-card fabber1" data-tier="Fabber 1" data-category="Workbench">
     <div class="machine-header">
@@ -373,13 +323,8 @@ $user = $conn->query("SELECT * FROM users WHERE user_id = $user_id")->fetch_asso
     <div class="tutorial-links">
         <h3>📹 Video Tutorials</h3>
         <a href="https://www.youtube.com/watch?v=uTloBPjC-uA" target="_blank" class="tutorial-link video">Soldering Basics (12:00)</a>
-        <a href="https://www.youtube.com/watch?v=7p_G7UqU3rY" target="_blank" class="tutorial-link video">Power Tool Safety (8:30)</a>
-        
-        <h3>📖 Written Guides</h3>
-        <a href="https://www.sparkfun.com/tutorials/106" target="_blank" class="tutorial-link guide">Soldering & Electronics Guide</a>
     </div>
-</div> 
-
+</div>
         <!-- FABBER 2 MACHINES -->
         
         <!-- Raise 3D Printers (Fabber 2) -->
