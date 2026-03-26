@@ -310,9 +310,9 @@ endif;
                             <?php endforeach; ?>
                         </div>
                         
-                        <div style="margin-top: 15px; text-align: right;">
-                            <a href="<?php echo $wiki_base_url; ?>" target="_blank" class="btn-book" style="display: inline-block; padding: 8px 15px; font-size: 0.9em;">
-                                Visit Full Wiki 📚
+                        <div style="margin-top: 20px;">
+                            <a href="<?php echo $wiki_base_url; ?>" target="_blank" class="btn-book" style="display: inline-block; padding: 10px 20px; font-size: 1em; background: #2E7D32; width: 100%; text-align: center; box-sizing: border-box;">
+                                📚 Visit Full Wiki
                             </a>
                         </div>
                     </div>
