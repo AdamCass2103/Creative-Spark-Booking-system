@@ -42,80 +42,119 @@ $prefs = $conn->query("SELECT * FROM user_preferences WHERE user_id = $user_id")
 $pending_bookings = $conn->query("SELECT COUNT(*) as count FROM session_attendees 
                                   WHERE user_id = $user_id AND booking_status = 'pending_approval'")->fetch_assoc()['count'];
 
-// ... rest of your code continues
-// Learning Resources Data with corrected wiki URLs (using /home/ structure)
-$wiki_base_url = "https://creative-spark-enterprise-fablab.gitbook.io/fablab-wiki/";
+// Get payment status
+$payment_status = $user['payment_status'] ?? 'pending';
 
-$videos = [
-        [
-            'title' => 'Laser Cutting for Beginners',
-            'duration' => '21:36',
-            'url' => 'https://learn.microsoft.com/en-us/shows/themakershow/mini-laser-cutting'
-        ],
-        [
-            'title' => '3D Printing Beginner Guide',
-            'duration' => '30:19',
-            'url' => 'https://www.youtube.com/watch?v=2vFdwz4U1VQ'
-        ],
-        [
-            'title' => 'CNC Milling Basics for Beginners',
-            'duration' => '18:45',
-            'url' => 'https://www.youtube.com/watch?v=cj0-wSGGe6g'
-        ],
-        [
-            'title' => 'Vinyl Cutter Tutorial for Beginners',
-            'duration' => '9:43',
-            'url' => 'https://www.youtube.com/watch?v=G9V-F7kWs8g'
-        ]
-];
+// Check if membership is active - ONLY show active dashboard if status is approved AND payment is paid
+$is_active = ($prefs['training_status'] == 'approved' && $payment_status == 'paid');
 
-// Wiki articles with CORRECT URLs based on your links
-$wiki_articles = [
-    [
-        'title' => 'Glossary of Terms', 
-        'new' => true,
-        'url' => $wiki_base_url . 'home/glossary-of-terms',
-        'description' => 'Common terms in digital fabrication'
-    ],
-    [
-        'title' => 'Fabrication Processes', 
-        'new' => false,
-        'url' => $wiki_base_url . 'home/fabrication-processes',
-        'description' => 'Guides for using equipment safely'
-    ],
-    
-    [
-        'title' => 'Extra Resources', 
-        'new' => false,
-        'url' => $wiki_base_url . 'home/extra-resources',
-        'description' => 'Tutorials and community forums'
-    ],
-    [
-        'title' => 'Fab Academy Diploma', 
-        'new' => false,
-        'url' => $wiki_base_url . 'home/fab-academy-diploma',
-        'description' => 'Intensive 5-month program in digital fabrication'
-    ],
-];
-
-$quick_help = [
-    [
-        'question' => 'How do I book a machine?',
-        'answer' => 'Go to the bookings page, select your machine, choose a time, and confirm. You need to have completed training for that machine first.',
-        'icon' => '📅'
-    ],
-    [
-        'question' => 'What safety gear do I need?',
-        'answer' => 'Safety glasses are required for all machines. Ear protection for loud equipment. Dust masks for sanding/woodwork.',
-        'icon' => '🛡️'
-    ],
-    [
-        'question' => 'Can I bring my own materials?',
-        'answer' => 'Yes, but they must be approved by staff first. Some materials can damage machines or are fire hazards.',
-        'icon' => '📦'
-    ]
-];
+// If not active, show the inactive message directly (not redirect to another file)
+if (!$is_active):
 ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Membership Required - Creative Spark</title>
+    <link rel="stylesheet" href="../css/member-dashboard.css">
+</head>
+<body>
+    <div class="inactive-container">
+        <div class="inactive-card">
+            <div class="warning-icon">⚠️</div>
+            <div class="warning-title">
+                <?php 
+                if ($prefs['training_status'] != 'approved'): 
+                    echo "Pending Approval";
+                else:
+                    echo "Payment Required";
+                endif;
+                ?>
+            </div>
+            
+            <div class="profile-summary">
+                <div class="profile-icon">👤</div>
+                <div style="text-align: left;">
+                    <h2 style="color: #2E7D32;">Welcome back, <?php echo htmlspecialchars($user['name']); ?></h2>
+                    <p style="color: #666;">
+                        <?php 
+                        if ($prefs['training_status'] != 'approved'): 
+                            echo "Your membership application is being reviewed.";
+                        else:
+                            echo "Complete payment to activate your membership.";
+                        endif;
+                        ?>
+                    </p>
+                </div>
+            </div>
+            
+            <div class="info-box">
+                <h3 style="color: #2E7D32; margin-bottom: 15px;">📋 Membership Status</h3>
+                <div class="info-row">
+                    <span class="info-label">Status:</span>
+                    <span class="info-value">
+                        <?php 
+                        if ($prefs['training_status'] != 'approved'): 
+                            echo '<span class="status-pending">Pending Approval</span>';
+                        else:
+                            echo '<span style="color: #ff9800;">⏳ Awaiting Payment</span>';
+                        endif;
+                        ?>
+                    </span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Selected Plan:</span>
+                    <span class="info-value"><?php echo $tier_name; ?></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Member Since:</span>
+                    <span class="info-value"><?php echo date('F Y', strtotime($user['created_at'])); ?></span>
+                </div>
+            </div>
+            
+            <div class="restrictions-list">
+                <h3>⛔ Currently Unavailable:</h3>
+                <ul>
+                    <li>Book training sessions</li>
+                    <li>Request machine time</li>
+                    <li>Access member resources</li>
+                    <li>Book equipment</li>
+                    <li>Attend workshops</li>
+                </ul>
+            </div>
+            
+            <?php if ($prefs['training_status'] != 'approved'): ?>
+                <div style="background: #e3f2fd; padding: 15px; border-radius: 10px; margin: 20px 0;">
+                    <p style="margin: 0;">📧 You'll receive an email when your application is reviewed.</p>
+                    <p style="margin: 5px 0 0; font-size: 0.85em; color: #666;">Contact Oscar if you have questions.</p>
+                </div>
+                <a href="logout.php" class="reactivate-btn" style="background: #6c757d;">← Logout</a>
+            <?php else: ?>
+                <a href="payment.php" class="reactivate-btn">
+                    💳 Complete Payment Now →
+                </a>
+                <div style="color: #666; font-size: 0.9em; margin: 20px 0;">
+                    Your training is approved! Complete payment to activate your membership.
+                </div>
+            <?php endif; ?>
+            
+            <div class="help-links">
+                <a href="mailto:oscar@creativespark.ie" class="help-link">📧 Contact Oscar</a>
+                <a href="logout.php" class="help-link" style="color: #f44336;">🚪 Logout</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+<?php
+    exit; // Stop here - don't show the full dashboard
+endif;
+
+// If we get here, membership is ACTIVE - show the full dashboard
+?>
+
+<!-- Your FULL ACTIVE DASHBOARD HTML HERE (the one with all the cards, bookings, etc.) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -149,7 +188,7 @@ $quick_help = [
                 🛠️ FabMan Portal
             </a>
             <a href="feedback.php" class="btn-book" style="background: #795548;">
-        💬 Feedback
+                💬 Feedback
             </a>
         </div>
         
@@ -177,155 +216,124 @@ $quick_help = [
             </div>
             
             <!-- Membership Card -->
-<div class="card">
-    <h2>🎫 Membership Status</h2>
-    <div class="info-row">
-        <strong>Returning Member:</strong>
-        <span><?php echo $prefs['is_returning_member'] ? 'Yes' : 'No'; ?></span>
-    </div>
-    <div class="info-row">
-        <strong>Training Required:</strong>
-        <span><?php echo $prefs['needs_training'] ? 'Yes' : 'No'; ?></span>
-    </div>
-    <div class="info-row">
-        <strong>Account Status:</strong>
-        <span class="status-<?php echo $prefs['training_status']; ?>">
-            <?php echo ucfirst($prefs['training_status']); ?>
-        </span>
-    </div>
-    
-    <!-- PAYMENT SECTION - Only shows when approved -->
-    <?php if ($prefs['training_status'] == 'approved'): ?>
-    <div class="info-row" style="border-top: 2px dashed #2E7D32; padding-top: 15px; margin-top: 10px;">
-        <strong>Payment Status:</strong>
-        <span>
-            <?php 
-            // Check if already paid
-            $payment_check = $conn->query("SELECT payment_status FROM users WHERE user_id = $user_id")->fetch_assoc();
-            $payment_status = $payment_check['payment_status'] ?? 'pending';
-            
-            if ($payment_status == 'paid'): ?>
-                <span style="color: #4caf50; font-weight: bold;">✅ Paid</span>
-            <?php else: ?>
-                <span style="color: #ff9800; font-weight: bold;">⏳ Payment Required</span>
-            <?php endif; ?>
-        </span>
-    </div>
-    
-    <?php if ($payment_status != 'paid'): ?>
-    <div style="margin-top: 20px; text-align: center;">
-        <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
-            <div style="font-size: 1.8em; font-weight: bold; color: #2E7D32;">
-                €<?php 
-                // Get amount based on tier
-                $amount = $prefs['tier_id'] == 1 ? '100' : ($prefs['tier_id'] == 2 ? '200' : ($prefs['tier_id'] == 3 ? '500' : 'Custom'));
-                echo $amount;
-                ?>
+            <div class="card">
+                <h2>🎫 Membership Status</h2>
+                <div class="info-row">
+                    <strong>Returning Member:</strong>
+                    <span><?php echo $prefs['is_returning_member'] ? 'Yes' : 'No'; ?></span>
+                </div>
+                <div class="info-row">
+                    <strong>Training Required:</strong>
+                    <span><?php echo $prefs['needs_training'] ? 'Yes' : 'No'; ?></span>
+                </div>
+                <div class="info-row">
+                    <strong>Account Status:</strong>
+                    <span class="status-<?php echo $prefs['training_status']; ?>">
+                        <?php echo ucfirst($prefs['training_status']); ?>
+                    </span>
+                </div>
+                <div class="info-row" style="border-top: 2px dashed #2E7D32; padding-top: 15px; margin-top: 10px;">
+                    <strong>Payment Status:</strong>
+                    <span style="color: #4caf50; font-weight: bold;">✅ Paid</span>
+                </div>
             </div>
-            <div style="color: #666;"><?php echo ucfirst($prefs['payment_type'] ?? 'monthly'); ?> payment</div>
-        </div>
-        
-        <a href="payment.php" class="btn-book" style="background: #ff9800; width: 100%; text-align: center; justify-content: center;">
-            💳 Complete Payment Now
-        </a>
-        <p style="font-size: 0.8em; color: #999; margin-top: 8px;">
-            Your membership is approved! Complete payment to unlock full access.
-        </p>
-    </div>
-    <?php endif; ?>
-    
-    <?php elseif ($prefs['training_status'] == 'pending'): ?>
-    <div style="margin-top: 15px; padding: 10px; background: #fff3e0; border-radius: 8px; text-align: center;">
-        <span style="color: #ff9800;">⏳ Waiting for approval</span>
-        <p style="font-size: 0.85em; color: #666; margin-top: 5px;">
-            You'll be able to pay once your membership is approved.
-        </p>
-    </div>
-    <?php endif; ?>
-</div>
 
-
-<!-- Learning Resources -->
-<div class="card" style="grid-column: span 2;">
-    <h2>📚 Learning Resources</h2>
-    
-    <div class="resources-grid">
-        <!-- Videos -->
-        <div>
-            <div class="resource-header">
-                <span style="font-size: 1.5em;">🎥</span>
-                <h3>Video Tutorials</h3>
-            </div>
-            <div class="video-list">
-                <?php foreach($videos as $video): ?>
-                <div class="video-item" onclick="window.open('<?php echo $video['url']; ?>', '_blank')">
-                    <div class="video-thumb">▶️</div>
-                    <div class="video-info">
-                        <div class="video-title"><?php echo $video['title']; ?></div>
-                        <div class="video-meta">
-                            <span>⏱️ <?php echo $video['duration']; ?></span>
+            <!-- Learning Resources -->
+            <div class="card" style="grid-column: span 2;">
+                <h2>📚 Learning Resources</h2>
+                
+                <div class="resources-grid">
+                    <!-- Videos -->
+                    <div>
+                        <div class="resource-header">
+                            <span style="font-size: 1.5em;">🎥</span>
+                            <h3>Video Tutorials</h3>
+                        </div>
+                        <div class="video-list">
+                            <?php 
+                            $videos = [
+                                ['title' => 'Laser Cutting for Beginners', 'duration' => '21:36', 'url' => 'https://learn.microsoft.com/en-us/shows/themakershow/mini-laser-cutting'],
+                                ['title' => '3D Printing Beginner Guide', 'duration' => '30:19', 'url' => 'https://www.youtube.com/watch?v=2vFdwz4U1VQ'],
+                                ['title' => 'CNC Milling Basics for Beginners', 'duration' => '18:45', 'url' => 'https://www.youtube.com/watch?v=cj0-wSGGe6g'],
+                                ['title' => 'Vinyl Cutter Tutorial for Beginners', 'duration' => '9:43', 'url' => 'https://www.youtube.com/watch?v=G9V-F7kWs8g']
+                            ];
+                            foreach($videos as $video): ?>
+                            <div class="video-item" onclick="window.open('<?php echo $video['url']; ?>', '_blank')">
+                                <div class="video-thumb">▶️</div>
+                                <div class="video-info">
+                                    <div class="video-title"><?php echo $video['title']; ?></div>
+                                    <div class="video-meta">
+                                        <span>⏱️ <?php echo $video['duration']; ?></span>
+                                    </div>
+                                </div>
+                                <button class="watch-btn">Watch</button>
+                            </div>
+                            <?php endforeach; ?>
+                        </div>
+                        
+                        <div style="margin-top: 20px;">
+                            <a href="tutorials.php" class="btn-book" style="display: inline-block; padding: 10px 20px; font-size: 1em; background: #ff6b6b; width: 100%; text-align: center;">
+                                📚 Machine Tutorials Library
+                            </a>
                         </div>
                     </div>
-                    <button class="watch-btn">Watch</button>
-                </div>
-                <?php endforeach; ?>
-            </div>
-            
-            <!-- Machine Tutorials Library Button - Styled like Visit Wiki -->
-            <div style="margin-top: 20px;">
-                <a href="tutorials.php" class="btn-book" style="display: inline-block; padding: 10px 20px; font-size: 1em; background: #ff6b6b; width: 100%; text-align: center; box-sizing: border-box;">
-                    📚 Machine Tutorials Library
-                </a>
-                <p style="font-size: 0.8em; color: #666; margin-top: 5px; text-align: center;">Complete guides for all machines</p>
-            </div>
-        </div>
-        
-        <!-- Wiki Articles -->
-        <div>
-            <div class="resource-header">
-                <span style="font-size: 1.5em;">📖</span>
-                <h3>Wiki Articles</h3>
-            </div>
-            <div class="article-list">
-                <?php foreach($wiki_articles as $article): ?>
-                <div class="article-item" onclick="window.open('<?php echo $article['url']; ?>', '_blank')">
-                    <div class="video-thumb">📄</div>
-                    <div class="article-info">
-                        <div class="article-title">
-                            <?php echo $article['title']; ?>
-                            <?php if($article['new']): ?>
-                                <span class="new-badge">NEW</span>
-                            <?php endif; ?>
+                    
+                    <!-- Wiki Articles -->
+                    <div>
+                        <div class="resource-header">
+                            <span style="font-size: 1.5em;">📖</span>
+                            <h3>Wiki Articles</h3>
                         </div>
-                        <div class="article-meta" style="font-size: 0.8em; color: #666; margin-top: 3px;">
-                            <?php echo $article['description']; ?>
+                        <div class="article-list">
+                            <?php 
+                            $wiki_base_url = "https://creative-spark-enterprise-fablab.gitbook.io/fablab-wiki/";
+                            $wiki_articles = [
+                                ['title' => 'Glossary of Terms', 'new' => true, 'url' => $wiki_base_url . 'home/glossary-of-terms', 'description' => 'Common terms in digital fabrication'],
+                                ['title' => 'Fabrication Processes', 'new' => false, 'url' => $wiki_base_url . 'home/fabrication-processes', 'description' => 'Guides for using equipment safely'],
+                                ['title' => 'Extra Resources', 'new' => false, 'url' => $wiki_base_url . 'home/extra-resources', 'description' => 'Tutorials and community forums'],
+                                ['title' => 'Fab Academy Diploma', 'new' => false, 'url' => $wiki_base_url . 'home/fab-academy-diploma', 'description' => 'Intensive 5-month program in digital fabrication']
+                            ];
+                            foreach($wiki_articles as $article): ?>
+                            <div class="article-item" onclick="window.open('<?php echo $article['url']; ?>', '_blank')">
+                                <div class="video-thumb">📄</div>
+                                <div class="article-info">
+                                    <div class="article-title">
+                                        <?php echo $article['title']; ?>
+                                        <?php if($article['new']): ?>
+                                            <span class="new-badge">NEW</span>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="article-meta"><?php echo $article['description']; ?></div>
+                                </div>
+                                <a href="<?php echo $article['url']; ?>" target="_blank" class="read-btn" onclick="event.stopPropagation();">Read</a>
+                            </div>
+                            <?php endforeach; ?>
+                        </div>
+                        
+                        <div style="margin-top: 15px; text-align: right;">
+                            <a href="<?php echo $wiki_base_url; ?>" target="_blank" class="btn-book" style="display: inline-block; padding: 8px 15px; font-size: 0.9em;">
+                                Visit Full Wiki 📚
+                            </a>
                         </div>
                     </div>
-                    <a href="<?php echo $article['url']; ?>" target="_blank" class="read-btn" onclick="event.stopPropagation();">Read</a>
                 </div>
-                <?php endforeach; ?>
             </div>
             
-            <!-- Wiki Navigation Link -->
-            <div style="margin-top: 15px; text-align: right;">
-                <a href="<?php echo $wiki_base_url; ?>" target="_blank" class="btn-book" style="display: inline-block; padding: 8px 15px; font-size: 0.9em;">
-                    Visit Full Wiki 📚
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
             <!-- Quick Help -->
             <div class="card" style="grid-column: span 2;">
                 <h2>❓ Quick Help</h2>
                 <div class="help-grid">
-                    <?php foreach($quick_help as $help): ?>
+                    <?php 
+                    $quick_help = [
+                        ['question' => 'How do I book a machine?', 'answer' => 'Go to the bookings page, select your machine, choose a time, and confirm. You need to have completed training for that machine first.', 'icon' => '📅'],
+                        ['question' => 'What safety gear do I need?', 'answer' => 'Safety glasses are required for all machines. Ear protection for loud equipment. Dust masks for sanding/woodwork.', 'icon' => '🛡️'],
+                        ['question' => 'Can I bring my own materials?', 'answer' => 'Yes, but they must be approved by staff first. Some materials can damage machines or are fire hazards.', 'icon' => '📦']
+                    ];
+                    foreach($quick_help as $help): ?>
                     <div class="help-card" onclick="showHelp('<?php echo $help['question']; ?>', '<?php echo $help['answer']; ?>')">
                         <div class="help-icon"><?php echo $help['icon']; ?></div>
                         <div class="help-question"><?php echo $help['question']; ?></div>
-                        <div class="help-answer-preview">
-                            Click for answer...
-                        </div>
+                        <div class="help-answer-preview">Click for answer...</div>
                     </div>
                     <?php endforeach; ?>
                 </div>
@@ -342,15 +350,6 @@ $quick_help = [
         </div>
     </div>
 
-    <style>
-        /* Additional styles for wiki articles */
-        .article-meta {
-            font-size: 0.8em;
-            color: #666;
-            margin-top: 3px;
-        }
-    </style>
-
     <script>
         function showHelp(question, answer) {
             document.getElementById('modalQuestion').textContent = question;
@@ -362,7 +361,6 @@ $quick_help = [
             document.getElementById('helpModal').style.display = 'none';
         }
 
-        // Close modal when clicking outside
         window.onclick = function(event) {
             var modal = document.getElementById('helpModal');
             if (event.target == modal) {
