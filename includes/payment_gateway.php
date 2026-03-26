@@ -38,7 +38,7 @@ class PaymentGateway {
         }
     }
     
-    // Template for Zero integration (to be completed later)
+    // Template for Zero integration 
     private function processWithZero($payment_id, $user_id, $amount) {
         // TODO: Integrate with Zero payment system
         // This is where the actual money transfer happens
