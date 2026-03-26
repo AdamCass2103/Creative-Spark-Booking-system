@@ -84,9 +84,9 @@ switch ($filter) {
     case 'no_training':
         $where = 'WHERE up.needs_training = 0';
         break;
-    case 'pending':
-        $where = 'WHERE up.training_status = "pending"';
-        break;
+        case 'pending':
+            $where = 'WHERE up.training_status = "pending"';
+            break;
 }
 
 // Get all users (viewers can still see this)
