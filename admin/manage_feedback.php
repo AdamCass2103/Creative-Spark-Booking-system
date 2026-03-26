@@ -45,7 +45,6 @@ if (isset($_POST['add_reply'])) {
 }
 
 // Get filter
-$filter = $_GET['filter'] ?? 'all';
 $status_filter = $_GET['status'] ?? 'all';
 $category_filter = $_GET['category'] ?? 'all';
 
@@ -114,19 +113,19 @@ $categories = $conn->query("SELECT DISTINCT category, COUNT(*) as count FROM fee
         <!-- Stats Cards -->
         <div class="feedback-stats">
             <div class="stat-card pending">
-                <h3><?php echo $stats['pending']; ?></h3>
+                <h3><?php echo $stats['pending'] ?? 0; ?></h3>
                 <p>Pending</p>
             </div>
             <div class="stat-card in-progress">
-                <h3><?php echo $stats['in_progress']; ?></h3>
+                <h3><?php echo $stats['in_progress'] ?? 0; ?></h3>
                 <p>In Progress</p>
             </div>
             <div class="stat-card completed">
-                <h3><?php echo $stats['completed']; ?></h3>
+                <h3><?php echo $stats['completed'] ?? 0; ?></h3>
                 <p>Completed</p>
             </div>
             <div class="stat-card urgent">
-                <h3><?php echo $stats['urgent']; ?></h3>
+                <h3><?php echo $stats['urgent'] ?? 0; ?></h3>
                 <p>Urgent</p>
             </div>
         </div>
@@ -141,11 +140,14 @@ $categories = $conn->query("SELECT DISTINCT category, COUNT(*) as count FROM fee
             
             <strong>Category:</strong>
             <a href="?status=<?php echo $status_filter; ?>&category=all" class="<?php echo $category_filter == 'all' ? 'active' : ''; ?>">All</a>
-            <?php while ($cat = $categories->fetch_assoc()): ?>
-                <a href="?status=<?php echo $status_filter; ?>&category=<?php echo $cat['category']; ?>" class="<?php echo $category_filter == $cat['category'] ? 'active' : ''; ?>">
-                    <?php echo ucfirst(str_replace('_', ' ', $cat['category'])); ?> (<?php echo $cat['count']; ?>)
-                </a>
-            <?php endwhile; ?>
+            <?php if ($categories && $categories->num_rows > 0): ?>
+                <?php $categories->data_seek(0); ?>
+                <?php while ($cat = $categories->fetch_assoc()): ?>
+                    <a href="?status=<?php echo $status_filter; ?>&category=<?php echo $cat['category']; ?>" class="<?php echo $category_filter == $cat['category'] ? 'active' : ''; ?>">
+                        <?php echo ucfirst(str_replace('_', ' ', $cat['category'])); ?> (<?php echo $cat['count']; ?>)
+                    </a>
+                <?php endwhile; ?>
+            <?php endif; ?>
         </div>
 
         <!-- Feedback List -->
@@ -175,12 +177,6 @@ $categories = $conn->query("SELECT DISTINCT category, COUNT(*) as count FROM fee
                     
                     <h3 style="margin: 10px 0;"><?php echo htmlspecialchars($item['subject']); ?></h3>
                     <p style="color: #333;"><?php echo nl2br(htmlspecialchars($item['description'])); ?></p>
-                    
-                    <?php if ($item['image_path']): ?>
-                        <div style="margin: 10px 0;">
-                            <a href="../<?php echo $item['image_path']; ?>" target="_blank" style="color: #2E7D32;">📷 View attached image</a>
-                        </div>
-                    <?php endif; ?>
                     
                     <div style="font-size: 0.85em; color: #666; margin: 10px 0;">
                         Submitted: <?php echo date('M j, Y \a\t g:i A', strtotime($item['created_at'])); ?>
@@ -218,7 +214,7 @@ $categories = $conn->query("SELECT DISTINCT category, COUNT(*) as count FROM fee
                 </div>
             <?php endwhile; ?>
         <?php else: ?>
-            <div class="empty-state" style="text-align: center; padding: 60px; background: white; border-radius: 10px;">
+            <div class="empty-state">
                 <p>No feedback found matching your filters.</p>
             </div>
         <?php endif; ?>

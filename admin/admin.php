@@ -177,7 +177,7 @@ $result = $conn->query("
                         <a href="manage_admins.php" style="color: #333; padding: 12px 16px; text-decoration: none; display: block; border-bottom: 1px solid #eee;">👥 Manage Admins</a>
                         <a href="manage_payments.php" style="color: #333; padding: 12px 16px; text-decoration: none; display: block; border-bottom: 1px solid #eee;">💳 Manage Payments</a>
                         <a href="activity_log.php" style="color: #333; padding: 12px 16px; text-decoration: none; display: block;">📋 Activity Log</a>
-                        <a href="manage_feeback.php" style="color: #333; padding: 12px 16px; text-decoration: none; display: block;">💬 Manage Feedbac</a>
+                        <a href="manage_feedback.php" style="color: #333; padding: 12px 16px; text-decoration: none; display: block; border-bottom: 1px solid #eee;">💬 Manage Feedback</a>
                     </div>
                 </div>
             </div>

@@ -22,23 +22,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_feedback'])) {
     $description = $conn->real_escape_string($_POST['description']);
     $priority = $conn->real_escape_string($_POST['priority']);
     
-    // Handle image upload (optional)
-    $image_path = null;
-    if (isset($_FILES['feedback_image']) && $_FILES['feedback_image']['error'] === UPLOAD_ERR_OK) {
-        $upload_dir = __DIR__ . '/../uploads/feedback/';
-        if (!file_exists($upload_dir)) {
-            mkdir($upload_dir, 0777, true);
-        }
-        $ext = pathinfo($_FILES['feedback_image']['name'], PATHINFO_EXTENSION);
-        $filename = 'feedback_' . time() . '_' . $user_id . '.' . $ext;
-        $upload_path = $upload_dir . $filename;
-        if (move_uploaded_file($_FILES['feedback_image']['tmp_name'], $upload_path)) {
-            $image_path = 'uploads/feedback/' . $filename;
-        }
-    }
-    
-    $stmt = $conn->prepare("INSERT INTO feedback (user_id, category, subject, description, priority, image_path, created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())");
-    $stmt->bind_param("isssss", $user_id, $category, $subject, $description, $priority, $image_path);
+    $stmt = $conn->prepare("INSERT INTO feedback (user_id, category, subject, description, priority, created_at) VALUES (?, ?, ?, ?, ?, NOW())");
+    $stmt->bind_param("issss", $user_id, $category, $subject, $description, $priority);
     
     if ($stmt->execute()) {
         $message = "✅ Thank you for your feedback! Oscar will review it soon.";
@@ -82,7 +67,7 @@ while ($row = $status_counts->fetch_assoc()) {
         <div class="feedback-header">
             <h1>💬 Share Your Feedback</h1>
             <p>Help us improve Creative Spark! Your ideas and reports matter.</p>
-            <a href="dashboard.php" class="back-link" style="display: inline-block; margin-top: 15px; color: #2E7D32;">← Back to Dashboard</a>
+            <a href="dashboard.php" class="back-link">← Back to Dashboard</a>
         </div>
 
         <?php if ($message): ?>
@@ -94,7 +79,7 @@ while ($row = $status_counts->fetch_assoc()) {
         <!-- Submit Feedback Form -->
         <div class="feedback-card">
             <h2 style="color: #2E7D32; margin-bottom: 20px;">📝 Submit New Feedback</h2>
-            <form method="POST" enctype="multipart/form-data">
+            <form method="POST">
                 <div class="form-group">
                     <label>Category *</label>
                     <select name="category" required>
@@ -124,12 +109,6 @@ while ($row = $status_counts->fetch_assoc()) {
                         <option value="medium" selected>Medium - Important</option>
                         <option value="high">High - Urgent issue</option>
                     </select>
-                </div>
-                
-                <div class="form-group">
-                    <label>Attach Photo (Optional)</label>
-                    <input type="file" name="feedback_image" accept="image/*">
-                    <small style="color: #666;">Upload a photo to help us understand the issue</small>
                 </div>
                 
                 <button type="submit" name="submit_feedback" class="btn-submit">
@@ -183,14 +162,8 @@ while ($row = $status_counts->fetch_assoc()) {
                             </span>
                         </div>
                         <h3 style="margin: 10px 0;"><?php echo htmlspecialchars($item['subject']); ?></h3>
-                        <p style="color: #666;"><?php echo nl2br(htmlspecialchars(substr($item['description'], 0, 150))); ?>...</p>
+                        <p style="color: #666;"><?php echo nl2br(htmlspecialchars(substr($item['description'], 0, 150))); ?><?php echo strlen($item['description']) > 150 ? '...' : ''; ?></p>
                         <small style="color: #999;">Submitted: <?php echo date('M j, Y', strtotime($item['created_at'])); ?></small>
-                        
-                        <?php if ($item['image_path']): ?>
-                            <div style="margin-top: 10px;">
-                                <a href="../<?php echo $item['image_path']; ?>" target="_blank" style="color: #2E7D32;">📷 View attached image</a>
-                            </div>
-                        <?php endif; ?>
                     </div>
                 <?php endwhile; ?>
             <?php else: ?>

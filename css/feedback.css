@@ -128,3 +128,12 @@
     font-size: 0.8em;
     color: #666;
 }
+.back-link {
+    color: #2E7D32;
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 15px;
+}
+.back-link:hover {
+    text-decoration: underline;
+}
