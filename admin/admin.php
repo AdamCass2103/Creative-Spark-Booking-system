@@ -84,9 +84,10 @@ switch ($filter) {
     case 'no_training':
         $where = 'WHERE up.needs_training = 0';
         break;
-        case 'pending':
-            $where = 'WHERE up.training_status = "pending"';
-            break;
+    case 'pending':
+        // FIXED: Use correct status value
+        $where = 'WHERE up.training_status = "pending_approval"';
+        break;
 }
 
 // Get all users (viewers can still see this)
@@ -189,9 +190,9 @@ $result = $conn->query("
         </div>
         
         <div class="table-container">
-            <table>
+             <table>
                 <thead>
-                    <tr>
+                     <tr>
                         <th>ID</th>
                         <th>Name</th>
                         <th>Email</th>
@@ -204,11 +205,11 @@ $result = $conn->query("
                         <th>Action</th>
                         <th>Delete</th>
                         <?php endif; ?>
-                    </tr>
+                     </tr>
                 </thead>
                 <tbody>
                     <?php while ($row = $result->fetch_assoc()): ?>
-                    <tr>
+                     <tr>
                         <td><?php echo $row['user_id']; ?></td>
                         <td><?php echo $row['name']; ?></td>
                         <td><?php echo $row['email']; ?></td>
@@ -217,7 +218,7 @@ $result = $conn->query("
                         <td><?php echo $row['terms_accepted'] ? 'Yes' : 'No'; ?></td>
                         <td>
                             <span class="status-<?php echo $row['training_status']; ?>">
-                                <?php echo ucfirst($row['training_status']); ?>
+                                <?php echo ucfirst($row['training_status'] == 'pending_approval' ? 'pending approval' : $row['training_status']); ?>
                             </span>
                         </td>
                         <?php if (!$is_viewer): ?>
@@ -225,7 +226,7 @@ $result = $conn->query("
                             <form method="POST" style="display: flex; gap: 10px; align-items: center;">
                                 <input type="hidden" name="user_id" value="<?php echo $row['user_id']; ?>">
                                 <select name="training_status">
-                                    <option value="pending" <?php echo $row['training_status'] == 'pending' ? 'selected' : ''; ?>>Pending</option>
+                                    <option value="pending_approval" <?php echo $row['training_status'] == 'pending_approval' ? 'selected' : ''; ?>>Pending Approval</option>
                                     <option value="approved" <?php echo $row['training_status'] == 'approved' ? 'selected' : ''; ?>>Approved</option>
                                     <option value="rejected" <?php echo $row['training_status'] == 'rejected' ? 'selected' : ''; ?>>Rejected</option>
                                     <option value="completed" <?php echo $row['training_status'] == 'completed' ? 'selected' : ''; ?>>Completed</option>
@@ -253,17 +254,17 @@ $result = $conn->query("
                             </a>
                         </td>
                         <?php endif; ?>
-                    </tr>
+                     </tr>
                     <?php endwhile; ?>
                 </tbody>
-            </table>
+             </table>
         </div>
         
         <div class="stats">
             <?php
             $total = $conn->query("SELECT COUNT(*) as count FROM users")->fetch_assoc()['count'];
             $need_training = $conn->query("SELECT COUNT(*) as count FROM user_preferences WHERE needs_training = 1")->fetch_assoc()['count'];
-            $pending = $conn->query("SELECT COUNT(*) as count FROM user_preferences WHERE training_status = 'pending'")->fetch_assoc()['count'];
+            $pending = $conn->query("SELECT COUNT(*) as count FROM user_preferences WHERE training_status = 'pending_approval'")->fetch_assoc()['count'];
             ?>
             <div class="stat-card">
                 <h3>Total Users</h3>
@@ -323,4 +324,4 @@ $result = $conn->query("
     }
     </script>
 </body>
-</html> 
+</html>
