@@ -148,6 +148,9 @@ $quick_help = [
             <a href="/fabman" class="btn-book" style="background: #ff9800;" target="_blank">
                 🛠️ FabMan Portal
             </a>
+            <a href="feedback.php" class="btn-book" style="background: #795548;">
+        💬 Feedback
+            </a>
         </div>
         
         <!-- Dashboard Grid -->
