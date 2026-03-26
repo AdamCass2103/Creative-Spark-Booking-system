@@ -344,135 +344,180 @@ $user = $conn->query("SELECT * FROM users WHERE user_id = $user_id")->fetch_asso
             </div>
         </div>
 
-        <!-- Formlabs Fabber 2 -->
-        <div class="machine-card fabber2 3d" data-tier="Fabber 2" data-category="3D Printer">
-            <div class="machine-header">
-                <h2>Formlabs Form 3L</h2>
-                <span class="tier-badge fabber2">Fabber 2</span>
-            </div>
-            <p class="machine-type">3D Printer - SLA (Large Format)</p>
-            <div class="tutorial-links">
-                <h3>📹 Video Tutorials</h3>
-                <a href="https://www.youtube.com/watch?v=Form3L" target="_blank" class="tutorial-link video">Form 3L Setup (9:45)</a>
-                
-                <h3>📖 Written Guides</h3>
-                <a href="https://formlabs.com/training/" target="_blank" class="tutorial-link guide">Formlabs Training Hub</a>
-            </div>
+       <!-- Formlabs Fabber 2 -->
+<div class="machine-card fabber2 3d" data-tier="Fabber 2" data-category="3D Printer">
+    <div class="machine-header">
+        <h2>Formlabs Form 3L</h2>
+        <span class="tier-badge fabber2">Fabber 2</span>
+    </div>
+    <p class="machine-type">3D Printer - SLA (Large Format)</p>
+    <div class="tutorial-links">
+        <h3>📹 Video Tutorials</h3>
+        <div class="tutorial-placeholder">
+            <p>⏳ Video tutorials coming soon</p>
+            <small>Check back later for Form 3L setup guides</small>
         </div>
+        
+        <h3>📖 Written Guides</h3>
+        <div class="tutorial-placeholder">
+            <p>📝 Written guides in progress</p>
+            <small>Visit <a href="https://formlabs.com/training/" target="_blank" rel="noopener noreferrer">Formlabs Training Hub</a> for official resources</small>
+        </div>
+    </div>
+</div>
 
-        <div class="machine-card fabber2 3d" data-tier="Fabber 2" data-category="3D Printer">
-            <div class="machine-header">
-                <h2>Formlabs Fuse 1</h2>
-                <span class="tier-badge fabber2">Fabber 2</span>
-            </div>
-            <p class="machine-type">3D Printer - SLS</p>
-            <div class="tutorial-links">
-                <h3>📹 Video Tutorials</h3>
-                <a href="https://www.youtube.com/watch?v=Fuse1SLS" target="_blank" class="tutorial-link video">SLS Printing Introduction (11:30)</a>
-                
-                <h3>📖 Written Guides</h3>
-                <a href="https://formlabs.com/uk/blog/sls-vs-sla-vs-fdm/" target="_blank" class="tutorial-link guide">SLS vs SLA vs FDM Guide</a>
-            </div>
+<div class="machine-card fabber2 3d" data-tier="Fabber 2" data-category="3D Printer">
+    <div class="machine-header">
+        <h2>Formlabs Fuse 1</h2>
+        <span class="tier-badge fabber2">Fabber 2</span>
+    </div>
+    <p class="machine-type">3D Printer - SLS</p>
+    <div class="tutorial-links">
+        <h3>📹 Video Tutorials</h3>
+        <div class="tutorial-placeholder">
+            <p>⏳ Video tutorials coming soon</p>
+            <small>SLS printing guides in production</small>
         </div>
+        
+        <h3>📖 Written Guides</h3>
+        <div class="tutorial-placeholder">
+            <p>📝 Written guides in progress</p>
+            <small>Learn more about <a href="https://formlabs.com/uk/blog/sls-vs-sla-vs-fdm/" target="_blank" rel="noopener noreferrer">SLS vs SLA vs FDM</a> on Formlabs</small>
+        </div>
+    </div>
+</div>
 
-        <!-- Ultimaker S5 -->
-        <div class="machine-card fabber2 3d" data-tier="Fabber 2" data-category="3D Printer">
-            <div class="machine-header">
-                <h2>Ultimaker S5</h2>
-                <span class="tier-badge fabber2">Fabber 2</span>
-            </div>
-            <p class="machine-type">3D Printer - FDM</p>
-            <div class="tutorial-links">
-                <h3>📹 Video Tutorials</h3>
-                <a href="https://www.youtube.com/watch?v=UltimakerS5" target="_blank" class="tutorial-link video">S5 Complete Guide (16:40)</a>
-                
-                <h3>📖 Written Guides</h3>
-                <a href="https://support.ultimaker.com/s/article/1667416763353" target="_blank" class="tutorial-link guide">Ultimaker S5 Manual</a>
-            </div>
+<!-- Ultimaker S5 -->
+<div class="machine-card fabber2 3d" data-tier="Fabber 2" data-category="3D Printer">
+    <div class="machine-header">
+        <h2>Ultimaker S5</h2>
+        <span class="tier-badge fabber2">Fabber 2</span>
+    </div>
+    <p class="machine-type">3D Printer - FDM</p>
+    <div class="tutorial-links">
+        <h3>📹 Video Tutorials</h3>
+        <div class="tutorial-placeholder">
+            <p>⏳ Video tutorials coming soon</p>
+            <small>Setup and maintenance guides on the way</small>
         </div>
+        
+        <h3>📖 Written Guides</h3>
+        <div class="tutorial-placeholder">
+            <p>📝 Written guides in progress</p>
+            <small>Check <a href="https://support.ultimaker.com/s/article/1667416763353" target="_blank" rel="noopener noreferrer">Ultimaker S5 Manual</a> for official documentation</small>
+        </div>
+    </div>
+</div>
 
-        <!-- Epilog Fusion Pro -->
-        <div class="machine-card fabber2 laser" data-tier="Fabber 2" data-category="Laser Cutter">
-            <div class="machine-header">
-                <h2>Epilog Fusion Pro 120W</h2>
-                <span class="tier-badge fabber2">Fabber 2</span>
-            </div>
-            <p class="machine-type">Laser Cutter - Industrial</p>
-            <div class="tutorial-links">
-                <h3>📹 Video Tutorials</h3>
-                <a href="https://www.youtube.com/watch?v=EpilogFusion" target="_blank" class="tutorial-link video">Fusion Pro Advanced Guide (18:20)</a>
-                
-                <h3>📖 Written Guides</h3>
-                <a href="https://www.epiloglaser.com/tech-support/laser-tutorials.htm" target="_blank" class="tutorial-link guide">Epilog Laser Tutorials</a>
-            </div>
+<!-- Epilog Fusion Pro -->
+<div class="machine-card fabber2 laser" data-tier="Fabber 2" data-category="Laser Cutter">
+    <div class="machine-header">
+        <h2>Epilog Fusion Pro 120W</h2>
+        <span class="tier-badge fabber2">Fabber 2</span>
+    </div>
+    <p class="machine-type">Laser Cutter - Industrial</p>
+    <div class="tutorial-links">
+        <h3>📹 Video Tutorials</h3>
+        <div class="tutorial-placeholder">
+            <p>⏳ Video tutorials coming soon</p>
+            <small>Advanced laser cutting guides in production</small>
         </div>
+        
+        <h3>📖 Written Guides</h3>
+        <div class="tutorial-placeholder">
+            <p>📝 Written guides in progress</p>
+            <small>Visit <a href="https://www.epiloglaser.com/tech-support/laser-tutorials.htm" target="_blank" rel="noopener noreferrer">Epilog Laser Tutorials</a> for official resources</small>
+        </div>
+    </div>
+</div>
 
-        <!-- Shopbot CNC -->
-        <div class="machine-card fabber2 cnc" data-tier="Fabber 2" data-category="CNC">
-            <div class="machine-header">
-                <h2>Shopbot PRSalpha</h2>
-                <span class="tier-badge fabber2">Fabber 2</span>
-            </div>
-            <p class="machine-type">CNC Milling - Large Format</p>
-            <div class="tutorial-links">
-                <h3>📹 Video Tutorials</h3>
-                <a href="https://www.youtube.com/watch?v=ShopbotBeginner" target="_blank" class="tutorial-link video">Shopbot Beginner Tutorial (18:00)</a>
-                <a href="https://www.youtube.com/watch?v=VCarve" target="_blank" class="tutorial-link video">VCarve Toolpaths (14:30)</a>
-                
-                <h3>📖 Written Guides</h3>
-                <a href="https://www.shopbottools.com/support" target="_blank" class="tutorial-link guide">Shopbot Support Center</a>
-                <a href="https://pub.fabcloud.io/tutorials/05_cnc_milling" target="_blank" class="tutorial-link guide">Advanced CNC Guide</a>
-            </div>
+<!-- Shopbot CNC -->
+<div class="machine-card fabber2 cnc" data-tier="Fabber 2" data-category="CNC">
+    <div class="machine-header">
+        <h2>Shopbot PRSalpha</h2>
+        <span class="tier-badge fabber2">Fabber 2</span>
+    </div>
+    <p class="machine-type">CNC Milling - Large Format</p>
+    <div class="tutorial-links">
+        <h3>📹 Video Tutorials</h3>
+        <div class="tutorial-placeholder">
+            <p>⏳ Video tutorials coming soon</p>
+            <small>Beginner to advanced CNC guides on the way</small>
         </div>
+        
+        <h3>📖 Written Guides</h3>
+        <div class="tutorial-placeholder">
+            <p>📝 Written guides in progress</p>
+            <small>Visit <a href="https://www.shopbottools.com/support" target="_blank" rel="noopener noreferrer">Shopbot Support Center</a> for official documentation</small>
+        </div>
+    </div>
+</div>
 
-        <!-- Roland MDX-50 -->
-        <div class="machine-card fabber2 cnc" data-tier="Fabber 2" data-category="CNC">
-            <div class="machine-header">
-                <h2>Roland Monofab MDX-50</h2>
-                <span class="tier-badge fabber2">Fabber 2</span>
-            </div>
-            <p class="machine-type">CNC Milling - High Definition</p>
-            <div class="tutorial-links">
-                <h3>📹 Video Tutorials</h3>
-                <a href="https://www.youtube.com/watch?v=RolandMDX50" target="_blank" class="tutorial-link video">MDX-50 Advanced Milling (15:10)</a>
-                
-                <h3>📖 Written Guides</h3>
-                <a href="https://www.rolanddga.com/support" target="_blank" class="tutorial-link guide">Roland Support</a>
-            </div>
+<!-- Roland MDX-50 -->
+<div class="machine-card fabber2 cnc" data-tier="Fabber 2" data-category="CNC">
+    <div class="machine-header">
+        <h2>Roland Monofab MDX-50</h2>
+        <span class="tier-badge fabber2">Fabber 2</span>
+    </div>
+    <p class="machine-type">CNC Milling - High Definition</p>
+    <div class="tutorial-links">
+        <h3>📹 Video Tutorials</h3>
+        <div class="tutorial-placeholder">
+            <p>⏳ Video tutorials coming soon</p>
+            <small>High-definition milling guides in production</small>
         </div>
+        
+        <h3>📖 Written Guides</h3>
+        <div class="tutorial-placeholder">
+            <p>📝 Written guides in progress</p>
+            <small>Visit <a href="https://www.rolanddga.com/support" target="_blank" rel="noopener noreferrer">Roland Support</a> for official resources</small>
+        </div>
+    </div>
+</div>
 
-        <!-- 3D Scanning -->
-        <div class="machine-card fabber2" data-tier="Fabber 2" data-category="Scanning">
-            <div class="machine-header">
-                <h2>Artec Leo 3D Scanner</h2>
-                <span class="tier-badge fabber2">Fabber 2</span>
-            </div>
-            <p class="machine-type">3D Scanning</p>
-            <div class="tutorial-links">
-                <h3>📹 Video Tutorials</h3>
-                <a href="https://www.youtube.com/watch?v=ArtecLeo" target="_blank" class="tutorial-link video">Artec Leo Basic Training (12:30)</a>
-                
-                <h3>📖 Written Guides</h3>
-                <a href="https://www.artec3d.com/academy" target="_blank" class="tutorial-link guide">Artec 3D Academy</a>
-                <a href="https://www.artec3d.com/academy/group/75?type=catalog" target="_blank" class="tutorial-link guide">Complete Leo Course</a>
-            </div>
+<!-- 3D Scanning -->
+<div class="machine-card fabber2" data-tier="Fabber 2" data-category="Scanning">
+    <div class="machine-header">
+        <h2>Artec Leo 3D Scanner</h2>
+        <span class="tier-badge fabber2">Fabber 2</span>
+    </div>
+    <p class="machine-type">3D Scanning</p>
+    <div class="tutorial-links">
+        <h3>📹 Video Tutorials</h3>
+        <div class="tutorial-placeholder">
+            <p>⏳ Video tutorials coming soon</p>
+            <small>Artec Leo training guides on the way</small>
         </div>
+        
+        <h3>📖 Written Guides</h3>
+        <div class="tutorial-placeholder">
+            <p>📝 Written guides in progress</p>
+            <small>Visit <a href="https://www.artec3d.com/academy" target="_blank" rel="noopener noreferrer">Artec 3D Academy</a> for official courses</small>
+        </div>
+    </div>
+</div>
 
-        <!-- Clay Printer -->
-        <div class="machine-card fabber2 3d" data-tier="Fabber 2" data-category="3D Printer">
-            <div class="machine-header">
-                <h2>WASP 40100 Clay Printer</h2>
-                <span class="tier-badge fabber2">Fabber 2</span>
-            </div>
-            <p class="machine-type">Clay 3D Printer</p>
-            <div class="tutorial-links">
-                <h3>📹 Video Tutorials</h3>
-                <a href="https://www.youtube.com/watch?v=WASPClay" target="_blank" class="tutorial-link video">Clay 3D Printing Tutorial (14:00)</a>
-                
-                <h3>📖 Written Guides</h3>
-                <a href="https://www.3dwasp.com/support/" target="_blank" class="tutorial-link guide">WASP Support Center</a>
-            </div>
+<!-- Clay Printer -->
+<div class="machine-card fabber2 3d" data-tier="Fabber 2" data-category="3D Printer">
+    <div class="machine-header">
+        <h2>WASP 40100 Clay Printer</h2>
+        <span class="tier-badge fabber2">Fabber 2</span>
+    </div>
+    <p class="machine-type">Clay 3D Printer</p>
+    <div class="tutorial-links">
+        <h3>📹 Video Tutorials</h3>
+        <div class="tutorial-placeholder">
+            <p>⏳ Video tutorials coming soon</p>
+            <small>Clay 3D printing guides in production</small>
         </div>
+        
+        <h3>📖 Written Guides</h3>
+        <div class="tutorial-placeholder">
+            <p>📝 Written guides in progress</p>
+            <small>Visit <a href="https://www.3dwasp.com/support/" target="_blank" rel="noopener noreferrer">WASP Support Center</a> for official documentation</small>
+        </div>
+    </div>
+</div>
 
     </div>
 

@@ -5,7 +5,35 @@ body {
     background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
     min-height: 100vh;
 }
+/* Tutorial Placeholder Styles */
+.tutorial-placeholder {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    margin: 10px 0;
+    text-align: center;
+    border-left: 3px solid #ff9800;
+}
 
+.tutorial-placeholder p {
+    margin: 0 0 5px 0;
+    color: #ff9800;
+    font-weight: 500;
+}
+
+.tutorial-placeholder small {
+    color: #6c757d;
+    font-size: 0.85em;
+}
+
+.tutorial-placeholder a {
+    color: #2E7D32;
+    text-decoration: none;
+}
+
+.tutorial-placeholder a:hover {
+    text-decoration: underline;
+}
 * {
     margin: 0;
     padding: 0;
