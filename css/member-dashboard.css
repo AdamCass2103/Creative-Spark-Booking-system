@@ -229,7 +229,9 @@ a {
     display: flex;
     gap: 15px;
     margin: 20px 0 30px 0;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    white-space: nowrap;
 }
 
 /* ----- BOOKING BUTTONS ----- */
