@@ -61,13 +61,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ");
             }
             
-            // Redirect based on status
-            if ($status['account_status'] == 'inactive') {
+            // Always redirect to member dashboard
                 redirect('../member/dashboard.php');
-            } else {
-                redirect('../member/dashboard.php');
-            }
-            
+                
         } else {
             $error = 'Invalid email or password!';
         }

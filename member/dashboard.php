@@ -147,14 +147,7 @@ if (!$is_active):
     </div>
 </body>
 </html>
-<?php
-    exit; // Stop here - don't show the full dashboard
-endif;
 
-// If we get here, membership is ACTIVE - show the full dashboard
-?>
-
-<!-- Your FULL ACTIVE DASHBOARD HTML HERE (the one with all the cards, bookings, etc.) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
