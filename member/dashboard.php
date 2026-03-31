@@ -70,35 +70,53 @@ $is_active = ($prefs['training_status'] == 'approved' && $payment_status == 'pai
 
         <!-- Action Bar with Booking Buttons -->
         <div class="action-bar">
+
         <?php if ($is_active): ?>
             <a href="book_training.php" class="btn-book">
+             📅 Book Training
+        <?php if (isset($pending_bookings) && $pending_bookings > 0): ?>
+            <span class="badge"><?php echo $pending_bookings; ?> pending</span>
+        <?php endif; ?>
+        </a>
+            <?php else: ?>
+         <a href="#" class="btn-book" onclick="showLocked()" style="opacity:0.6;">
                 📅 Book Training
-                <?php if (isset($pending_bookings) && $pending_bookings > 0): ?>
-                    <span class="badge"><?php echo $pending_bookings; ?> pending</span>
-                <?php endif; ?>
-                <?php else: ?>
-             <a href="#" class="btn-book" onclick="showLocked()" style="opacity:0.6;">
-                <?php endif; ?>
             </a>
+            <?php endif; ?>
+
+
             <?php if ($is_active): ?>
-            <a href="my_bookings.php" class="btn-book" style="background: #9c27b0;">
-                📋 My Bookings
-                <?php else: ?>
-                    <a href="#" class="btn-book" onclick="showLocked()" style="background:#9c27b0;opacity:0.6;">
-                <?php endif; ?>
+                <a href="my_bookings.php" class="btn-book" style="background: #9c27b0;">
+                    📋 My Bookings
+                </a>
+            <?php else: ?>
+                <a href="#" class="btn-book" onclick="showLocked()" style="background:#9c27b0;opacity:0.6;">
+                    📋 My Bookings
+                </a>
+            <?php endif; ?>
+
+
+            <a href="my_account.php" class="btn-book" style="background: #2E7D32;">
+                👤 My Account
             </a>
-            <a href="my_account.php" class="btn-book" style="background: #2E7D32;">👤 My Account</a>
+
+
             <?php if ($is_active): ?>
-            <a href="/fabman" class="btn-book" style="background: #ff9800;" target="_blank">
-                🛠️ FabMan Portal
-                <?php else: ?>
-                    <a href="#" class="btn-book" onclick="showLocked()" style="background:#ff9800;opacity:0.6;">
-                <?php endif; ?>
-            </a>
+                <a href="/fabman" class="btn-book" style="background: #ff9800;" target="_blank">
+                    🛠️ FabMan Portal
+                </a>
+            <?php else: ?>
+                <a href="#" class="btn-book" onclick="showLocked()" style="background:#ff9800;opacity:0.6;">
+                    🛠️ FabMan Portal
+                </a>
+            <?php endif; ?>
+
+
             <a href="feedback.php" class="btn-book" style="background: #795548;">
                 💬 Feedback
             </a>
-        </div>
+
+            </div>
         
         <!-- Dashboard Grid -->
         <div class="dashboard-grid">
