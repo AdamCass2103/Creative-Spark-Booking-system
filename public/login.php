@@ -63,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             // Redirect based on status
             if ($status['account_status'] == 'inactive') {
-                redirect('../member/inactive_dashboard.php');
+                redirect('../member/dashboard.php');
             } else {
                 redirect('../member/dashboard.php');
             }
