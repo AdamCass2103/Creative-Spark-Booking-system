@@ -116,6 +116,10 @@ $is_active = ($prefs['training_status'] == 'approved' && $payment_status == 'pai
                 💬 Feedback
             </a>
 
+            <a href="materials.php" class="btn-book" style="background:#607d8b;">
+                📦 Materials List
+            </a>
+
             </div>
         
         <!-- Dashboard Grid -->
