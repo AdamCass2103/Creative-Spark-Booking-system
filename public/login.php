@@ -95,6 +95,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
             <button type="submit" class="get-started-btn" style="padding: 12px; font-size: 16px;">Login</button>
         </form>
+
+        <div style="text-align: center; margin: 15px 0;">
+            <a href="forgot_password.php" style="color: #666; font-size: 0.9em;">Forgot Password?</a>
+        </div>
         
         <div style="text-align: center; margin-top: 20px;">
             <a href="index.php" style="color: #666;">← Back to Home</a>
