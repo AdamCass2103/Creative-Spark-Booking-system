@@ -34,7 +34,9 @@ $admin_id = getCurrentAdminId();
 $admin_role = getCurrentAdminRole();
 $is_viewer = ($admin_role == 'viewer');
 
-
+// Get pending password reset requests count for notification bell
+$pending_resets = $conn->query("SELECT COUNT(*) as count FROM password_resets WHERE notified = 0 AND expires_at > NOW() AND used = 0")->fetch_assoc();
+$reset_notification_count = $pending_resets['count'];
 
 // Only allow modifications if NOT a viewer
 if (!$is_viewer) {
@@ -131,6 +133,48 @@ $result = $conn->query("
             opacity: 0.5;
             pointer-events: none;
         }
+        /* Notification Bell Styles */
+        .notification-bell {
+            position: relative;
+            display: inline-block;
+            margin-right: 15px;
+        }
+        .notification-bell a {
+            color: #2c3e50;
+            text-decoration: none;
+            font-size: 1.5em;
+            position: relative;
+            display: inline-block;
+            transition: transform 0.2s;
+        }
+        .notification-bell a:hover {
+            transform: scale(1.05);
+        }
+        .notification-badge {
+            position: absolute;
+            top: -8px;
+            right: -12px;
+            background: #f44336;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 11px;
+            font-weight: bold;
+            min-width: 18px;
+            text-align: center;
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
     </style>
 </head>
 <body>
@@ -156,11 +200,22 @@ $result = $conn->query("
         <?php endif; ?>
         
         <div class="header">
-            <h1>Admin Panel 
-                <?php if ($is_viewer): ?>
-                    <span class="viewer-badge">Viewer Mode</span>
-                <?php endif; ?>
-            </h1>
+            <div class="header-title">
+                <!-- Notification Bell -->
+                <div class="notification-bell">
+                    <a href="reset_requests.php">
+                        🔔
+                        <?php if ($reset_notification_count > 0): ?>
+                            <span class="notification-badge"><?php echo $reset_notification_count; ?></span>
+                        <?php endif; ?>
+                    </a>
+                </div>
+                <h1>Admin Panel 
+                    <?php if ($is_viewer): ?>
+                        <span class="viewer-badge">Viewer Mode</span>
+                    <?php endif; ?>
+                </h1>
+            </div>
             <div class="nav">
                 <a href="../member/dashboard.php" class="btn back-btn">← Back to Dashboard</a>
                 <?php if (!$is_viewer): ?>
@@ -173,11 +228,17 @@ $result = $conn->query("
                     <button class="btn" style="background: #2E7D32;" onclick="toggleAdminMenu()">
                         👥 Admin ▼
                     </button>
-                    <div id="adminMenu" style="display: none; position: absolute; background: white; min-width: 200px; box-shadow: 0 8px 16px rgba(0,0,0,0.2); z-index: 1; border-radius: 5px; margin-top: 5px; right: 0;">
+                    <div id="adminMenu" style="display: none; position: absolute; background: white; min-width: 220px; box-shadow: 0 8px 16px rgba(0,0,0,0.2); z-index: 1; border-radius: 8px; margin-top: 5px; right: 0;">
                         <a href="manage_admins.php" style="color: #333; padding: 12px 16px; text-decoration: none; display: block; border-bottom: 1px solid #eee;">👥 Manage Admins</a>
                         <a href="manage_payments.php" style="color: #333; padding: 12px 16px; text-decoration: none; display: block; border-bottom: 1px solid #eee;">💳 Manage Payments</a>
-                        <a href="activity_log.php" style="color: #333; padding: 12px 16px; text-decoration: none; display: block;">📋 Activity Log</a>
-                        <a href="manage_feedback.php" style="color: #333; padding: 12px 16px; text-decoration: none; display: block; border-bottom: 1px solid #eee;">💬 Manage Feedback</a>
+                        <a href="reset_requests.php" style="color: #333; padding: 12px 16px; text-decoration: none; display: block; border-bottom: 1px solid #eee;">
+                            🔐 Password Resets
+                            <?php if ($reset_notification_count > 0): ?>
+                                <span style="background: #f44336; color: white; padding: 2px 6px; border-radius: 10px; font-size: 10px; margin-left: 8px;"><?php echo $reset_notification_count; ?></span>
+                            <?php endif; ?>
+                        </a>
+                        <a href="activity_log.php" style="color: #333; padding: 12px 16px; text-decoration: none; display: block; border-bottom: 1px solid #eee;">📋 Activity Log</a>
+                        <a href="manage_feedback.php" style="color: #333; padding: 12px 16px; text-decoration: none; display: block;">💬 Manage Feedback</a>
                     </div>
                 </div>
             </div>
@@ -212,8 +273,8 @@ $result = $conn->query("
                     <?php while ($row = $result->fetch_assoc()): ?>
                      <tr>
                         <td><?php echo $row['user_id']; ?></td>
-                        <td><?php echo $row['name']; ?></td>
-                        <td><?php echo $row['email']; ?></td>
+                        <td><?php echo htmlspecialchars($row['name']); ?></td>
+                        <td><?php echo htmlspecialchars($row['email']); ?></td>
                         <td><?php echo $row['is_returning_member'] ? 'Yes' : 'No'; ?></td>
                         <td><?php echo $row['needs_training'] ? 'Yes' : 'No'; ?></td>
                         <td><?php echo $row['terms_accepted'] ? 'Yes' : 'No'; ?></td>

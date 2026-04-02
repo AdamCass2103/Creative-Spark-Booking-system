@@ -27,28 +27,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $expires_at = date('Y-m-d H:i:s', strtotime('+1 hour'));
             
             // Delete any existing tokens for this email
-            $conn->query("DELETE FROM password_resets WHERE email = '$email'");
+            $conn->query("DELETE FROM password_resets WHERE email = '$email' AND used = 0");
             
             // Insert new token
-            $stmt = $conn->prepare("INSERT INTO password_resets (email, token, expires_at) VALUES (?, ?, ?)");
+            $stmt = $conn->prepare("INSERT INTO password_resets (email, token, expires_at, notified, created_at) VALUES (?, ?, ?, 0, NOW())");
             $stmt->bind_param("sss", $email, $token, $expires_at);
             
             if ($stmt->execute()) {
-                // Create reset link
-                $reset_link = SITE_URL . "/reset_password.php?token=" . $token;
-                
-                // Send email
-                sendResetEmail($email, $reset_link);
-                
+                // NO EMAIL SENT - Admin will handle it manually
                 $success = true;
-                $message = "If an account exists with that email, you will receive a password reset link shortly.";
+                $message = "✅ Reset request sent to Oscar. You'll receive your reset link shortly via email.";
             } else {
                 $error = "Something went wrong. Please try again.";
             }
         } else {
             // Don't reveal if email exists or not (security best practice)
             $success = true;
-            $message = "If an account exists with that email, you will receive a password reset link shortly.";
+            $message = "If an account exists with that email, Oscar will send you a reset link shortly.";
         }
     }
 }
@@ -83,13 +78,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             margin-bottom: 25px;
             font-size: 14px;
         }
+        .manual-note {
+            text-align: center;
+            background: #fff3cd;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #856404;
+        }
     </style>
 </head>
 <body>
     <div class="container" style="max-width: 400px;">
         <div class="login-icon">🔐</div>
         <h1>Forgot Password?</h1>
-        <div class="info-text">Enter your email address and we'll send you a link to reset your password.</div>
+        <div class="info-text">Enter your email address and Oscar will send you a reset link.</div>
         
         <?php if ($message): ?>
             <div class="message-box <?php echo $success ? 'success' : 'error'; ?>">
@@ -102,9 +106,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="form-group">
                 <input type="email" name="email" placeholder="Email Address" required style="width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px; font-size: 1em;">
             </div>
-            <button type="submit" class="btn" style="width: 100%;">Send Reset Link</button>
+            <button type="submit" class="btn" style="width: 100%;">Request Reset</button>
         </form>
         <?php endif; ?>
+        
+        <div class="manual-note">
+            ℹ️ Oscar will receive your request and email you a reset link manually.
+        </div>
         
         <div class="back-link">
             <a href="login.php">← Back to Login</a>
