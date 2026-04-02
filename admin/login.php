@@ -33,7 +33,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Log the login
                 logAdminActivity($admin['admin_id'], 'login', 'admin', $admin['admin_id'], 'Logged in');
                 
-                header('Location: admin.php');
+                // ========== REDIRECT BASED ON ROLE ==========
+                if ($admin['role'] === 'analyst') {
+                    header('Location: business_dashboard.php');
+                } else {
+                    header('Location: admin.php');
+                }
                 exit();
             } else {
                 $error = 'Invalid password';
