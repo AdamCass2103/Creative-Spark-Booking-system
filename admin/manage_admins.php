@@ -1,138 +1,256 @@
 <?php
 require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../includes/auth.php';
-require_once __DIR__ . '/../includes/functions.php';
 require_once __DIR__ . '/../includes/admin_functions.php';
-requireSuperAdmin(); // Only super admin can manage admins
+requireAdmin();
+
+// Only super admin can manage other admins
+$current_role = getCurrentAdminRole();
+if ($current_role !== 'super_admin') {
+    die("Access denied. Only Super Admins can manage admin users.");
+}
 
 $conn = getDatabaseConnection();
-if (!$conn) {
-    die("Database connection error. Please try again later.");
-}
+$message = '';
+$error = '';
 
-$admin_id = getCurrentAdminId();
-
-// Handle add admin
-if (isset($_POST['add_admin'])) {
+// Handle adding new admin
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_admin'])) {
     $name = $conn->real_escape_string($_POST['name']);
     $username = $conn->real_escape_string($_POST['username']);
-    $password = $_POST['password']; // In production, hash this!
-    $role = $_POST['role'];
+    $password = $_POST['password'];
+    $role = $conn->real_escape_string($_POST['role']);
     
-    $conn->query("INSERT INTO admin_users (name, username, password_hash, role) 
-                  VALUES ('$name', '$username', '$password', '$role')");
-    
-    logAdminActivity($admin_id, 'add_admin', 'admin', $conn->insert_id, "Added admin: $name");
-}
-
-// Handle delete admin
-if (isset($_POST['delete_admin'])) {
-    $target_admin_id = (int)$_POST['admin_id'];
-    if ($target_admin_id != $admin_id) { // Can't delete yourself
-        $admin = $conn->query("SELECT name FROM admin_users WHERE admin_id = $target_admin_id")->fetch_assoc();
-        $conn->query("DELETE FROM admin_users WHERE admin_id = $target_admin_id");
-        logAdminActivity($admin_id, 'delete_admin', 'admin', $target_admin_id, "Deleted admin: " . $admin['name']);
+    // Validate
+    if (empty($name) || empty($username) || empty($password)) {
+        $error = "Please fill in all fields.";
+    } elseif (strlen($password) < 6) {
+        $error = "Password must be at least 6 characters.";
+    } else {
+        // Check if username exists
+        $check = $conn->query("SELECT admin_id FROM admin_users WHERE username = '$username'");
+        if ($check->num_rows > 0) {
+            $error = "Username already exists.";
+        } else {
+            // For now, store plain text (match your existing system)
+            $hashed_password = $password; // Your system uses plain text
+            
+            $conn->query("INSERT INTO admin_users (name, username, password_hash, role) 
+                          VALUES ('$name', '$username', '$hashed_password', '$role')");
+            
+            if ($conn->affected_rows > 0) {
+                logAdminActivity(getCurrentAdminId(), 'add_admin', 'admin', $conn->insert_id, "Added new $role: $username");
+                $message = "Admin user added successfully!";
+            } else {
+                $error = "Failed to add admin user.";
+            }
+        }
     }
 }
 
-// Get all admins
-$admins = $conn->query("SELECT * FROM admin_users ORDER BY created_at DESC");
+// Handle deleting admin
+if (isset($_GET['delete']) && isset($_GET['id'])) {
+    $id = (int)$_GET['delete'];
+    // Don't allow deleting yourself
+    if ($id != getCurrentAdminId()) {
+        $admin = $conn->query("SELECT username FROM admin_users WHERE admin_id = $id")->fetch_assoc();
+        $conn->query("DELETE FROM admin_users WHERE admin_id = $id");
+        logAdminActivity(getCurrentAdminId(), 'delete_admin', 'admin', $id, "Deleted admin: {$admin['username']}");
+        $message = "Admin user deleted successfully!";
+    } else {
+        $error = "You cannot delete your own account.";
+    }
+}
+
+// Get all admin users
+$admins = $conn->query("SELECT admin_id, name, username, role, last_login, created_at FROM admin_users ORDER BY admin_id");
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Manage Admins</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Admins - Creative Spark</title>
     <link rel="stylesheet" href="../css/admin.css">
     <style>
-        .admin-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-        .admin-card {
+        .form-card {
             background: white;
-            padding: 20px;
+            padding: 25px;
             border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            border-left: 4px solid #2E7D32;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-        .admin-card.super {
-            border-left-color: #9c27b0;
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .btn-save {
+            background: #2E7D32;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .btn-save:hover {
+            background: #1B5E20;
         }
         .role-badge {
             display: inline-block;
             padding: 3px 10px;
             border-radius: 20px;
             font-size: 12px;
-            font-weight: bold;
-            background: #e8f5e9;
-            color: #2E7D32;
+            font-weight: 600;
         }
-        .role-badge.super {
-            background: #f3e5f5;
-            color: #9c27b0;
+        .role-super_admin { background: #9c27b0; color: white; }
+        .role-admin { background: #2196f3; color: white; }
+        .role-viewer { background: #ff9800; color: white; }
+        .role-analyst { background: #4caf50; color: white; }
+        .delete-btn {
+            background: #f44336;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 12px;
         }
-        .add-form {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 30px;
+        .delete-btn:hover {
+            background: #d32f2f;
+        }
+        .message {
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+        .role-select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>👥 Manage Administrators</h1>
+            <h1>👥 Manage Admin Users</h1>
             <div class="nav">
-                <a href="admin.php" class="btn back-btn">← Back to Admin Panel</a>
-                <a href="activity_log.php" class="btn">📋 Activity Log</a>
+                <a href="admin.php" class="btn back-btn">← Back to Admin</a>
             </div>
         </div>
+
+        <?php if ($message): ?>
+            <div class="message success">✅ <?php echo $message; ?></div>
+        <?php endif; ?>
         
+        <?php if ($error): ?>
+            <div class="message error">❌ <?php echo $error; ?></div>
+        <?php endif; ?>
+
         <!-- Add New Admin Form -->
-        <div class="add-form">
-            <h2>Add New Admin</h2>
+        <div class="form-card">
+            <h2>➕ Add New Admin User</h2>
             <form method="POST">
-                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
-                    <input type="text" name="name" placeholder="Full Name" required>
-                    <input type="text" name="username" placeholder="Username" required>
-                    <input type="password" name="password" placeholder="Password" required>
-                    <select name="role">
-                        <option value="admin">Admin</option>
-                        <option value="super_admin">Super Admin</option>
-                        <option value="viewer">Viewer</option>
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" name="name" required placeholder="e.g., John Smith">
+                </div>
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" name="username" required placeholder="e.g., johnsmith">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" name="password" required placeholder="Minimum 6 characters">
+                </div>
+                <div class="form-group">
+                    <label>Role</label>
+                    <select name="role" class="role-select">
+                        <option value="analyst">📊 Analyst - Business Dashboard only (read-only)</option>
+                        <option value="viewer">👁️ Viewer - Can view but not edit</option>
+                        <option value="admin">🔧 Admin - Full admin access</option>
+                        <option value="super_admin">⭐ Super Admin - Full access + can manage admins</option>
                     </select>
                 </div>
-                <button type="submit" name="add_admin" class="btn" style="margin-top: 10px;">➕ Add Admin</button>
+                <button type="submit" name="add_admin" class="btn-save">Create Admin User</button>
             </form>
         </div>
+
+        <!-- Existing Admins List -->
+        <div class="table-container">
+            <h2 style="padding: 15px 0 0 15px;">📋 Existing Admin Users</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Username</th>
+                        <th>Role</th>
+                        <th>Last Login</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php while ($admin = $admins->fetch_assoc()): ?>
+                        <?php 
+                        $role_class = '';
+                        switch($admin['role']) {
+                            case 'super_admin': $role_class = 'role-super_admin'; break;
+                            case 'admin': $role_class = 'role-admin'; break;
+                            case 'viewer': $role_class = 'role-viewer'; break;
+                            case 'analyst': $role_class = 'role-analyst'; break;
+                        }
+                        ?>
+                        <tr>
+                            <td><?php echo $admin['admin_id']; ?></td>
+                            <td><?php echo htmlspecialchars($admin['name']); ?></td>
+                            <td><?php echo htmlspecialchars($admin['username']); ?></td>
+                            <td><span class="role-badge <?php echo $role_class; ?>"><?php echo strtoupper(str_replace('_', ' ', $admin['role'])); ?></span></td>
+                            <td><?php echo $admin['last_login'] ? date('M j, Y', strtotime($admin['last_login'])) : 'Never'; ?></td>
+                            <td><?php echo date('M j, Y', strtotime($admin['created_at'])); ?></td>
+                            <td>
+                                <?php if ($admin['admin_id'] != getCurrentAdminId()): ?>
+                                    <a href="?delete=<?php echo $admin['admin_id']; ?>" class="delete-btn" onclick="return confirm('Delete this admin user?')">Delete</a>
+                                <?php else: ?>
+                                    <span style="color: #999;">(You)</span>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                    <?php endwhile; ?>
+                </tbody>
+            </table>
+        </div>
         
-        <!-- Admin List -->
-        <div class="admin-grid">
-            <?php if($admins): ?>
-                <?php while($admin = $admins->fetch_assoc()): ?>
-                <div class="admin-card <?php echo $admin['role'] == 'super_admin' ? 'super' : ''; ?>">
-                    <div style="display: flex; justify-content: space-between;">
-                        <h3><?php echo $admin['name']; ?></h3>
-                        <span class="role-badge <?php echo $admin['role'] == 'super_admin' ? 'super' : ''; ?>">
-                            <?php echo ucfirst($admin['role']); ?>
-                        </span>
-                    </div>
-                    <p style="color: #666; margin: 5px 0;">@<?php echo $admin['username']; ?></p>
-                    <p style="color: #999; font-size: 0.9em;">
-                        Last login: <?php echo $admin['last_login'] ? date('M j, Y', strtotime($admin['last_login'])) : 'Never'; ?>
-                    </p>
-                    <?php if($admin['admin_id'] != $admin_id && $admin['role'] != 'super_admin'): ?>
-                    <form method="POST" style="margin-top: 10px;">
-                        <input type="hidden" name="admin_id" value="<?php echo $admin['admin_id']; ?>">
-                        <button type="submit" name="delete_admin" class="btn" style="background: #f44336; padding: 5px 10px;">Delete</button>
-                    </form>
-                    <?php endif; ?>
-                </div>
-                <?php endwhile; ?>
-            <?php endif; ?>
+        <div style="margin-top: 20px; padding: 15px; background: #e3f2fd; border-radius: 8px;">
+            <h3 style="color: #1976d2; margin-bottom: 10px;">📌 Role Descriptions</h3>
+            <ul style="margin-left: 20px; color: #555;">
+                <li><strong>⭐ Super Admin</strong> - Full access to everything + can manage other admin users</li>
+                <li><strong>🔧 Admin</strong> - Full access to admin panel (users, bookings, payments)</li>
+                <li><strong>👁️ Viewer</strong> - Can view all data but cannot make changes</li>
+                <li><strong>📊 Analyst</strong> - Business dashboard only (financial stats, member activity - read only)</li>
+            </ul>
         </div>
     </div>
 </body>
