@@ -35,7 +35,8 @@ $admin_role = getCurrentAdminRole();
 $is_viewer = ($admin_role == 'viewer');
 
 // Get pending password reset requests count for notification bell
-$pending_resets = $conn->query("SELECT COUNT(*) as count FROM password_resets WHERE notified = 0 AND expires_at > NOW() AND used = 0")->fetch_assoc();
+// To this:
+$pending_resets = $conn->query("SELECT COUNT(*) as count FROM password_resets WHERE expires_at > NOW()")->fetch_assoc();
 $reset_notification_count = $pending_resets['count'];
 
 // Only allow modifications if NOT a viewer

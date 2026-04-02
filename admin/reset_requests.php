@@ -11,13 +11,13 @@ $error = '';
 // Handle generating reset link
 if (isset($_GET['generate']) && isset($_GET['id'])) {
     $id = (int)$_GET['id'];
-    $reset = $conn->query("SELECT email, token FROM password_resets WHERE id = $id AND used = 0 AND expires_at > NOW()")->fetch_assoc();
+    $reset = $conn->query("SELECT email, token FROM password_resets WHERE id = $id AND expires_at > NOW()")->fetch_assoc();
     
     if ($reset) {
         $reset_link = SITE_URL . "/reset_password.php?token=" . $reset['token'];
         
-        // Mark as notified (Oscar has seen it)
-        $conn->query("UPDATE password_resets SET notified = 1 WHERE id = $id");
+        // Delete the token so it can't be used again
+        $conn->query("DELETE FROM password_resets WHERE id = $id");
         
         $generated_link = $reset_link;
     } else {
@@ -25,23 +25,12 @@ if (isset($_GET['generate']) && isset($_GET['id'])) {
     }
 }
 
-// Mark as completed (after Oscar has sent the email)
-if (isset($_GET['complete']) && isset($_GET['id'])) {
-    $id = (int)$_GET['id'];
-    $conn->query("UPDATE password_resets SET used = 1 WHERE id = $id");
-    header("Location: reset_requests.php");
-    exit;
-}
-
-// Get all pending reset requests
+// Get all pending reset requests (not expired)
 $requests = $conn->query("
     SELECT * FROM password_resets 
-    WHERE expires_at > NOW() AND used = 0 
+    WHERE expires_at > NOW()
     ORDER BY created_at DESC
 ");
-
-// Get counts for badges
-$pending_count = $conn->query("SELECT COUNT(*) as count FROM password_resets WHERE notified = 0 AND expires_at > NOW() AND used = 0")->fetch_assoc();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -102,14 +91,6 @@ $pending_count = $conn->query("SELECT COUNT(*) as count FROM password_resets WHE
             font-size: 0.7em;
             margin-left: 10px;
         }
-        .status-new {
-            color: #ff9800;
-            font-weight: bold;
-        }
-        .status-sent {
-            color: #2E7D32;
-            font-weight: bold;
-        }
     </style>
 </head>
 <body>
@@ -117,8 +98,8 @@ $pending_count = $conn->query("SELECT COUNT(*) as count FROM password_resets WHE
         <div class="header">
             <h1>
                 🔐 Password Reset Requests
-                <?php if ($pending_count['count'] > 0): ?>
-                    <span class="badge-pending"><?php echo $pending_count['count']; ?> new</span>
+                <?php if ($requests && $requests->num_rows > 0): ?>
+                    <span class="badge-pending"><?php echo $requests->num_rows; ?> pending</span>
                 <?php endif; ?>
             </h1>
             <div class="nav">
@@ -138,9 +119,7 @@ $pending_count = $conn->query("SELECT COUNT(*) as count FROM password_resets WHE
                 <ol>
                     <li>Copy the link above</li>
                     <li>Email it to the user</li>
-                    <li>Click "Mark as Sent" below when done</li>
                 </ol>
-                <a href="?complete=1&id=<?php echo $_GET['id']; ?>" class="btn" style="background: #28a745;">✓ Mark as Sent</a>
             </div>
         <?php endif; ?>
 
@@ -157,7 +136,6 @@ $pending_count = $conn->query("SELECT COUNT(*) as count FROM password_resets WHE
                         <th>Email</th>
                         <th>Requested</th>
                         <th>Expires</th>
-                        <th>Status</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -169,24 +147,13 @@ $pending_count = $conn->query("SELECT COUNT(*) as count FROM password_resets WHE
                                 <td><?php echo date('M j, Y g:i A', strtotime($row['created_at'])); ?></td>
                                 <td><?php echo date('M j, Y g:i A', strtotime($row['expires_at'])); ?></td>
                                 <td>
-                                    <?php if ($row['notified']): ?>
-                                        <span class="status-sent">✓ Link Generated</span>
-                                    <?php else: ?>
-                                        <span class="status-new">⏳ Pending</span>
-                                    <?php endif; ?>
-                                </td>
-                                <td>
-                                    <?php if (!$row['notified']): ?>
-                                        <a href="?generate=1&id=<?php echo $row['id']; ?>" class="btn-small" style="background: #2E7D32;">Generate Link</a>
-                                    <?php else: ?>
-                                        <span style="color: #999;">Sent</span>
-                                    <?php endif; ?>
-                                </td>
+                                    <a href="?generate=1&id=<?php echo $row['id']; ?>" class="btn-small" style="background: #2E7D32;">Generate Link</a>
+                                 </td>
                             </tr>
                         <?php endwhile; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="5" style="text-align: center; padding: 40px;">
+                            <td colspan="4" style="text-align: center; padding: 40px;">
                                 No pending password reset requests.
                             </td>
                         </tr>

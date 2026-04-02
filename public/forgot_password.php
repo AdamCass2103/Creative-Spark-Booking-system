@@ -26,15 +26,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $token = bin2hex(random_bytes(32));
             $expires_at = date('Y-m-d H:i:s', strtotime('+1 hour'));
             
-            // Delete any existing tokens for this email
-            $conn->query("DELETE FROM password_resets WHERE email = '$email' AND used = 0");
+            // Delete any existing tokens for this email that are still valid
+            $conn->query("DELETE FROM password_resets WHERE email = '$email' AND expires_at > NOW()");
             
-            // Insert new token
-            $stmt = $conn->prepare("INSERT INTO password_resets (email, token, expires_at, notified, created_at) VALUES (?, ?, ?, 0, NOW())");
+            // Insert new token (without 'notified' column for compatibility)
+            $stmt = $conn->prepare("INSERT INTO password_resets (email, token, expires_at, created_at) VALUES (?, ?, ?, NOW())");
             $stmt->bind_param("sss", $email, $token, $expires_at);
             
             if ($stmt->execute()) {
-                // NO EMAIL SENT - Admin will handle it manually
                 $success = true;
                 $message = "✅ Reset request sent to Oscar. You'll receive your reset link shortly via email.";
             } else {
