@@ -1,6 +1,13 @@
 /* ========================================
    MANAGE ADMINS PAGE STYLES
    ======================================== */
+   body {
+    font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+    line-height: 1.5;
+    color: #2c3e50;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+    min-height: 100vh;
+}
 
    .form-card {
     background: white;
